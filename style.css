@@ -1,6 +1,5 @@
-/* style.css */
 body {
-  font-family: 'Century Gothic', sans-serif; /* Change the font-family to Century Gothic */
+  font-family: 'Century Gothic', Arial, sans-serif;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -10,24 +9,44 @@ body {
   background-color: #f0f0f0;
 }
 
-.wheel {
+.card-row {
   display: flex;
   flex-wrap: wrap;
-  width: 400px;
-}
-
-.slot {
-  width: 400px;
-  height: 400px;
   justify-content: center;
   align-items: center;
-  border: 1px solid black;
-  background-color: white;
-  display: none;
-  font-size: 72px;
-  transition: all 0.5s ease-in-out;
+  margin-top: 20px;
+  width: 700px; /* Adjust the width to accommodate 5 cards in a row */
 }
 
-button {
-  margin-top: 20px;
+.card {
+  width: 120px;
+  height: 120px;
+  margin: 5px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 24px;
+  background-color: white;
+  cursor: pointer;
+  user-select: none;
+  border: 1px solid #ccc;
+  box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+  transition: background-color 0.3s ease;
+  background-color: white;
+  color: transparent;
+}
+
+.card.flipped {
+  background-color: white;
+  color: black;
+  pointer-events: none;
+}
+
+.card.matched {
+  background-color: #3bb143; /* Change to your desired color for matched cards */
+  color: white;
+}
+
+#start-button {
+  margin-bottom: 20px;
 }
