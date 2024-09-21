@@ -1,7 +1,7 @@
 const sightWords = [
   'a', 'about', 'above', 'again', 'all', 'also', 'are', 'be', 'came', 'day',
   'do', 'does', 'for', 'go', 'he', 'her', 'his', 'how', 'I', 'in', 'into', 'is',
-  'it', 'know', 'many', 'name', 'not', 'now', 'of', 'on', ' one', 'over', 'said',
+  'it', 'know', 'many', 'name', 'not', 'now', 'of', 'on', 'one', 'over', 'said',
   'she', 'so', 'some', 'story', 'the', 'their', 'then', 'there', 'this', 'to',
   'too', 'want', 'was', 'were', 'what', 'when', 'white'
 ];
@@ -30,6 +30,7 @@ function shuffleSets() {
   return sets;
 }
 
+// Shuffle array helper
 function shuffleArray(array) {
   const shuffled = array.slice();
   for (let i = shuffled.length - 1; i > 0; i--) {
@@ -42,15 +43,14 @@ function shuffleArray(array) {
 // Create and append cards to the DOM
 function createCards() {
   cardContainer.innerHTML = '';
-  const set = shuffledSets[currentSet];
-  for (let word of set) {
+  const set = shuffleArray(shuffledSets[currentSet]);
+  set.forEach(word => {
     const card = document.createElement('div');
     card.classList.add('card');
     card.dataset.word = word;
-    card.textContent = 'Click to reveal';
     card.addEventListener('click', () => flipCard(card));
     cardContainer.appendChild(card);
-  }
+  });
 }
 
 // Handle card click event
@@ -64,20 +64,18 @@ function flipCard(card) {
       if (card1.dataset.word === card2.dataset.word) {
         matchedCards.push(card1, card2);
         flippedCards = [];
-        // Indicate correct match with background color
         card1.classList.add('matched');
         card2.classList.add('matched');
       } else {
         setTimeout(() => {
-          card1.textContent = 'Click to reveal';
-          card2.textContent = 'Click to reveal';
+          card1.textContent = '';
+          card2.textContent = '';
           flippedCards = [];
         }, 1000);
       }
     }
 
-    if (matchedCards.length === sightWords.length) {
-      // All cards are matched, go to the next set
+    if (matchedCards.length === shuffledSets[currentSet].length) {
       matchedCards = [];
       currentSet++;
       if (currentSet < shuffledSets.length) {
