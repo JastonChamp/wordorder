@@ -6,96 +6,42 @@ const sightWords = [
   'too', 'want', 'was', 'were', 'what', 'when', 'white'
 ];
 
-const cardContainer = document.querySelector('.card-row');
+let currentWordIndex = 0;
+let isSpinning = false;
+
+// Elements from the DOM
+const spinnerDisplay = document.getElementById('spinner-word');
 const startButton = document.getElementById('start-button');
-let flippedCards = [];
-let matchedCards = [];
-let shuffledSets = [];
-let currentSet = 0;
+const checkButton = document.getElementById('check-button');
+const inputField = document.getElementById('user-input');
 
-// Shuffle the sets of 5 words with 2 cards each
-function shuffleSets() {
-  const sets = [];
-  const wordsCopy = sightWords.slice();
-
-  while (wordsCopy.length > 0) {
-    const set = [];
-    for (let i = 0; i < 5; i++) {
-      const word = wordsCopy.pop();
-      set.push(word, word); // Add 2 cards with the same word
-    }
-    sets.push(set);
-  }
-
-  return sets;
-}
-
-// Shuffle array helper
-function shuffleArray(array) {
-  const shuffled = array.slice();
-  for (let i = shuffled.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
-  }
-  return shuffled;
-}
-
-// Create and append cards to the DOM
-function createCards() {
-  cardContainer.innerHTML = '';
-  const set = shuffleArray(shuffledSets[currentSet]);
-  set.forEach(word => {
-    const card = document.createElement('div');
-    card.classList.add('card');
-    card.dataset.word = word;
-    card.addEventListener('click', () => flipCard(card));
-    cardContainer.appendChild(card);
-  });
-}
-
-// Handle card click event
-function flipCard(card) {
-  if (flippedCards.length < 2 && !flippedCards.includes(card)) {
-    card.textContent = card.dataset.word;
-    flippedCards.push(card);
-
-    if (flippedCards.length === 2) {
-      const [card1, card2] = flippedCards;
-      if (card1.dataset.word === card2.dataset.word) {
-        matchedCards.push(card1, card2);
-        flippedCards = [];
-        card1.classList.add('matched');
-        card2.classList.add('matched');
-      } else {
-        setTimeout(() => {
-          card1.textContent = '';
-          card2.textContent = '';
-          flippedCards = [];
-        }, 1000);
-      }
-    }
-
-    if (matchedCards.length === shuffledSets[currentSet].length) {
-      matchedCards = [];
-      currentSet++;
-      if (currentSet < shuffledSets.length) {
-        startButton.textContent = 'Next Set of Words';
-        startButton.disabled = false;
-      } else {
-        startButton.textContent = 'Game Over';
-        startButton.disabled = true;
-      }
-    }
+// Initialize spinner game
+function startSpinner() {
+  if (!isSpinning) {
+    isSpinning = true;
+    currentWordIndex = Math.floor(Math.random() * sightWords.length); // Pick a random word
+    spinnerDisplay.textContent = sightWords[currentWordIndex]; // Display the word
+    inputField.value = ''; // Clear input field for new entry
+    isSpinning = false;
   }
 }
 
-// Handle start button click event
-startButton.addEventListener('click', () => {
-  startButton.disabled = true;
-  shuffledSets = shuffleSets();
-  currentSet = 0;
-  createCards();
-});
+// Check user input against the displayed word
+function checkAnswer() {
+  const userAnswer = inputField.value.trim().toLowerCase();
+  const correctAnswer = sightWords[currentWordIndex].toLowerCase();
 
-// Initialize the game
-createCards();
+  if (userAnswer === correctAnswer) {
+    alert("Correct!");
+    startSpinner(); // Spin for next word
+  } else {
+    alert("Incorrect! Try again.");
+  }
+}
+
+// Event listeners for buttons
+startButton.addEventListener('click', startSpinner);
+checkButton.addEventListener('click', checkAnswer);
+
+// Start the game with the first word
+startSpinner();
