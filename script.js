@@ -9,6 +9,7 @@ const sightWords = [
 ];
 
 let revealedWords = 0;  // Track how many words have been revealed
+let points = 0;  // Add a points counter
 const totalWords = sightWords.length;  // Total number of words
 let selectedVoice = null;  // This will store the selected female voice
 
@@ -19,14 +20,17 @@ document.addEventListener('DOMContentLoaded', () => {
     const progressFill = document.getElementById('progressFill');
     const progressText = document.getElementById('progressText');
     const complimentBox = document.getElementById('complimentBox');
+    const pointsBox = document.getElementById('points'); // Points box
 
     // Ensure all elements exist before proceeding
-    if (!wordDisplay || !spinButton || !progressFill || !progressText || !complimentBox) {
+    if (!wordDisplay || !spinButton || !progressFill || !progressText || !complimentBox || !pointsBox) {
         console.error('One or more DOM elements not found');
         return;
     }
 
     const compliments = ['Great job!', 'Fantastic!', 'Well done!', 'You did it!', 'Awesome!'];
+    const spinSound = new Audio('spin-sound.mp3');  // Add spin sound
+    const rewardSound = new Audio('reward-sound.mp3');  // Add reward sound
 
     // Select a female voice or fallback
     function setFemaleVoice() {
@@ -58,8 +62,15 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    // Load progress and points from localStorage if available
+    revealedWords = parseInt(localStorage.getItem('revealedWords')) || 0;
+    points = parseInt(localStorage.getItem('points')) || 0;
+    updateProgress();  // Update progress on load
+    pointsBox.textContent = points;  // Display points on load
+
     // Function to spin and select a random word
     function spinWord() {
+        spinSound.play();  // Play spin sound
         wordDisplay.classList.remove('shake');  // Remove any previous shake effect
         wordDisplay.textContent = '';  // Clear the display for the new word
         complimentBox.textContent = '';  // Clear any previous compliment
@@ -80,12 +91,28 @@ document.addEventListener('DOMContentLoaded', () => {
         // Speak the word using the Web Speech API
         speakWord(selectedWord);
 
+        // Add points (e.g., 10 points per word)
+        points += 10;
+        pointsBox.textContent = points;
+
         // Update the progress
         revealedWords++;
         updateProgress();
 
+        // Save progress and points to localStorage
+        localStorage.setItem('revealedWords', revealedWords);
+        localStorage.setItem('points', points);
+
+        // Play reward sound after word is revealed
+        rewardSound.play();
+
         // Show a compliment
         setTimeout(giveCompliment, 1000);  // Delay the compliment after word is spoken
+
+        // Trigger level-up animation if user reaches milestones
+        if (revealedWords === 10 || revealedWords === 20) {
+            triggerLevelUp();
+        }
     }
 
     // Function to speak the word using the selected female voice
@@ -123,8 +150,18 @@ document.addEventListener('DOMContentLoaded', () => {
         progressText.textContent = `${revealedWords} / ${totalWords} Words Revealed`;  // Update progress text
     }
 
+    // Function to trigger a level-up animation
+    function triggerLevelUp() {
+        const levelUpMessage = document.createElement('div');
+        levelUpMessage.classList.add('level-up');
+        levelUpMessage.textContent = 'Level Up!';
+        document.body.appendChild(levelUpMessage);
+
+        setTimeout(() => {
+            levelUpMessage.remove();  // Remove after showing
+        }, 2000);  // Show for 2 seconds
+    }
+
     // Add event listener for the spin button
     spinButton.addEventListener('click', spinWord);
-
-    console.log('Event listener added to spinButton');  // Log to confirm event listener is added
 });
