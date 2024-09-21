@@ -8,11 +8,11 @@ const sightWords = [
   'too', 'want', 'was', 'were', 'what', 'when', 'white'
 ];
 
-// Keep track of how many words have been revealed
+// Track words revealed
 let wordsRevealed = 0;
 const totalWords = sightWords.length;
 
-// Get references to the HTML elements
+// Get references to HTML elements
 const wordDisplay = document.getElementById('wordDisplay');
 const spinButton = document.getElementById('spinButton');
 const progressFill = document.getElementById('progressFill');
@@ -20,15 +20,23 @@ const progressText = document.getElementById('progressText');
 
 // Function to randomly pick a word and display it
 function spinWord() {
-  const randomIndex = Math.floor(Math.random() * sightWords.length);
-  const selectedWord = sightWords[randomIndex];
-  wordDisplay.textContent = selectedWord;
-  sightWords.splice(randomIndex, 1); // Remove revealed word from the array
-  
-  // Update progress
-  wordsRevealed++;
-  updateProgress();
-  speakWord(selectedWord);
+  if (sightWords.length > 0) {
+    const randomIndex = Math.floor(Math.random() * sightWords.length);
+    const selectedWord = sightWords[randomIndex];
+    wordDisplay.textContent = selectedWord;
+
+    // Remove revealed word from the array
+    sightWords.splice(randomIndex, 1);
+
+    // Update progress
+    wordsRevealed++;
+    updateProgress();
+    
+    // Speak the word aloud
+    speakWord(selectedWord);
+  } else {
+    wordDisplay.textContent = "All words revealed!";
+  }
 }
 
 // Function to use Web Speech API to read the word
