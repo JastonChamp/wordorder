@@ -1,65 +1,116 @@
+/* General Styles */
 body {
-    font-family: 'Comic Sans MS', 'Comic Sans', cursive;
+    font-family: 'Comic Sans MS', cursive, sans-serif;
+    background-color: #e0f7fa;
     display: flex;
-    flex-direction: column;
     justify-content: center;
     align-items: center;
     height: 100vh;
     margin: 0;
-    background-color: #e0f7fa;
 }
 
 .spinner-container {
     text-align: center;
-    background-color: white;
-    padding: 40px;
-    border-radius: 10px;
-    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 15px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
 
-.word-display {
-    font-size: 48px;
-    margin-bottom: 30px;
-    color: #000;
-}
-
+/* Spin Button */
 .spin-button {
-    font-family: 'Comic Sans MS', 'Comic Sans', cursive;
-    font-size: 24px;
-    padding: 15px 30px;
-    background-color: #4CAF50;
-    color: white;
+    padding: 10px 20px;
+    background-color: #4CAF50; /* Green */
     border: none;
-    border-radius: 5px;
-    cursor: pointer;
+    color: white;
+    text-align: center;
+    font-size: 20px;
+    border-radius: 10px;
+    transition: all 0.2s ease-in-out;
+    box-shadow: 0 4px #999;  /* Add shadow */
 }
 
 .spin-button:hover {
-    background-color: #45a049;
+    background-color: #45a049; /* Darker Green on hover */
+    transform: scale(1.1); /* Slight enlarge on hover */
 }
 
+.spin-button:active {
+    background-color: #3e8e41;
+    box-shadow: 0 2px #666;
+    transform: translateY(4px); /* Button click effect */
+}
+
+/* Word Display */
+.word-display {
+    font-size: 36px;
+    color: #333;
+    margin-bottom: 20px;
+}
+
+/* Progress Bar */
 .progress-bar {
     width: 80%;
-    background-color: #ddd;
     height: 15px;
-    border-radius: 5px;
-    margin-top: 30px;
+    background-color: #ddd;
+    border-radius: 7px;
+    margin: 20px auto;
 }
 
 .progress-fill {
-    height: 15px;
-    background-color: #4CAF50;
-    border-radius: 5px;
+    height: 100%;
     width: 0;
+    background: linear-gradient(to right, red, green);  /* Color transition */
+    transition: width 0.3s ease-in-out;  /* Smooth progress fill */
+    border-radius: 7px;  /* Rounded corners */
 }
 
+/* Progress Text */
 .progress-text {
-    margin-top: 10px;
+    margin: 10px 0;
     font-size: 18px;
 }
 
+/* Compliment Box */
 #complimentBox {
-    margin-top: 15px;
     font-size: 30px;
     color: green;
+    font-weight: bold;
+    text-align: center;
+    animation: fadeInUp 0.8s ease-in-out;  /* Compliment fade-in */
+}
+
+@keyframes fadeInUp {
+    0% {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Points Box */
+.points-box {
+    font-size: 20px;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 20px;
+}
+
+/* Level Up Animation */
+@keyframes levelUp {
+    0% { opacity: 0; transform: scale(0.5); }
+    100% { opacity: 1; transform: scale(1.2); }
+}
+
+.level-up {
+    font-size: 50px;
+    color: gold;
+    animation: levelUp 1s ease-out;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
 }
