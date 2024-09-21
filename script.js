@@ -11,70 +11,80 @@ const sightWords = [
 let revealedWords = 0;
 const totalWords = sightWords.length;
 
+// Ensure the DOM is fully loaded
 document.addEventListener('DOMContentLoaded', () => {
-  const wordDisplay = document.getElementById('wordDisplay');
-  const spinButton = document.getElementById('spinButton');
-  const progressFill = document.getElementById('progressFill');
-  const progressText = document.getElementById('progressText');
-  const complimentBox = document.getElementById('complimentBox');
+    console.log('DOM fully loaded');  // Debugging log
 
-  const compliments = ['Great job!', 'Fantastic!', 'Well done!', 'You did it!', 'Awesome!'];
+    const wordDisplay = document.getElementById('wordDisplay');
+    const spinButton = document.getElementById('spinButton');
+    const progressFill = document.getElementById('progressFill');
+    const progressText = document.getElementById('progressText');
+    const complimentBox = document.getElementById('complimentBox');
+
+    console.log('DOM Elements:', { wordDisplay, spinButton, progressFill, progressText, complimentBox });  // Check elements
+
+    const compliments = ['Great job!', 'Fantastic!', 'Well done!', 'You did it!', 'Awesome!'];
   
-  // Function to spin and select a random word
-  function spinWord() {
-    // Reset UI
-    wordDisplay.classList.remove('shake');
-    wordDisplay.textContent = '';
-    complimentBox.textContent = '';
+    // Function to spin and select a random word
+    function spinWord() {
+        console.log('Spin button clicked');  // Debugging log
 
-    // Add shake effect
-    wordDisplay.classList.add('shake');
-    setTimeout(() => {
-        wordDisplay.classList.remove('shake'); // Remove shake effect after animation
-    }, 500);
+        // Reset UI
+        wordDisplay.classList.remove('shake');
+        wordDisplay.textContent = '';
+        complimentBox.textContent = '';
 
-    // Select a random word
-    const randomIndex = Math.floor(Math.random() * sightWords.length);
-    const selectedWord = sightWords[randomIndex];
-    wordDisplay.textContent = selectedWord;
+        // Add shake effect
+        wordDisplay.classList.add('shake');
+        setTimeout(() => {
+            wordDisplay.classList.remove('shake'); // Remove shake effect after animation
+        }, 500);
 
-    // Remove the revealed word from the array to avoid repetition
-    sightWords.splice(randomIndex, 1);
+        // Select a random word
+        const randomIndex = Math.floor(Math.random() * sightWords.length);
+        const selectedWord = sightWords[randomIndex];
+        wordDisplay.textContent = selectedWord;
 
-    // Speak the word aloud
-    speakWord(selectedWord);
+        // Remove the revealed word from the array to avoid repetition
+        sightWords.splice(randomIndex, 1);
 
-    // Update progress
-    revealedWords++;
-    updateProgress();
+        // Speak the word aloud
+        speakWord(selectedWord);
 
-    // Show compliment after speaking
-    setTimeout(giveCompliment, 1000);
-  }
+        // Update progress
+        revealedWords++;
+        updateProgress();
 
-  // Function to speak the word using Web Speech API
-  function speakWord(word) {
-    const utterance = new SpeechSynthesisUtterance(word);
-    window.speechSynthesis.speak(utterance);
-  }
+        // Show compliment after speaking
+        setTimeout(giveCompliment, 1000);
+    }
 
-  // Function to show a random compliment
-  function giveCompliment() {
-    const compliment = compliments[Math.floor(Math.random() * compliments.length)];
-    complimentBox.textContent = compliment;
+    // Function to speak the word using Web Speech API
+    function speakWord(word) {
+        const utterance = new SpeechSynthesisUtterance(word);
+        window.speechSynthesis.speak(utterance);
+    }
 
-    // Speak the compliment
-    const utterance = new SpeechSynthesisUtterance(compliment);
-    window.speechSynthesis.speak(utterance);
-  }
+    // Function to show a random compliment
+    function giveCompliment() {
+        const compliment = compliments[Math.floor(Math.random() * compliments.length)];
+        complimentBox.textContent = compliment;
 
-  // Function to update the progress bar and text
-  function updateProgress() {
-    const progressPercentage = (revealedWords / totalWords) * 100;
-    progressFill.style.width = progressPercentage + '%';
-    progressText.textContent = `${revealedWords} / ${totalWords} Words Revealed`;
-  }
+        // Speak the compliment
+        const utterance = new SpeechSynthesisUtterance(compliment);
+        window.speechSynthesis.speak(utterance);
+    }
 
-  // Add event listener to the spin button
-  spinButton.addEventListener('click', spinWord);
+    // Function to update the progress bar and text
+    function updateProgress() {
+        const progressPercentage = (revealedWords / totalWords) * 100;
+        progressFill.style.width = progressPercentage + '%';
+        progressText.textContent = `${revealedWords} / ${totalWords} Words Revealed`;
+    }
+
+    // Add event listener to the spin button
+    spinButton.addEventListener('click', spinWord);
+
+    // Check if the event listener was successfully added
+    console.log('Event listener added to spinButton');
 });
