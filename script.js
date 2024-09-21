@@ -1,3 +1,5 @@
+// JavaScript: spinner.js
+
 const sightWords = [
   'a', 'about', 'above', 'again', 'all', 'also', 'are', 'be', 'came', 'day',
   'do', 'does', 'for', 'go', 'he', 'her', 'his', 'how', 'I', 'in', 'into', 'is',
@@ -6,42 +8,41 @@ const sightWords = [
   'too', 'want', 'was', 'were', 'what', 'when', 'white'
 ];
 
-let currentWordIndex = 0;
-let isSpinning = false;
+// Keep track of how many words have been revealed
+let wordsRevealed = 0;
+const totalWords = sightWords.length;
 
-// Elements from the DOM
-const spinnerDisplay = document.getElementById('spinner-word');
-const startButton = document.getElementById('start-button');
-const checkButton = document.getElementById('check-button');
-const inputField = document.getElementById('user-input');
+// Get references to the HTML elements
+const wordDisplay = document.getElementById('wordDisplay');
+const spinButton = document.getElementById('spinButton');
+const progressFill = document.getElementById('progressFill');
+const progressText = document.getElementById('progressText');
 
-// Initialize spinner game
-function startSpinner() {
-  if (!isSpinning) {
-    isSpinning = true;
-    currentWordIndex = Math.floor(Math.random() * sightWords.length); // Pick a random word
-    spinnerDisplay.textContent = sightWords[currentWordIndex]; // Display the word
-    inputField.value = ''; // Clear input field for new entry
-    isSpinning = false;
-  }
+// Function to randomly pick a word and display it
+function spinWord() {
+  const randomIndex = Math.floor(Math.random() * sightWords.length);
+  const selectedWord = sightWords[randomIndex];
+  wordDisplay.textContent = selectedWord;
+  sightWords.splice(randomIndex, 1); // Remove revealed word from the array
+  
+  // Update progress
+  wordsRevealed++;
+  updateProgress();
+  speakWord(selectedWord);
 }
 
-// Check user input against the displayed word
-function checkAnswer() {
-  const userAnswer = inputField.value.trim().toLowerCase();
-  const correctAnswer = sightWords[currentWordIndex].toLowerCase();
-
-  if (userAnswer === correctAnswer) {
-    alert("Correct!");
-    startSpinner(); // Spin for next word
-  } else {
-    alert("Incorrect! Try again.");
-  }
+// Function to use Web Speech API to read the word
+function speakWord(word) {
+  const utterance = new SpeechSynthesisUtterance(word);
+  speechSynthesis.speak(utterance);
 }
 
-// Event listeners for buttons
-startButton.addEventListener('click', startSpinner);
-checkButton.addEventListener('click', checkAnswer);
+// Function to update the progress bar and text
+function updateProgress() {
+  const progressPercentage = (wordsRevealed / totalWords) * 100;
+  progressFill.style.width = progressPercentage + '%';
+  progressText.textContent = `${wordsRevealed} / ${totalWords} Words Revealed`;
+}
 
-// Start the game with the first word
-startSpinner();
+// Add event listener to the spin button
+spinButton.addEventListener('click', spinWord);
