@@ -20,9 +20,11 @@ const progressText = document.getElementById('progressText');
 
 // Function to randomly pick a word and display it
 function spinWord() {
+  console.log('Spin button clicked');  // Debugging line
   if (sightWords.length > 0) {
     const randomIndex = Math.floor(Math.random() * sightWords.length);
     const selectedWord = sightWords[randomIndex];
+    console.log('Selected word:', selectedWord);  // Debugging line
     wordDisplay.textContent = selectedWord;
 
     // Remove revealed word from the array
@@ -52,5 +54,7 @@ function updateProgress() {
   progressText.textContent = `${wordsRevealed} / ${totalWords} Words Revealed`;
 }
 
-// Add event listener to the spin button
-spinButton.addEventListener('click', spinWord);
+// Add event listener after window load to ensure DOM is ready
+window.onload = function() {
+  spinButton.addEventListener('click', spinWord);
+};
