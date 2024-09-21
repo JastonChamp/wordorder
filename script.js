@@ -22,6 +22,14 @@ document.addEventListener('DOMContentLoaded', () => {
     const complimentBox = document.getElementById('complimentBox');
     const pointsBox = document.getElementById('points'); // Points box
 
+    // Debugging: Log each element to see which one is missing
+    console.log('wordDisplay:', wordDisplay);
+    console.log('spinButton:', spinButton);
+    console.log('progressFill:', progressFill);
+    console.log('progressText:', progressText);
+    console.log('complimentBox:', complimentBox);
+    console.log('pointsBox:', pointsBox);
+
     // Ensure all elements exist before proceeding
     if (!wordDisplay || !spinButton || !progressFill || !progressText || !complimentBox || !pointsBox) {
         console.error('One or more DOM elements not found');
