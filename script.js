@@ -8,12 +8,11 @@ const sightWords = [
   'too', 'want', 'was', 'were', 'what', 'when', 'white'
 ];
 
-let revealedWords = 0;  // Track how many words have been revealed
+let revealedWords = 0;  // Track revealed words
 const totalWords = sightWords.length;  // Total number of words
+let selectedVoice = null;  // This will store the selected female voice
 
 document.addEventListener('DOMContentLoaded', () => {
-    console.log('DOM fully loaded');  // Debugging log to confirm DOM is loaded
-
     const wordDisplay = document.getElementById('wordDisplay');
     const spinButton = document.getElementById('spinButton');
     const progressFill = document.getElementById('progressFill');
@@ -21,69 +20,102 @@ document.addEventListener('DOMContentLoaded', () => {
     const complimentBox = document.getElementById('complimentBox');
 
     const compliments = ['Great job!', 'Fantastic!', 'Well done!', 'You did it!', 'Awesome!'];
-  
+
+    // Select a female voice or fallback
+    function setFemaleVoice() {
+        const voices = window.speechSynthesis.getVoices();
+        
+        // Attempt to find a specific female voice (Google UK Female)
+        selectedVoice = voices.find(voice => 
+            voice.name.includes('Google UK English Female') || voice.name.includes('female')
+        );
+
+        // Fallback to first available voice if no female voice is found
+        if (!selectedVoice && voices.length > 0) {
+            selectedVoice = voices[0];
+        }
+
+        // Safari-specific fallback: retry loading voices if none are found
+        if (voices.length === 0) {
+            console.log("No voices found, retrying...");
+            setTimeout(setFemaleVoice, 500);
+        }
+    }
+
+    // Load voices when the speech synthesis API changes
+    if ('speechSynthesis' in window) {
+        if (speechSynthesis.onvoiceschanged !== undefined) {
+            speechSynthesis.onvoiceschanged = setFemaleVoice;
+        } else {
+            setFemaleVoice();  // Fallback for older browsers
+        }
+    }
+
     // Function to spin and select a random word
     function spinWord() {
-        console.log('Spin button clicked');  // Debugging log to check button click
-
-        // Reset UI for each new spin
         wordDisplay.classList.remove('shake');
-        wordDisplay.textContent = '';  // Clear the word display
-        complimentBox.textContent = '';  // Clear the compliment box
+        wordDisplay.textContent = '';  // Clear previous word
+        complimentBox.textContent = '';  // Clear previous compliment
 
-        // Add shake effect for a little animation
         wordDisplay.classList.add('shake');
         setTimeout(() => {
-            wordDisplay.classList.remove('shake');  // Remove shake after a short delay
+            wordDisplay.classList.remove('shake');  // Remove shake effect
         }, 500);
 
-        // Select a random word from the array
+        // Select a random word
         const randomIndex = Math.floor(Math.random() * sightWords.length);
         const selectedWord = sightWords[randomIndex];
-        console.log('Selected Word:', selectedWord);  // Debugging log to show selected word
         wordDisplay.textContent = selectedWord;
 
-        // Remove the revealed word from the array so it isn't repeated
+        // Remove revealed word from array
         sightWords.splice(randomIndex, 1);
 
-        // Speak the word using the Web Speech API
+        // Speak the word
         speakWord(selectedWord);
 
-        // Update the progress bar and text
+        // Update progress
         revealedWords++;
         updateProgress();
 
-        // Show a compliment after speaking the word
-        setTimeout(giveCompliment, 1000);  // Delay before showing compliment
+        // Show compliment
+        setTimeout(giveCompliment, 1000);
     }
 
-    // Function to speak the word using the Web Speech API
+    // Function to speak the word using the selected female voice
     function speakWord(word) {
         const utterance = new SpeechSynthesisUtterance(word);
-        console.log('Speaking Word:', word);  // Debugging log to confirm speaking
-        window.speechSynthesis.speak(utterance);  // Speak the word aloud
+        utterance.rate = 0.8;  // Adjust the rate for clarity
+        utterance.pitch = 1.1; // Adjust the pitch for a pleasant tone
+        utterance.volume = 0.9;  // Set volume
+
+        // If a female voice is selected, use it
+        if (selectedVoice) {
+            utterance.voice = selectedVoice;
+        }
+
+        window.speechSynthesis.speak(utterance);
     }
 
-    // Function to show a random compliment after revealing a word
+    // Function to show a random compliment
     function giveCompliment() {
         const compliment = compliments[Math.floor(Math.random() * compliments.length)];
         complimentBox.textContent = compliment;
 
         // Speak the compliment
         const utterance = new SpeechSynthesisUtterance(compliment);
+        if (selectedVoice) {
+            utterance.voice = selectedVoice;  // Use the same female voice for compliments
+        }
         window.speechSynthesis.speak(utterance);
     }
 
     // Function to update the progress bar and text
     function updateProgress() {
         const progressPercentage = (revealedWords / totalWords) * 100;
-        console.log('Progress Updated:', `${revealedWords} / ${totalWords} Words Revealed`);  // Log progress
-        progressFill.style.width = progressPercentage + '%';  // Update progress bar width
-        progressText.textContent = `${revealedWords} / ${totalWords} Words Revealed`;  // Update progress text
+        progressFill.style.width = progressPercentage + '%';
+        progressText.textContent = `${revealedWords} / ${totalWords} Words Revealed`;
     }
 
-    // Add event listener to the spin button
+    // Event listener for spin button
     spinButton.addEventListener('click', spinWord);
-
-    console.log('Event listener added to spinButton');  // Log to confirm event listener is added
 });
