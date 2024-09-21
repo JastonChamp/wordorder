@@ -1,83 +1,76 @@
-/* Basic body setup */
-body {
-  font-family: 'Century Gothic', Arial, sans-serif;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-  margin: 0;
-  background-color: #f0f0f0;
-}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sight Word Spinner</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #e0f7fa;
+        }
+        .spinner-container {
+            text-align: center;
+            background-color: white;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+        }
+        .word-display {
+            font-size: 48px;
+            margin-bottom: 30px;
+            color: #000;
+        }
+        .spin-button {
+            font-size: 24px;
+            padding: 15px 30px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .spin-button:hover {
+            background-color: #45a049;
+        }
+        .progress-bar {
+            width: 80%;
+            background-color: #ddd;
+            height: 15px;
+            border-radius: 5px;
+            margin-top: 30px;
+        }
+        .progress-fill {
+            height: 15px;
+            background-color: #4CAF50;
+            border-radius: 5px;
+            width: 0;
+        }
+        .progress-text {
+            margin-top: 10px;
+            font-size: 18px;
+        }
+    </style>
+</head>
+<body>
 
-/* Center game container */
-.game-container {
-  text-align: center;
-  background-color: white;
-  padding: 30px;
-  border-radius: 10px;
-  box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.2);
-}
+    <div class="spinner-container">
+        <h2>Great job!</h2>
+        <div class="word-display" id="wordDisplay">Press Spin to start</div>
+        <button class="spin-button" id="spinButton">Spin</button>
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressFill"></div>
+        </div>
+        <div class="progress-text" id="progressText">0 / 145 Words Revealed</div>
+    </div>
 
-/* Heading style */
-h1 {
-  font-size: 2rem;
-  color: #333;
-  margin-bottom: 20px;
-}
+    <script src="spinner.js"></script>
 
-/* Instruction text */
-#instruction {
-  font-size: 1.2rem;
-  margin-bottom: 20px;
-  color: #555;
-}
-
-/* Spinner word display */
-.spinner-word {
-  font-size: 3rem;
-  color: #007bff;
-  margin-bottom: 20px;
-  background-color: #89cff0;
-  padding: 20px;
-  border-radius: 5px;
-  border: 2px solid #ccc;
-  width: 300px;
-  display: inline-block;
-  transition: background-color 0.3s ease;
-}
-
-/* Input field for user answer */
-input[type="text"] {
-  font-size: 1.2rem;
-  padding: 10px;
-  width: 300px;
-  margin-bottom: 20px;
-  border-radius: 5px;
-  border: 1px solid #ccc;
-}
-
-/* Control buttons */
-.controls {
-  margin-top: 20px;
-}
-
-button {
-  padding: 10px 20px;
-  background-color: #007bff;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  margin: 5px;
-  font-size: 1rem;
-}
-
-button:hover {
-  background-color: #0056b3;
-}
-
-/* Disabled state for buttons */
-button:disabled {
-  background-color: #ccc;
-  cursor: not-allowed;
-}
+</body>
+</html>
