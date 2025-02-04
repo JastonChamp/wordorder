@@ -110,8 +110,8 @@ let puzzles = [];
 function speak(text) {
   if ('speechSynthesis' in window) {
     const utterance = new SpeechSynthesisUtterance(text);
-    utterance.rate = 1; // Normal speed
-    utterance.pitch = 1; // Normal pitch
+    utterance.rate = 1;   // Adjust rate for clarity (1 = normal speed)
+    utterance.pitch = 1;  // Adjust pitch as desired
     window.speechSynthesis.speak(utterance);
   } else {
     console.warn("Speech Synthesis API is not supported in this browser.");
@@ -129,7 +129,7 @@ function shuffle(array) {
   return array;
 }
 
-/* === Puzzle Generation === */
+/* === Generate Puzzle Containers === */
 function generatePuzzles() {
   const shuffledSentences = shuffle([...sentencePool]);
   const selectedSentences = shuffledSentences.slice(0, numPuzzles);
@@ -166,14 +166,28 @@ function generatePuzzles() {
     dropZone.setAttribute("role", "list");
     puzzleDiv.appendChild(dropZone);
 
-    // Optional "Listen" button for instructions
-    const listenButton = document.createElement("button");
-    listenButton.className = "listen-btn";
-    listenButton.innerText = "Listen";
-    listenButton.addEventListener("click", () => {
-      speak(`Arrange the words to form a sentence. When you're finished, click Check Answers.`);
+    // Button to listen to puzzle instructions
+    const listenInstrButton = document.createElement("button");
+    listenInstrButton.className = "listen-btn";
+    listenInstrButton.innerText = "Listen Instructions";
+    listenInstrButton.addEventListener("click", () => {
+      speak("Arrange the words to form a correct sentence. Drag words from the word bank to the drop zone. When you are ready, click Check Answers.");
     });
-    puzzleDiv.appendChild(listenButton);
+    puzzleDiv.appendChild(listenInstrButton);
+
+    // Button to read the current word bank aloud
+    const readWordsButton = document.createElement("button");
+    readWordsButton.className = "read-words-btn";
+    readWordsButton.innerText = "Read Word Bank";
+    readWordsButton.addEventListener("click", () => {
+      const words = Array.from(wordBank.children).map(w => w.innerText);
+      if (words.length > 0) {
+        speak("The words are: " + words.join(", "));
+      } else {
+        speak("The word bank is empty. Please drag words into the drop zone.");
+      }
+    });
+    puzzleDiv.appendChild(readWordsButton);
 
     puzzle.container = puzzleDiv;
     puzzlesContainer.appendChild(puzzleDiv);
@@ -226,14 +240,14 @@ function initializeGame() {
     const wordBank = container.querySelector(".word-bank");
     const dropZone = container.querySelector(".drop-zone");
 
-    // Clear any previous content
+    // Clear previous content (in case of reset)
     wordBank.innerHTML = "";
     dropZone.innerHTML = "";
 
-    // Shuffle words and create draggable word elements
+    // Shuffle words for this puzzle and create draggable elements
     const wordsShuffled = shuffle([...puzzle.correct]);
     wordsShuffled.forEach(word => {
-      let wordDiv = document.createElement("div");
+      const wordDiv = document.createElement("div");
       wordDiv.className = "word";
       wordDiv.setAttribute("role", "listitem");
       wordDiv.draggable = true;
@@ -243,7 +257,7 @@ function initializeGame() {
       wordBank.appendChild(wordDiv);
     });
 
-    // Add event listeners for drop zones
+    // Add event listeners to word bank and drop zone
     [wordBank, dropZone].forEach(zone => {
       zone.addEventListener("dragover", handleDragOver);
       zone.addEventListener("dragleave", handleDragLeave);
@@ -252,7 +266,7 @@ function initializeGame() {
   });
 }
 
-/* === Check Answers & Provide Feedback === */
+/* === Check Answers & Feedback === */
 function checkAnswers() {
   let totalCorrect = 0;
   puzzles.forEach(puzzle => {
@@ -267,7 +281,7 @@ function checkAnswers() {
       word.classList.remove("correct", "incorrect");
     });
 
-    // Apply highlighting
+    // Apply visual feedback per word
     Array.from(dropZone.children).forEach((word, index) => {
       if (word.innerText === correctWords[index]) {
         word.classList.add("correct");
@@ -278,8 +292,8 @@ function checkAnswers() {
 
     if (isCorrect) {
       totalCorrect++;
-      // Speak out the correct sentence as positive reinforcement
-      speak(`Great job! The sentence is: ${correctWords.join(" ")}`);
+      // Positive reinforcement: read the correct sentence aloud
+      speak("Great job! The sentence is: " + correctWords.join(" "));
     }
   });
   document.getElementById("score").innerText = `You got ${totalCorrect} out of ${puzzles.length} sentences correct!`;
@@ -293,8 +307,8 @@ function resetGame() {
   initializeGame();
 }
 
-/* === Event Listeners === */
-// Listen Instructions button
+/* === Global Event Listeners === */
+// Listen to header instructions
 document.getElementById("listen-instructions-btn").addEventListener("click", () => {
   const instructions = document.querySelector("p.instructions").innerText;
   speak(instructions);
@@ -304,5 +318,5 @@ document.getElementById("listen-instructions-btn").addEventListener("click", () 
 document.getElementById("check-btn").addEventListener("click", checkAnswers);
 document.getElementById("reset-btn").addEventListener("click", resetGame);
 
-// Initialize the game when the DOM is ready
+// Initialize game when the DOM is ready
 document.addEventListener("DOMContentLoaded", initializeGame);
