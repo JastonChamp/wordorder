@@ -206,6 +206,7 @@ function initializeGame() {
     // Shuffle the words for this puzzle and create draggable word elements
     let wordsShuffled = shuffle([...puzzle.correct]);
     wordsShuffled.forEach(word => {
+      // Debug: console.log("Creating word:", word);
       let wordDiv = document.createElement("div");
       wordDiv.className = "word";
       wordDiv.draggable = true;
@@ -233,13 +234,13 @@ function checkAnswers() {
     const correctWords = puzzle.correct;
     let isCorrect = (userWords.join(" ") === correctWords.join(" "));
 
-    // Remove previous highlighting
-    dropZone.childNodes.forEach(word => {
+    // Remove previous highlighting using only element children
+    Array.from(dropZone.children).forEach(word => {
       word.classList.remove("correct", "incorrect");
     });
 
     // Highlight correct and incorrect words
-    dropZone.childNodes.forEach((word, index) => {
+    Array.from(dropZone.children).forEach((word, index) => {
       if (word.innerText === correctWords[index]) {
         word.classList.add("correct");
       } else {
@@ -264,5 +265,5 @@ function resetGame() {
 document.getElementById("check-btn").addEventListener("click", checkAnswers);
 document.getElementById("reset-btn").addEventListener("click", resetGame);
 
-// Initialize the game on page load
-window.addEventListener("load", initializeGame);
+// Initialize the game when the DOM is ready
+document.addEventListener("DOMContentLoaded", initializeGame);
