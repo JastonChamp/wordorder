@@ -1,175 +1,268 @@
-// JavaScript: spinner.js
-
-const sightWords = [
-  'a', 'about', 'above', 'again', 'all', 'also', 'are', 'be', 'came', 'day',
-  'do', 'does', 'for', 'go', 'he', 'her', 'his', 'how', 'I', 'in', 'into', 'is',
-  'it', 'know', 'many', 'name', 'not', 'now', 'of', 'on', 'one', 'over', 'said',
-  'she', 'so', 'some', 'story', 'the', 'their', 'then', 'there', 'this', 'to',
-  'too', 'want', 'was', 'were', 'what', 'when', 'white'
+// A larger pool of 100 sentences to train word order variety
+const sentencePool = [
+  "The cat sat on the mat.",
+  "A big red balloon floated in the sky.",
+  "I enjoy reading my favorite storybook.",
+  "My friend and I play soccer after school.",
+  "The sun shines brightly on a warm day.",
+  "Birds chirp melodiously in the early morning.",
+  "The little boy kicked the ball across the field.",
+  "She sang a beautiful song at the school concert.",
+  "The trees swayed gently in the cool breeze.",
+  "A rainbow appeared after the heavy rain.",
+  "The puppy chased its tail in the garden.",
+  "Grandma baked delicious cookies for everyone.",
+  "The children laughed while playing hide and seek.",
+  "Stars twinkled in the clear night sky.",
+  "The butterfly fluttered over the blooming flowers.",
+  "The dog barked loudly at the mailman.",
+  "Mom made a tasty dinner for the family.",
+  "The car zoomed down the busy road.",
+  "He drew a colorful picture of the ocean.",
+  "The teacher read an interesting story to the class.",
+  "The fish swam gracefully in the pond.",
+  "She wore a bright yellow dress to the party.",
+  "The garden was full of blooming roses.",
+  "A little bird built a nest on the tree.",
+  "He played the piano with great skill.",
+  "The library was quiet and peaceful.",
+  "A gentle rain fell on the playground.",
+  "They enjoyed a picnic in the park.",
+  "The airplane soared high above the clouds.",
+  "She wrote a letter to her best friend.",
+  "The snow fell softly on the ground.",
+  "He rode his bicycle around the neighborhood.",
+  "The river flowed calmly through the town.",
+  "A curious kitten explored the house.",
+  "The farmer planted vegetables in the garden.",
+  "The cake was decorated with colorful sprinkles.",
+  "They sang a happy song during the celebration.",
+  "The clock ticked steadily on the wall.",
+  "He built a sandcastle at the beach.",
+  "The stars shone brightly in the night sky.",
+  "She skipped joyfully on her way to school.",
+  "The squirrel quickly climbed the tall tree.",
+  "A gentle breeze cooled the hot afternoon.",
+  "He solved the puzzle with great care.",
+  "The train arrived at the station on time.",
+  "The wind whispered through the leaves.",
+  "A playful dolphin jumped in the sea.",
+  "The farmer milked the cow in the barn.",
+  "She painted a beautiful picture of a garden.",
+  "The children built a fort out of cushions.",
+  "The ice cream melted on the hot summer day.",
+  "He caught a shiny fish from the lake.",
+  "The busy bees buzzed around the flowers.",
+  "She tied a ribbon around her new book.",
+  "The castle stood tall on the hill.",
+  "A tiny ant marched on the ground.",
+  "He found a smooth pebble on the path.",
+  "The moon glowed softly in the dark sky.",
+  "She whispered a secret to her friend.",
+  "The windmill turned slowly in the field.",
+  "A brave knight rode a strong horse.",
+  "The forest was filled with chirping birds.",
+  "He picked a bouquet of wildflowers.",
+  "The rain stopped and the sun appeared.",
+  "She danced gracefully at the recital.",
+  "The little ducklings followed their mother.",
+  "A gentle stream flowed through the forest.",
+  "The family gathered for a fun game night.",
+  "He built a model airplane from scratch.",
+  "The artist mixed vibrant colors on the palette.",
+  "The baby giggled at the playful puppy.",
+  "She read a bedtime story to her sibling.",
+  "The mountain peak was covered in snow.",
+  "The wind blew the leaves across the yard.",
+  "A cheerful tune played on the radio.",
+  "The library had many interesting books.",
+  "He wore a bright red hat to the fair.",
+  "The campfire crackled under the starry sky.",
+  "She made a delicious sandwich for lunch.",
+  "The train chugged along the tracks.",
+  "A kind neighbor helped carry the groceries.",
+  "The flower garden smelled wonderfully sweet.",
+  "He practiced his spelling words every day.",
+  "The gentle teacher explained the lesson clearly.",
+  "The dog wagged its tail happily.",
+  "She admired the sparkling jewels in the shop.",
+  "The city lights twinkled in the distance.",
+  "He built a treehouse in the backyard.",
+  "The morning dew covered the grass.",
+  "A soft melody filled the quiet room.",
+  "She baked a chocolate cake for the party.",
+  "The gentle cat purred on her lap.",
+  "He collected shiny stickers for his album.",
+  "The birds flew south for the winter.",
+  "She skipped stones across the calm lake.",
+  "The new student made many friends.",
+  "A playful kitten chased a ball of yarn.",
+  "The aroma of fresh bread filled the kitchen.",
+  "He enjoyed a cool glass of lemonade.",
+  "The joyful children ran and played in the park."
 ];
 
-let revealedWords = 0;  // Track how many words have been revealed
-let points = 0;  // Add a points counter
-const totalWords = sightWords.length;  // Total number of words
-let selectedVoice = null;  // This will store the selected female voice
+// Set the number of puzzles to display (adjust as needed)
+const numPuzzles = 5;
+let puzzles = [];
 
-document.addEventListener('DOMContentLoaded', () => {
-    // Get references to HTML elements
-    const wordDisplay = document.getElementById('wordDisplay');
-    const spinButton = document.getElementById('spinButton');
-    const progressFill = document.getElementById('progressFill');
-    const progressText = document.getElementById('progressText');
-    const complimentBox = document.getElementById('complimentBox');
-    const pointsBox = document.getElementById('points'); // Points box
+// Shuffle function using the Fisher-Yates algorithm
+function shuffle(array) {
+  let currentIndex = array.length, randomIndex;
+  while (currentIndex !== 0) {
+    randomIndex = Math.floor(Math.random() * currentIndex);
+    currentIndex--;
+    [array[currentIndex], array[randomIndex]] = [array[randomIndex], array[currentIndex]];
+  }
+  return array;
+}
 
-    // Debugging: Log each element to see which one is missing
-    console.log('wordDisplay:', wordDisplay);
-    console.log('spinButton:', spinButton);
-    console.log('progressFill:', progressFill);
-    console.log('progressText:', progressText);
-    console.log('complimentBox:', complimentBox);
-    console.log('pointsBox:', pointsBox);
+// Dynamically generate puzzle containers from the sentence pool
+function generatePuzzles() {
+  // Shuffle the sentence pool and pick the desired number of puzzles
+  const shuffledSentences = shuffle([...sentencePool]);
+  const selectedSentences = shuffledSentences.slice(0, numPuzzles);
 
-    // Ensure all elements exist before proceeding
-    if (!wordDisplay || !spinButton || !progressFill || !progressText || !complimentBox || !pointsBox) {
-        console.error('One or more DOM elements not found');
-        return;
-    }
+  puzzles = selectedSentences.map(sentence => {
+    return {
+      correct: sentence.split(" "),
+      container: null
+    };
+  });
 
-    const compliments = ['Great job!', 'Fantastic!', 'Well done!', 'You did it!', 'Awesome!'];
-    const spinSound = new Audio('spin-sound.mp3');  // Add spin sound
-    const rewardSound = new Audio('reward-sound.mp3');  // Add reward sound
+  // Create HTML elements for each puzzle
+  const puzzlesContainer = document.getElementById("puzzles");
+  puzzlesContainer.innerHTML = ""; // Clear previous puzzles
 
-    // Select a female voice or fallback
-    function setFemaleVoice() {
-        const voices = window.speechSynthesis.getVoices();
-        
-        // Attempt to find a specific female voice (Google UK Female or similar)
-        selectedVoice = voices.find(voice => 
-            voice.name.includes('Google UK English Female') || voice.name.includes('female')
-        );
+  puzzles.forEach((puzzle, index) => {
+    const puzzleDiv = document.createElement("div");
+    puzzleDiv.className = "sentence-container";
+    puzzleDiv.setAttribute("data-answer", puzzle.correct.join(" "));
 
-        // Fallback to the first available voice if no female voice is found
-        if (!selectedVoice && voices.length > 0) {
-            selectedVoice = voices[0];
-        }
+    // Create a header for the puzzle
+    const header = document.createElement("h3");
+    header.innerText = `${index + 1}) Arrange the words:`;
+    puzzleDiv.appendChild(header);
 
-        // Safari-specific fallback: retry loading voices if none are found
-        if (voices.length === 0) {
-            console.log("No voices found, retrying...");
-            setTimeout(setFemaleVoice, 500);
-        }
-    }
+    // Create Word Bank and Drop Zone divs
+    const wordBank = document.createElement("div");
+    wordBank.className = "word-bank";
+    wordBank.setAttribute("aria-label", "Word Bank");
+    puzzleDiv.appendChild(wordBank);
 
-    // Load voices when the speech synthesis API changes
-    if ('speechSynthesis' in window) {
-        if (speechSynthesis.onvoiceschanged !== undefined) {
-            speechSynthesis.onvoiceschanged = setFemaleVoice;
-        } else {
-            setFemaleVoice();  // Fallback for older browsers
-        }
-    }
+    const dropZone = document.createElement("div");
+    dropZone.className = "drop-zone";
+    dropZone.setAttribute("aria-label", "Drop Zone");
+    puzzleDiv.appendChild(dropZone);
 
-    // Load progress and points from localStorage if available
-    revealedWords = parseInt(localStorage.getItem('revealedWords')) || 0;
-    points = parseInt(localStorage.getItem('points')) || 0;
-    updateProgress();  // Update progress on load
-    pointsBox.textContent = points;  // Display points on load
+    // Attach this puzzle container to the puzzle object
+    puzzle.container = puzzleDiv;
 
-    // Function to spin and select a random word
-    function spinWord() {
-        spinSound.play();  // Play spin sound
-        wordDisplay.classList.remove('shake');  // Remove any previous shake effect
-        wordDisplay.textContent = '';  // Clear the display for the new word
-        complimentBox.textContent = '';  // Clear any previous compliment
+    // Append the puzzle container to the main puzzles div
+    puzzlesContainer.appendChild(puzzleDiv);
+  });
+}
 
-        wordDisplay.classList.add('shake');  // Add a shake effect
-        setTimeout(() => {
-            wordDisplay.classList.remove('shake');  // Remove shake after the animation
-        }, 500);
+// Drag & Drop functionality
+let draggedItem = null;
 
-        // Select a random word
-        const randomIndex = Math.floor(Math.random() * sightWords.length);
-        const selectedWord = sightWords[randomIndex];
-        wordDisplay.textContent = selectedWord;
+function handleDragStart(e) {
+  draggedItem = e.target;
+  e.target.style.opacity = "0.5";
+  e.dataTransfer.setData("text/plain", e.target.innerText);
+}
 
-        // Remove the revealed word from the array to avoid repetition
-        sightWords.splice(randomIndex, 1);
+function handleDragEnd(e) {
+  e.target.style.opacity = "1";
+}
 
-        // Speak the word using the Web Speech API
-        speakWord(selectedWord);
+function handleDragOver(e) {
+  e.preventDefault();
+}
 
-        // Add points (e.g., 10 points per word)
-        points += 10;
-        pointsBox.textContent = points;
+function handleDrop(e) {
+  e.preventDefault();
+  // Only allow drop on valid zones: word-bank or drop-zone
+  if (e.target.classList.contains("word-bank") || e.target.classList.contains("drop-zone")) {
+    e.target.appendChild(draggedItem);
+  }
+}
 
-        // Update the progress
-        revealedWords++;
-        updateProgress();
+// Initialize the game: populate each word bank with shuffled words
+function initializeGame() {
+  // Clear any previous score
+  document.getElementById("score").innerText = "";
+  generatePuzzles();
 
-        // Save progress and points to localStorage
-        localStorage.setItem('revealedWords', revealedWords);
-        localStorage.setItem('points', points);
+  puzzles.forEach(puzzle => {
+    const container = puzzle.container;
+    const wordBank = container.querySelector(".word-bank");
+    const dropZone = container.querySelector(".drop-zone");
 
-        // Play reward sound after word is revealed
-        rewardSound.play();
+    // Clear previous content (in case of a reset)
+    wordBank.innerHTML = "";
+    dropZone.innerHTML = "";
 
-        // Show a compliment
-        setTimeout(giveCompliment, 1000);  // Delay the compliment after word is spoken
+    // Shuffle the words for this puzzle and create draggable word elements
+    let wordsShuffled = shuffle([...puzzle.correct]);
+    wordsShuffled.forEach(word => {
+      let wordDiv = document.createElement("div");
+      wordDiv.className = "word";
+      wordDiv.draggable = true;
+      wordDiv.innerText = word;
+      wordDiv.addEventListener("dragstart", handleDragStart);
+      wordDiv.addEventListener("dragend", handleDragEnd);
+      wordBank.appendChild(wordDiv);
+    });
 
-        // Trigger level-up animation if user reaches milestones
-        if (revealedWords === 10 || revealedWords === 20) {
-            triggerLevelUp();
-        }
-    }
+    // Set up drop zones with event listeners
+    [wordBank, dropZone].forEach(zone => {
+      zone.addEventListener("dragover", handleDragOver);
+      zone.addEventListener("drop", handleDrop);
+    });
+  });
+}
 
-    // Function to speak the word using the selected female voice
-    function speakWord(word) {
-        const utterance = new SpeechSynthesisUtterance(word);
-        utterance.rate = 0.8;  // Slow down the speech rate for clarity
-        utterance.pitch = 1.1;  // Slightly increase the pitch for a pleasant tone
-        utterance.volume = 0.9;  // Lower the volume slightly
+// Check the student's answers and provide visual feedback
+function checkAnswers() {
+  let totalCorrect = 0;
+  puzzles.forEach(puzzle => {
+    const container = puzzle.container;
+    const dropZone = container.querySelector(".drop-zone");
+    const userWords = Array.from(dropZone.children).map(word => word.innerText);
+    const correctWords = puzzle.correct;
+    let isCorrect = (userWords.join(" ") === correctWords.join(" "));
 
-        // Use the selected female voice, if available
-        if (selectedVoice) {
-            utterance.voice = selectedVoice;
-        }
+    // Remove previous highlighting
+    dropZone.childNodes.forEach(word => {
+      word.classList.remove("correct", "incorrect");
+    });
 
-        window.speechSynthesis.speak(utterance);  // Speak the word aloud
-    }
+    // Highlight correct and incorrect words
+    dropZone.childNodes.forEach((word, index) => {
+      if (word.innerText === correctWords[index]) {
+        word.classList.add("correct");
+      } else {
+        word.classList.add("incorrect");
+      }
+    });
 
-    // Function to show a random compliment after revealing a word
-    function giveCompliment() {
-        const compliment = compliments[Math.floor(Math.random() * compliments.length)];
-        complimentBox.textContent = compliment;
+    if (isCorrect) totalCorrect++;
+  });
+  document.getElementById("score").innerText = `You got ${totalCorrect} out of ${puzzles.length} sentences correct!`;
+}
 
-        // Speak the compliment
-        const utterance = new SpeechSynthesisUtterance(compliment);
-        if (selectedVoice) {
-            utterance.voice = selectedVoice;  // Use the same female voice for compliments
-        }
-        window.speechSynthesis.speak(utterance);
-    }
+// Reset the game so that students can try a new set of puzzles
+function resetGame() {
+  document.querySelectorAll(".word").forEach(word => {
+    word.classList.remove("correct", "incorrect");
+  });
+  initializeGame();
+}
 
-    // Function to update the progress bar and text
-    function updateProgress() {
-        const progressPercentage = (revealedWords / totalWords) * 100;
-        progressFill.style.width = progressPercentage + '%';  // Update the progress bar width
-        progressText.textContent = `${revealedWords} / ${totalWords} Words Revealed`;  // Update progress text
-    }
+// Button event listeners
+document.getElementById("check-btn").addEventListener("click", checkAnswers);
+document.getElementById("reset-btn").addEventListener("click", resetGame);
 
-    // Function to trigger a level-up animation
-    function triggerLevelUp() {
-        const levelUpMessage = document.createElement('div');
-        levelUpMessage.classList.add('level-up');
-        levelUpMessage.textContent = 'Level Up!';
-        document.body.appendChild(levelUpMessage);
-
-        setTimeout(() => {
-            levelUpMessage.remove();  // Remove after showing
-        }, 2000);  // Show for 2 seconds
-    }
-
-    // Add event listener for the spin button
-    spinButton.addEventListener('click', spinWord);
-});
+// Initialize the game on page load
+window.addEventListener("load", initializeGame);
