@@ -106,7 +106,19 @@ const sentencePool = [
 const numPuzzles = 5;
 let puzzles = [];
 
-// Shuffle function using the Fisher-Yates algorithm
+/* === Speech API Utility === */
+function speak(text) {
+  if ('speechSynthesis' in window) {
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.rate = 1; // Normal speed
+    utterance.pitch = 1; // Normal pitch
+    window.speechSynthesis.speak(utterance);
+  } else {
+    console.warn("Speech Synthesis API is not supported in this browser.");
+  }
+}
+
+/* === Shuffle Function (Fisher-Yates) === */
 function shuffle(array) {
   let currentIndex = array.length, randomIndex;
   while (currentIndex !== 0) {
@@ -117,20 +129,16 @@ function shuffle(array) {
   return array;
 }
 
-// Dynamically generate puzzle containers from the sentence pool
+/* === Puzzle Generation === */
 function generatePuzzles() {
-  // Shuffle the sentence pool and pick the desired number of puzzles
   const shuffledSentences = shuffle([...sentencePool]);
   const selectedSentences = shuffledSentences.slice(0, numPuzzles);
 
-  puzzles = selectedSentences.map(sentence => {
-    return {
-      correct: sentence.split(" "),
-      container: null
-    };
-  });
+  puzzles = selectedSentences.map(sentence => ({
+    correct: sentence.split(" "),
+    container: null
+  }));
 
-  // Create HTML elements for each puzzle
   const puzzlesContainer = document.getElementById("puzzles");
   puzzlesContainer.innerHTML = ""; // Clear previous puzzles
 
@@ -139,31 +147,40 @@ function generatePuzzles() {
     puzzleDiv.className = "sentence-container";
     puzzleDiv.setAttribute("data-answer", puzzle.correct.join(" "));
 
-    // Create a header for the puzzle
+    // Puzzle header
     const header = document.createElement("h3");
     header.innerText = `${index + 1}) Arrange the words:`;
     puzzleDiv.appendChild(header);
 
-    // Create Word Bank and Drop Zone divs
+    // Word Bank
     const wordBank = document.createElement("div");
     wordBank.className = "word-bank";
     wordBank.setAttribute("aria-label", "Word Bank");
+    wordBank.setAttribute("role", "list");
     puzzleDiv.appendChild(wordBank);
 
+    // Drop Zone
     const dropZone = document.createElement("div");
     dropZone.className = "drop-zone";
     dropZone.setAttribute("aria-label", "Drop Zone");
+    dropZone.setAttribute("role", "list");
     puzzleDiv.appendChild(dropZone);
 
-    // Attach this puzzle container to the puzzle object
-    puzzle.container = puzzleDiv;
+    // Optional "Listen" button for instructions
+    const listenButton = document.createElement("button");
+    listenButton.className = "listen-btn";
+    listenButton.innerText = "Listen";
+    listenButton.addEventListener("click", () => {
+      speak(`Arrange the words to form a sentence. When you're finished, click Check Answers.`);
+    });
+    puzzleDiv.appendChild(listenButton);
 
-    // Append the puzzle container to the main puzzles div
+    puzzle.container = puzzleDiv;
     puzzlesContainer.appendChild(puzzleDiv);
   });
 }
 
-// Drag & Drop functionality
+/* === Drag & Drop Handlers === */
 let draggedItem = null;
 
 function handleDragStart(e) {
@@ -178,19 +195,29 @@ function handleDragEnd(e) {
 
 function handleDragOver(e) {
   e.preventDefault();
+  if (e.currentTarget.classList.contains("drop-zone")) {
+    e.currentTarget.classList.add("active");
+  }
+}
+
+function handleDragLeave(e) {
+  if (e.currentTarget.classList.contains("drop-zone")) {
+    e.currentTarget.classList.remove("active");
+  }
 }
 
 function handleDrop(e) {
   e.preventDefault();
-  // Only allow drop on valid zones: word-bank or drop-zone
+  if (e.currentTarget.classList.contains("drop-zone")) {
+    e.currentTarget.classList.remove("active");
+  }
   if (e.target.classList.contains("word-bank") || e.target.classList.contains("drop-zone")) {
     e.target.appendChild(draggedItem);
   }
 }
 
-// Initialize the game: populate each word bank with shuffled words
+/* === Initialize Game === */
 function initializeGame() {
-  // Clear any previous score
   document.getElementById("score").innerText = "";
   generatePuzzles();
 
@@ -199,16 +226,16 @@ function initializeGame() {
     const wordBank = container.querySelector(".word-bank");
     const dropZone = container.querySelector(".drop-zone");
 
-    // Clear previous content (in case of a reset)
+    // Clear any previous content
     wordBank.innerHTML = "";
     dropZone.innerHTML = "";
 
-    // Shuffle the words for this puzzle and create draggable word elements
-    let wordsShuffled = shuffle([...puzzle.correct]);
+    // Shuffle words and create draggable word elements
+    const wordsShuffled = shuffle([...puzzle.correct]);
     wordsShuffled.forEach(word => {
-      // Debug: console.log("Creating word:", word);
       let wordDiv = document.createElement("div");
       wordDiv.className = "word";
+      wordDiv.setAttribute("role", "listitem");
       wordDiv.draggable = true;
       wordDiv.innerText = word;
       wordDiv.addEventListener("dragstart", handleDragStart);
@@ -216,15 +243,16 @@ function initializeGame() {
       wordBank.appendChild(wordDiv);
     });
 
-    // Set up drop zones with event listeners
+    // Add event listeners for drop zones
     [wordBank, dropZone].forEach(zone => {
       zone.addEventListener("dragover", handleDragOver);
+      zone.addEventListener("dragleave", handleDragLeave);
       zone.addEventListener("drop", handleDrop);
     });
   });
 }
 
-// Check the student's answers and provide visual feedback
+/* === Check Answers & Provide Feedback === */
 function checkAnswers() {
   let totalCorrect = 0;
   puzzles.forEach(puzzle => {
@@ -232,14 +260,14 @@ function checkAnswers() {
     const dropZone = container.querySelector(".drop-zone");
     const userWords = Array.from(dropZone.children).map(word => word.innerText);
     const correctWords = puzzle.correct;
-    let isCorrect = (userWords.join(" ") === correctWords.join(" "));
+    const isCorrect = (userWords.join(" ") === correctWords.join(" "));
 
-    // Remove previous highlighting using only element children
+    // Remove previous highlighting
     Array.from(dropZone.children).forEach(word => {
       word.classList.remove("correct", "incorrect");
     });
 
-    // Highlight correct and incorrect words
+    // Apply highlighting
     Array.from(dropZone.children).forEach((word, index) => {
       if (word.innerText === correctWords[index]) {
         word.classList.add("correct");
@@ -248,12 +276,16 @@ function checkAnswers() {
       }
     });
 
-    if (isCorrect) totalCorrect++;
+    if (isCorrect) {
+      totalCorrect++;
+      // Speak out the correct sentence as positive reinforcement
+      speak(`Great job! The sentence is: ${correctWords.join(" ")}`);
+    }
   });
   document.getElementById("score").innerText = `You got ${totalCorrect} out of ${puzzles.length} sentences correct!`;
 }
 
-// Reset the game so that students can try a new set of puzzles
+/* === Reset Game === */
 function resetGame() {
   document.querySelectorAll(".word").forEach(word => {
     word.classList.remove("correct", "incorrect");
@@ -261,7 +293,14 @@ function resetGame() {
   initializeGame();
 }
 
-// Button event listeners
+/* === Event Listeners === */
+// Listen Instructions button
+document.getElementById("listen-instructions-btn").addEventListener("click", () => {
+  const instructions = document.querySelector("p.instructions").innerText;
+  speak(instructions);
+});
+
+// Check and Reset buttons
 document.getElementById("check-btn").addEventListener("click", checkAnswers);
 document.getElementById("reset-btn").addEventListener("click", resetGame);
 
