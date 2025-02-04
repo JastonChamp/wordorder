@@ -1,25 +1,456 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sight Word Spinner</title>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Word Order Adventure</title>
+  <style>
+    /* CSS Variables for easy theme customization */
+    :root {
+      --primary-color: #4a90e2;
+      --secondary-color: #fdd835;
+      --background-color: #f0f8ff;
+      --text-color: #333;
+      --correct-bg: #c8e6c9;
+      --correct-border: #66bb6a;
+      --incorrect-bg: #ffcdd2;
+      --incorrect-border: #e57373;
+      --word-bg: #ffeb3b;
+      --word-border: #fdd835;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: "Comic Sans MS", Arial, sans-serif;
+      background-color: var(--background-color);
+      margin: 0;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      color: var(--text-color);
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    h1 {
+      font-size: 2.5em;
+      margin-bottom: 10px;
+    }
+
+    p.instructions {
+      font-size: 1.2em;
+      margin: 0;
+    }
+
+    .game-container {
+      max-width: 900px;
+      width: 100%;
+      padding: 20px;
+      background-color: #fff;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .sentence-container {
+      margin-bottom: 30px;
+      padding: 15px;
+      border: 2px solid var(--primary-color);
+      border-radius: 8px;
+      background-color: #e9f2fb;
+    }
+
+    .sentence-container h3 {
+      margin: 0 0 10px 0;
+      color: var(--primary-color);
+    }
+
+    .word-bank,
+    .drop-zone {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      min-height: 50px;
+      border: 2px dashed #ccc;
+      border-radius: 5px;
+      padding: 10px;
+      background-color: #f9f9f9;
+      transition: background-color 0.3s ease;
+    }
+
+    .word-bank:hover,
+    .drop-zone:hover {
+      background-color: #fff;
+    }
+
+    .word {
+      padding: 10px 15px;
+      background-color: var(--word-bg);
+      border: 1px solid var(--word-border);
+      border-radius: 5px;
+      cursor: move;
+      user-select: none;
+      font-weight: bold;
+      transition: transform 0.2s, background-color 0.3s;
+    }
+
+    .word:active {
+      transform: scale(1.1);
+    }
+
+    .correct {
+      background-color: var(--correct-bg) !important;
+      border-color: var(--correct-border) !important;
+    }
+
+    .incorrect {
+      background-color: var(--incorrect-bg) !important;
+      border-color: var(--incorrect-border) !important;
+    }
+
+    .button-container {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      margin-top: 20px;
+      flex-wrap: wrap;
+    }
+
+    button {
+      padding: 10px 20px;
+      font-size: 1em;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      background-color: var(--primary-color);
+      color: #fff;
+      transition: background-color 0.3s;
+    }
+
+    button:hover {
+      background-color: #357abd;
+    }
+
+    #score {
+      text-align: center;
+      font-size: 1.2em;
+      margin-top: 20px;
+      font-weight: bold;
+    }
+
+    @media (max-width: 600px) {
+      h1 {
+        font-size: 2em;
+      }
+      .word {
+        font-size: 0.9em;
+      }
+      .button-container {
+        flex-direction: column;
+      }
+    }
+  </style>
 </head>
 <body>
+  <header>
+    <h1>Word Order Adventure</h1>
+    <p class="instructions">
+      Drag and drop the words from the <strong>Word Bank</strong> into the <strong>Drop Zone</strong> to form the correct sentence.
+      When you're ready, click <em>Check Answers</em> to see your progress!
+    </p>
+  </header>
 
-    <div class="spinner-container">
-        <div class="points-box">Points: <span id="points">0</span></div>
-        <div class="word-display" id="wordDisplay">Press Spin to start</div> <!-- Ensure this exists -->
-        <button class="spin-button" id="spinButton">Spin</button>
-        <div class="progress-bar">
-            <div class="progress-fill" id="progressFill"></div>
-        </div>
-        <div class="progress-text" id="progressText">0 / 145 Words Revealed</div>
-        <div id="complimentBox"></div>
+  <main class="game-container">
+    <!-- Puzzle containers will be generated here dynamically -->
+    <div id="puzzles"></div>
+
+    <!-- Buttons for checking and resetting the game -->
+    <div class="button-container">
+      <button id="check-btn">Check Answers</button>
+      <button id="reset-btn">Reset Game</button>
     </div>
 
-    <script src="script.js"></script>
+    <p id="score"></p>
+  </main>
 
+  <script>
+    // A larger pool of 100 sentences to train word order variety
+    const sentencePool = [
+      "The cat sat on the mat.",
+      "A big red balloon floated in the sky.",
+      "I enjoy reading my favorite storybook.",
+      "My friend and I play soccer after school.",
+      "The sun shines brightly on a warm day.",
+      "Birds chirp melodiously in the early morning.",
+      "The little boy kicked the ball across the field.",
+      "She sang a beautiful song at the school concert.",
+      "The trees swayed gently in the cool breeze.",
+      "A rainbow appeared after the heavy rain.",
+      "The puppy chased its tail in the garden.",
+      "Grandma baked delicious cookies for everyone.",
+      "The children laughed while playing hide and seek.",
+      "Stars twinkled in the clear night sky.",
+      "The butterfly fluttered over the blooming flowers.",
+      "The dog barked loudly at the mailman.",
+      "Mom made a tasty dinner for the family.",
+      "The car zoomed down the busy road.",
+      "He drew a colorful picture of the ocean.",
+      "The teacher read an interesting story to the class.",
+      "The fish swam gracefully in the pond.",
+      "She wore a bright yellow dress to the party.",
+      "The garden was full of blooming roses.",
+      "A little bird built a nest on the tree.",
+      "He played the piano with great skill.",
+      "The library was quiet and peaceful.",
+      "A gentle rain fell on the playground.",
+      "They enjoyed a picnic in the park.",
+      "The airplane soared high above the clouds.",
+      "She wrote a letter to her best friend.",
+      "The snow fell softly on the ground.",
+      "He rode his bicycle around the neighborhood.",
+      "The river flowed calmly through the town.",
+      "A curious kitten explored the house.",
+      "The farmer planted vegetables in the garden.",
+      "The cake was decorated with colorful sprinkles.",
+      "They sang a happy song during the celebration.",
+      "The clock ticked steadily on the wall.",
+      "He built a sandcastle at the beach.",
+      "The stars shone brightly in the night sky.",
+      "She skipped joyfully on her way to school.",
+      "The squirrel quickly climbed the tall tree.",
+      "A gentle breeze cooled the hot afternoon.",
+      "He solved the puzzle with great care.",
+      "The train arrived at the station on time.",
+      "The wind whispered through the leaves.",
+      "A playful dolphin jumped in the sea.",
+      "The farmer milked the cow in the barn.",
+      "She painted a beautiful picture of a garden.",
+      "The children built a fort out of cushions.",
+      "The ice cream melted on the hot summer day.",
+      "He caught a shiny fish from the lake.",
+      "The busy bees buzzed around the flowers.",
+      "She tied a ribbon around her new book.",
+      "The castle stood tall on the hill.",
+      "A tiny ant marched on the ground.",
+      "He found a smooth pebble on the path.",
+      "The moon glowed softly in the dark sky.",
+      "She whispered a secret to her friend.",
+      "The windmill turned slowly in the field.",
+      "A brave knight rode a strong horse.",
+      "The forest was filled with chirping birds.",
+      "He picked a bouquet of wildflowers.",
+      "The rain stopped and the sun appeared.",
+      "She danced gracefully at the recital.",
+      "The little ducklings followed their mother.",
+      "A gentle stream flowed through the forest.",
+      "The family gathered for a fun game night.",
+      "He built a model airplane from scratch.",
+      "The artist mixed vibrant colors on the palette.",
+      "The baby giggled at the playful puppy.",
+      "She read a bedtime story to her sibling.",
+      "The mountain peak was covered in snow.",
+      "The wind blew the leaves across the yard.",
+      "A cheerful tune played on the radio.",
+      "The library had many interesting books.",
+      "He wore a bright red hat to the fair.",
+      "The campfire crackled under the starry sky.",
+      "She made a delicious sandwich for lunch.",
+      "The train chugged along the tracks.",
+      "A kind neighbor helped carry the groceries.",
+      "The flower garden smelled wonderfully sweet.",
+      "He practiced his spelling words every day.",
+      "The gentle teacher explained the lesson clearly.",
+      "The dog wagged its tail happily.",
+      "She admired the sparkling jewels in the shop.",
+      "The city lights twinkled in the distance.",
+      "He built a treehouse in the backyard.",
+      "The morning dew covered the grass.",
+      "A soft melody filled the quiet room.",
+      "She baked a chocolate cake for the party.",
+      "The gentle cat purred on her lap.",
+      "He collected shiny stickers for his album.",
+      "The birds flew south for the winter.",
+      "She skipped stones across the calm lake.",
+      "The new student made many friends.",
+      "A playful kitten chased a ball of yarn.",
+      "The aroma of fresh bread filled the kitchen.",
+      "He enjoyed a cool glass of lemonade.",
+      "The joyful children ran and played in the park."
+    ];
+
+    // Set the number of puzzles to display (adjust as needed)
+    const numPuzzles = 5;
+    let puzzles = [];
+
+    // Shuffle function using Fisher-Yates algorithm
+    function shuffle(array) {
+      let currentIndex = array.length, randomIndex;
+      while (currentIndex !== 0) {
+        randomIndex = Math.floor(Math.random() * currentIndex);
+        currentIndex--;
+        [array[currentIndex], array[randomIndex]] = [array[randomIndex], array[currentIndex]];
+      }
+      return array;
+    }
+
+    // Dynamically generate puzzle containers from the sentence pool
+    function generatePuzzles() {
+      // Shuffle the sentence pool and pick the desired number of puzzles
+      const shuffledSentences = shuffle([...sentencePool]);
+      const selectedSentences = shuffledSentences.slice(0, numPuzzles);
+
+      puzzles = selectedSentences.map(sentence => {
+        return {
+          correct: sentence.split(" "),
+          container: null
+        };
+      });
+
+      // Create HTML elements for each puzzle
+      const puzzlesContainer = document.getElementById("puzzles");
+      puzzlesContainer.innerHTML = ""; // Clear previous puzzles
+
+      puzzles.forEach((puzzle, index) => {
+        const puzzleDiv = document.createElement("div");
+        puzzleDiv.className = "sentence-container";
+        puzzleDiv.setAttribute("data-answer", puzzle.correct.join(" "));
+
+        // Create a header for the puzzle
+        const header = document.createElement("h3");
+        header.innerText = `${index + 1}) Arrange the words:`;
+        puzzleDiv.appendChild(header);
+
+        // Create Word Bank and Drop Zone divs
+        const wordBank = document.createElement("div");
+        wordBank.className = "word-bank";
+        wordBank.setAttribute("aria-label", "Word Bank");
+        puzzleDiv.appendChild(wordBank);
+
+        const dropZone = document.createElement("div");
+        dropZone.className = "drop-zone";
+        dropZone.setAttribute("aria-label", "Drop Zone");
+        puzzleDiv.appendChild(dropZone);
+
+        // Attach this puzzle container to the puzzle object
+        puzzle.container = puzzleDiv;
+
+        // Append the puzzle container to the main puzzles div
+        puzzlesContainer.appendChild(puzzleDiv);
+      });
+    }
+
+    // Drag & Drop functionality
+    let draggedItem = null;
+
+    function handleDragStart(e) {
+      draggedItem = e.target;
+      e.target.style.opacity = "0.5";
+      e.dataTransfer.setData("text/plain", e.target.innerText);
+    }
+
+    function handleDragEnd(e) {
+      e.target.style.opacity = "1";
+    }
+
+    function handleDragOver(e) {
+      e.preventDefault();
+    }
+
+    function handleDrop(e) {
+      e.preventDefault();
+      // Only allow drop on valid zones: word-bank or drop-zone
+      if (
+        e.target.classList.contains("word-bank") ||
+        e.target.classList.contains("drop-zone")
+      ) {
+        e.target.appendChild(draggedItem);
+      }
+    }
+
+    // Initialize the game: populate each word bank with shuffled words
+    function initializeGame() {
+      // Clear any previous score
+      document.getElementById("score").innerText = "";
+      generatePuzzles();
+
+      puzzles.forEach((puzzle, index) => {
+        const container = puzzle.container;
+        const wordBank = container.querySelector(".word-bank");
+        const dropZone = container.querySelector(".drop-zone");
+
+        // Clear previous content (in case of a reset)
+        wordBank.innerHTML = "";
+        dropZone.innerHTML = "";
+
+        // Shuffle the words for this puzzle and create draggable word elements
+        let wordsShuffled = shuffle([...puzzle.correct]);
+        wordsShuffled.forEach(word => {
+          let wordDiv = document.createElement("div");
+          wordDiv.className = "word";
+          wordDiv.draggable = true;
+          wordDiv.innerText = word;
+          wordDiv.addEventListener("dragstart", handleDragStart);
+          wordDiv.addEventListener("dragend", handleDragEnd);
+          wordBank.appendChild(wordDiv);
+        });
+
+        // Set up drop zones with event listeners
+        [wordBank, dropZone].forEach(zone => {
+          zone.addEventListener("dragover", handleDragOver);
+          zone.addEventListener("drop", handleDrop);
+        });
+      });
+    }
+
+    // Check the student's answers and provide visual feedback
+    function checkAnswers() {
+      let totalCorrect = 0;
+      puzzles.forEach(puzzle => {
+        const container = puzzle.container;
+        const dropZone = container.querySelector(".drop-zone");
+        const userWords = Array.from(dropZone.children).map(word => word.innerText);
+        const correctWords = puzzle.correct;
+        let isCorrect = (userWords.join(" ") === correctWords.join(" "));
+
+        // Remove previous highlighting
+        dropZone.childNodes.forEach(word => {
+          word.classList.remove("correct", "incorrect");
+        });
+
+        // Highlight correct and incorrect words
+        dropZone.childNodes.forEach((word, index) => {
+          if (word.innerText === correctWords[index]) {
+            word.classList.add("correct");
+          } else {
+            word.classList.add("incorrect");
+          }
+        });
+
+        if (isCorrect) totalCorrect++;
+      });
+      document.getElementById("score").innerText = `You got ${totalCorrect} out of ${puzzles.length} sentences correct!`;
+    }
+
+    // Reset the game so that students can try a new set of puzzles
+    function resetGame() {
+      document.querySelectorAll(".word").forEach(word => {
+        word.classList.remove("correct", "incorrect");
+      });
+      initializeGame();
+    }
+
+    // Button event listeners
+    document.getElementById("check-btn").addEventListener("click", checkAnswers);
+    document.getElementById("reset-btn").addEventListener("click", resetGame);
+
+    // Initialize the game on page load
+    window.addEventListener("load", initializeGame);
+  </script>
 </body>
 </html>
