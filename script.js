@@ -1,120 +1,76 @@
-// A larger pool of 100 sentences to train word order variety
-const sentencePool = [
-  "The cat sat on the mat.",
-  "A big red balloon floated in the sky.",
-  "I enjoy reading my favorite storybook.",
-  "My friend and I play soccer after school.",
-  "The sun shines brightly on a warm day.",
-  "Birds chirp melodiously in the early morning.",
-  "The little boy kicked the ball across the field.",
-  "She sang a beautiful song at the school concert.",
-  "The trees swayed gently in the cool breeze.",
-  "A rainbow appeared after the heavy rain.",
-  "The puppy chased its tail in the garden.",
-  "Grandma baked delicious cookies for everyone.",
-  "The children laughed while playing hide and seek.",
-  "Stars twinkled in the clear night sky.",
-  "The butterfly fluttered over the blooming flowers.",
-  "The dog barked loudly at the mailman.",
-  "Mom made a tasty dinner for the family.",
-  "The car zoomed down the busy road.",
-  "He drew a colorful picture of the ocean.",
-  "The teacher read an interesting story to the class.",
-  "The fish swam gracefully in the pond.",
-  "She wore a bright yellow dress to the party.",
-  "The garden was full of blooming roses.",
-  "A little bird built a nest on the tree.",
-  "He played the piano with great skill.",
-  "The library was quiet and peaceful.",
-  "A gentle rain fell on the playground.",
-  "They enjoyed a picnic in the park.",
-  "The airplane soared high above the clouds.",
-  "She wrote a letter to her best friend.",
-  "The snow fell softly on the ground.",
-  "He rode his bicycle around the neighborhood.",
-  "The river flowed calmly through the town.",
-  "A curious kitten explored the house.",
-  "The farmer planted vegetables in the garden.",
-  "The cake was decorated with colorful sprinkles.",
-  "They sang a happy song during the celebration.",
-  "The clock ticked steadily on the wall.",
-  "He built a sandcastle at the beach.",
-  "The stars shone brightly in the night sky.",
-  "She skipped joyfully on her way to school.",
-  "The squirrel quickly climbed the tall tree.",
-  "A gentle breeze cooled the hot afternoon.",
-  "He solved the puzzle with great care.",
-  "The train arrived at the station on time.",
-  "The wind whispered through the leaves.",
-  "A playful dolphin jumped in the sea.",
-  "The farmer milked the cow in the barn.",
-  "She painted a beautiful picture of a garden.",
-  "The children built a fort out of cushions.",
-  "The ice cream melted on the hot summer day.",
-  "He caught a shiny fish from the lake.",
-  "The busy bees buzzed around the flowers.",
-  "She tied a ribbon around her new book.",
-  "The castle stood tall on the hill.",
-  "A tiny ant marched on the ground.",
-  "He found a smooth pebble on the path.",
-  "The moon glowed softly in the dark sky.",
-  "She whispered a secret to her friend.",
-  "The windmill turned slowly in the field.",
-  "A brave knight rode a strong horse.",
-  "The forest was filled with chirping birds.",
-  "He picked a bouquet of wildflowers.",
-  "The rain stopped and the sun appeared.",
-  "She danced gracefully at the recital.",
-  "The little ducklings followed their mother.",
-  "A gentle stream flowed through the forest.",
-  "The family gathered for a fun game night.",
-  "He built a model airplane from scratch.",
-  "The artist mixed vibrant colors on the palette.",
-  "The baby giggled at the playful puppy.",
-  "She read a bedtime story to her sibling.",
-  "The mountain peak was covered in snow.",
-  "The wind blew the leaves across the yard.",
-  "A cheerful tune played on the radio.",
-  "The library had many interesting books.",
-  "He wore a bright red hat to the fair.",
-  "The campfire crackled under the starry sky.",
-  "She made a delicious sandwich for lunch.",
-  "The train chugged along the tracks.",
-  "A kind neighbor helped carry the groceries.",
-  "The flower garden smelled wonderfully sweet.",
-  "He practiced his spelling words every day.",
-  "The gentle teacher explained the lesson clearly.",
-  "The dog wagged its tail happily.",
-  "She admired the sparkling jewels in the shop.",
-  "The city lights twinkled in the distance.",
-  "He built a treehouse in the backyard.",
-  "The morning dew covered the grass.",
-  "A soft melody filled the quiet room.",
-  "She baked a chocolate cake for the party.",
-  "The gentle cat purred on her lap.",
-  "He collected shiny stickers for his album.",
-  "The birds flew south for the winter.",
-  "She skipped stones across the calm lake.",
-  "The new student made many friends.",
-  "A playful kitten chased a ball of yarn.",
-  "The aroma of fresh bread filled the kitchen.",
-  "He enjoyed a cool glass of lemonade.",
-  "The joyful children ran and played in the park."
-];
-
-// Set the number of puzzles to display (adjust as needed)
-const numPuzzles = 5;
-let puzzles = [];
-
 /* === Speech API Utility === */
 function speak(text) {
   if ('speechSynthesis' in window) {
     const utterance = new SpeechSynthesisUtterance(text);
-    utterance.rate = 1;   // Adjust rate for clarity (1 = normal speed)
-    utterance.pitch = 1;  // Adjust pitch as desired
+    utterance.rate = 1;   // Normal speed for clarity
+    utterance.pitch = 1;  // Normal pitch
     window.speechSynthesis.speak(utterance);
   } else {
     console.warn("Speech Synthesis API is not supported in this browser.");
+  }
+}
+
+/* === Level Sentence Pools === */
+// Sample sentences for each level (P1–P6)
+const sentencesP1 = [
+  "Cat is black.",
+  "Dog runs.",
+  "Bird flies.",
+  "Sun is hot.",
+  "Mom cooks."
+];
+const sentencesP2 = [
+  "The red ball bounces.",
+  "A small dog barks.",
+  "Big cat sleeps.",
+  "The sun is bright.",
+  "Blue bird sings."
+];
+const sentencesP3 = [
+  "The boy eats an apple.",
+  "The girl plays with a toy.",
+  "The dog chases the ball.",
+  "The teacher reads a book.",
+  "The cat drinks milk."
+];
+const sentencesP4 = [
+  "The happy girl sings beautifully.",
+  "The boy quickly runs to school.",
+  "The teacher explains the lesson clearly.",
+  "The children play in the park.",
+  "The red car moves fast."
+];
+const sentencesP5 = [
+  "The teacher reads a story, and the children listen attentively.",
+  "The boy finished his homework before dinner.",
+  "The little girl happily skipped to school.",
+  "The bright sun shines over the calm sea.",
+  "The busy bees buzz around the blooming flowers."
+];
+const sentencesP6 = [
+  "After finishing his homework, the student went to the library.",
+  "Although it was raining, the children played outside happily.",
+  "The teacher, who was very kind, explained the lesson in detail.",
+  "Despite the heavy traffic, she arrived at school on time.",
+  "When the bell rang, the students hurried to their classrooms."
+];
+
+/* === Global Variables === */
+let puzzles = [];  // Array of puzzle objects: { correct: Array, submitted: Boolean, userAnswer: Array }
+let currentPuzzleIndex = 0;
+let score = 0;
+let currentLevel = 'p3'; // Default level is Primary 3
+
+/* === Get Sentences for the Selected Level === */
+function getSentencesForLevel(level) {
+  switch (level) {
+    case 'p1': return sentencesP1;
+    case 'p2': return sentencesP2;
+    case 'p3': return sentencesP3;
+    case 'p4': return sentencesP4;
+    case 'p5': return sentencesP5;
+    case 'p6': return sentencesP6;
+    default: return sentencesP3;
   }
 }
 
@@ -129,69 +85,93 @@ function shuffle(array) {
   return array;
 }
 
-/* === Generate Puzzle Containers === */
+/* === Generate Puzzles === */
 function generatePuzzles() {
-  const shuffledSentences = shuffle([...sentencePool]);
-  const selectedSentences = shuffledSentences.slice(0, numPuzzles);
-
+  const sentencePool = getSentencesForLevel(currentLevel);
+  // For this version, we use all sentences from the pool (shuffled order)
+  const selectedSentences = shuffle([...sentencePool]);
   puzzles = selectedSentences.map(sentence => ({
     correct: sentence.split(" "),
-    container: null
+    submitted: false,
+    userAnswer: null
   }));
+  currentPuzzleIndex = 0;
+  score = 0;
+}
 
-  const puzzlesContainer = document.getElementById("puzzles");
-  puzzlesContainer.innerHTML = ""; // Clear previous puzzles
-
-  puzzles.forEach((puzzle, index) => {
-    const puzzleDiv = document.createElement("div");
-    puzzleDiv.className = "sentence-container";
-    puzzleDiv.setAttribute("data-answer", puzzle.correct.join(" "));
-
-    // Puzzle header
-    const header = document.createElement("h3");
-    header.innerText = `${index + 1}) Arrange the words:`;
-    puzzleDiv.appendChild(header);
-
-    // Word Bank
-    const wordBank = document.createElement("div");
-    wordBank.className = "word-bank";
-    wordBank.setAttribute("aria-label", "Word Bank");
-    wordBank.setAttribute("role", "list");
-    puzzleDiv.appendChild(wordBank);
-
-    // Drop Zone
-    const dropZone = document.createElement("div");
-    dropZone.className = "drop-zone";
-    dropZone.setAttribute("aria-label", "Drop Zone");
-    dropZone.setAttribute("role", "list");
-    puzzleDiv.appendChild(dropZone);
-
-    // Button to listen to puzzle instructions
-    const listenInstrButton = document.createElement("button");
-    listenInstrButton.className = "listen-btn";
-    listenInstrButton.innerText = "Listen Instructions";
-    listenInstrButton.addEventListener("click", () => {
-      speak("Arrange the words to form a correct sentence. Drag words from the word bank to the drop zone. When you are ready, click Check Answers.");
+/* === Display the Current Puzzle === */
+function displayCurrentPuzzle() {
+  const puzzleContainer = document.getElementById("puzzle-container");
+  puzzleContainer.innerHTML = "";
+  
+  if (currentPuzzleIndex < 0 || currentPuzzleIndex >= puzzles.length) {
+    puzzleContainer.innerHTML = "<p>No puzzle available.</p>";
+    return;
+  }
+  
+  const puzzle = puzzles[currentPuzzleIndex];
+  const container = document.createElement("div");
+  container.className = "sentence-container";
+  
+  // Puzzle header
+  const header = document.createElement("h3");
+  header.innerText = `Question ${currentPuzzleIndex + 1}: Arrange the words:`;
+  container.appendChild(header);
+  
+  // Create Word Bank and Drop Zone
+  const wordBank = document.createElement("div");
+  wordBank.className = "word-bank";
+  wordBank.setAttribute("aria-label", "Word Bank");
+  wordBank.setAttribute("role", "list");
+  
+  const dropZone = document.createElement("div");
+  dropZone.className = "drop-zone";
+  dropZone.setAttribute("aria-label", "Drop Zone");
+  dropZone.setAttribute("role", "list");
+  
+  container.appendChild(wordBank);
+  container.appendChild(dropZone);
+  
+  // If not submitted, add shuffled words to the word bank
+  if (!puzzle.submitted) {
+    const wordsShuffled = shuffle([...puzzle.correct]);
+    wordsShuffled.forEach(word => {
+      const wordDiv = document.createElement("div");
+      wordDiv.className = "word";
+      wordDiv.setAttribute("role", "listitem");
+      wordDiv.draggable = true;
+      wordDiv.innerText = word;
+      wordDiv.addEventListener("dragstart", handleDragStart);
+      wordDiv.addEventListener("dragend", handleDragEnd);
+      wordBank.appendChild(wordDiv);
     });
-    puzzleDiv.appendChild(listenInstrButton);
-
-    // Button to read the current word bank aloud
-    const readWordsButton = document.createElement("button");
-    readWordsButton.className = "read-words-btn";
-    readWordsButton.innerText = "Read Word Bank";
-    readWordsButton.addEventListener("click", () => {
-      const words = Array.from(wordBank.children).map(w => w.innerText);
-      if (words.length > 0) {
-        speak("The words are: " + words.join(", "));
+  } else {
+    // If already submitted, display the student's answer in the drop zone with highlighting,
+    // and show the correct order in the word bank for review.
+    puzzle.userAnswer.forEach((word, index) => {
+      const wordDiv = document.createElement("div");
+      wordDiv.className = "word";
+      wordDiv.innerText = word;
+      if (word === puzzle.correct[index]) {
+        wordDiv.classList.add("correct");
       } else {
-        speak("The word bank is empty. Please drag words into the drop zone.");
+        wordDiv.classList.add("incorrect");
       }
+      dropZone.appendChild(wordDiv);
     });
-    puzzleDiv.appendChild(readWordsButton);
-
-    puzzle.container = puzzleDiv;
-    puzzlesContainer.appendChild(puzzleDiv);
-  });
+    puzzle.correct.forEach(word => {
+      const wordDiv = document.createElement("div");
+      wordDiv.className = "word";
+      wordDiv.innerText = word;
+      wordBank.appendChild(wordDiv);
+    });
+  }
+  
+  puzzleContainer.appendChild(container);
+  
+  // Update progress and score display
+  document.getElementById("progress").innerText = `Question ${currentPuzzleIndex + 1} of ${puzzles.length}`;
+  document.getElementById("score").innerText = `Score: ${score}`;
 }
 
 /* === Drag & Drop Handlers === */
@@ -230,93 +210,87 @@ function handleDrop(e) {
   }
 }
 
-/* === Initialize Game === */
-function initializeGame() {
-  document.getElementById("score").innerText = "";
-  generatePuzzles();
-
-  puzzles.forEach(puzzle => {
-    const container = puzzle.container;
-    const wordBank = container.querySelector(".word-bank");
-    const dropZone = container.querySelector(".drop-zone");
-
-    // Clear previous content (in case of reset)
-    wordBank.innerHTML = "";
-    dropZone.innerHTML = "";
-
-    // Shuffle words for this puzzle and create draggable elements
-    const wordsShuffled = shuffle([...puzzle.correct]);
-    wordsShuffled.forEach(word => {
-      const wordDiv = document.createElement("div");
-      wordDiv.className = "word";
-      wordDiv.setAttribute("role", "listitem");
-      wordDiv.draggable = true;
-      wordDiv.innerText = word;
-      wordDiv.addEventListener("dragstart", handleDragStart);
-      wordDiv.addEventListener("dragend", handleDragEnd);
-      wordBank.appendChild(wordDiv);
-    });
-
-    // Add event listeners to word bank and drop zone
-    [wordBank, dropZone].forEach(zone => {
-      zone.addEventListener("dragover", handleDragOver);
-      zone.addEventListener("dragleave", handleDragLeave);
-      zone.addEventListener("drop", handleDrop);
-    });
-  });
-}
-
-/* === Check Answers & Feedback === */
-function checkAnswers() {
-  let totalCorrect = 0;
-  puzzles.forEach(puzzle => {
-    const container = puzzle.container;
-    const dropZone = container.querySelector(".drop-zone");
-    const userWords = Array.from(dropZone.children).map(word => word.innerText);
-    const correctWords = puzzle.correct;
-    const isCorrect = (userWords.join(" ") === correctWords.join(" "));
-
-    // Remove previous highlighting
-    Array.from(dropZone.children).forEach(word => {
-      word.classList.remove("correct", "incorrect");
-    });
-
-    // Apply visual feedback per word
-    Array.from(dropZone.children).forEach((word, index) => {
-      if (word.innerText === correctWords[index]) {
-        word.classList.add("correct");
-      } else {
-        word.classList.add("incorrect");
-      }
-    });
-
-    if (isCorrect) {
-      totalCorrect++;
-      // Positive reinforcement: read the correct sentence aloud
-      speak("Great job! The sentence is: " + correctWords.join(" "));
+/* === Submit Answer for Current Puzzle === */
+function submitAnswer() {
+  const puzzleContainer = document.getElementById("puzzle-container");
+  const currentPuzzleElem = puzzleContainer.querySelector(".sentence-container");
+  if (!currentPuzzleElem) return;
+  
+  const dropZone = currentPuzzleElem.querySelector(".drop-zone");
+  const userWords = Array.from(dropZone.children).map(word => word.innerText);
+  const puzzle = puzzles[currentPuzzleIndex];
+  
+  if (userWords.length !== puzzle.correct.length) {
+    alert("Please arrange all words before submitting.");
+    return;
+  }
+  
+  puzzle.submitted = true;
+  puzzle.userAnswer = userWords;
+  
+  const isCorrect = (userWords.join(" ") === puzzle.correct.join(" "));
+  
+  // Highlight each word in the drop zone
+  Array.from(dropZone.children).forEach((wordElem, index) => {
+    wordElem.classList.remove("correct", "incorrect");
+    if (wordElem.innerText === puzzle.correct[index]) {
+      wordElem.classList.add("correct");
+    } else {
+      wordElem.classList.add("incorrect");
     }
   });
-  document.getElementById("score").innerText = `You got ${totalCorrect} out of ${puzzles.length} sentences correct!`;
+  
+  if (isCorrect) {
+    score++;
+    speak("Great job! The sentence is: " + puzzle.correct.join(" "));
+  } else {
+    speak("That's not quite right. The correct sentence is: " + puzzle.correct.join(" "));
+  }
+  
+  displayCurrentPuzzle();
 }
 
-/* === Reset Game === */
-function resetGame() {
-  document.querySelectorAll(".word").forEach(word => {
-    word.classList.remove("correct", "incorrect");
-  });
-  initializeGame();
+/* === Navigation Functions === */
+function nextPuzzle() {
+  if (currentPuzzleIndex < puzzles.length - 1) {
+    currentPuzzleIndex++;
+    displayCurrentPuzzle();
+  } else {
+    alert("This is the last question.");
+  }
+}
+
+function prevPuzzle() {
+  if (currentPuzzleIndex > 0) {
+    currentPuzzleIndex--;
+    displayCurrentPuzzle();
+  } else {
+    alert("This is the first question.");
+  }
+}
+
+/* === Reset Quiz === */
+function resetQuiz() {
+  generatePuzzles();
+  displayCurrentPuzzle();
 }
 
 /* === Global Event Listeners === */
-// Listen to header instructions
 document.getElementById("listen-instructions-btn").addEventListener("click", () => {
   const instructions = document.querySelector("p.instructions").innerText;
   speak(instructions);
 });
+document.getElementById("submit-btn").addEventListener("click", submitAnswer);
+document.getElementById("next-btn").addEventListener("click", nextPuzzle);
+document.getElementById("prev-btn").addEventListener("click", prevPuzzle);
+document.getElementById("reset-btn").addEventListener("click", resetQuiz);
+document.getElementById("level-select").addEventListener("change", (e) => {
+  currentLevel = e.target.value;
+  resetQuiz();
+});
 
-// Check and Reset buttons
-document.getElementById("check-btn").addEventListener("click", checkAnswers);
-document.getElementById("reset-btn").addEventListener("click", resetGame);
-
-// Initialize game when the DOM is ready
-document.addEventListener("DOMContentLoaded", initializeGame);
+/* === Initialize Quiz on DOM Ready === */
+document.addEventListener("DOMContentLoaded", () => {
+  generatePuzzles();
+  displayCurrentPuzzle();
+});
