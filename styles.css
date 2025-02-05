@@ -111,7 +111,7 @@ p.instructions {
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
-  min-height: 45px;
+  min-height: 60px; /* Increased min-height for easier dropping */
   border: 2px dashed #ccc;
   border-radius: 5px;
   padding: 8px;
@@ -119,6 +119,8 @@ p.instructions {
   transition: background-color 0.3s ease, border-color 0.3s ease;
   margin-bottom: 8px;
   pointer-events: auto;
+  /* Ensure drop zone receives touch events */
+  touch-action: none;
 }
 .word-bank:hover, .drop-zone:hover {
   background-color: #fff;
