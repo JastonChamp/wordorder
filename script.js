@@ -233,6 +233,13 @@ function displayCurrentPuzzle() {
   container.appendChild(wordBank);
   container.appendChild(dropZone);
   
+  // Add event listeners for drop zone
+  [wordBank, dropZone].forEach(zone => {
+    zone.addEventListener("dragover", handleDragOver);
+    zone.addEventListener("dragleave", handleDragLeave);
+    zone.addEventListener("drop", handleDrop);
+  });
+  
   // If not submitted, add shuffled words to the word bank
   if (!puzzle.submitted) {
     const wordsShuffled = shuffle([...puzzle.correct]);
@@ -282,22 +289,26 @@ function handleDragStart(e) {
   draggedItem = e.target;
   e.target.style.opacity = "0.5";
   e.dataTransfer.setData("text/plain", e.target.innerText);
+  console.log("Drag started for:", e.target.innerText);
 }
 
 function handleDragEnd(e) {
   e.target.style.opacity = "1";
+  console.log("Drag ended for:", e.target.innerText);
 }
 
 function handleDragOver(e) {
   e.preventDefault();
   if (e.currentTarget.classList.contains("drop-zone")) {
     e.currentTarget.classList.add("active");
+    console.log("Drag over drop-zone:", e.currentTarget);
   }
 }
 
 function handleDragLeave(e) {
   if (e.currentTarget.classList.contains("drop-zone")) {
     e.currentTarget.classList.remove("active");
+    console.log("Drag left drop-zone:", e.currentTarget);
   }
 }
 
@@ -309,7 +320,6 @@ function handleDrop(e) {
     console.log("Drop event fired on:", e.currentTarget);
     if (draggedItem) {
       console.log("Dropped item:", draggedItem.innerText);
-      // Append dragged item to the drop zone using currentTarget
       e.currentTarget.appendChild(draggedItem);
     } else {
       console.warn("No dragged item available on drop.");
