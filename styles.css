@@ -118,6 +118,7 @@ p.instructions {
   background-color: #f9f9f9;
   transition: background-color 0.3s ease, border-color 0.3s ease;
   margin-bottom: 8px;
+  pointer-events: auto;
 }
 .word-bank:hover, .drop-zone:hover {
   background-color: #fff;
