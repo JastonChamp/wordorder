@@ -303,10 +303,17 @@ function handleDragLeave(e) {
 
 function handleDrop(e) {
   e.preventDefault();
+  e.stopPropagation(); // Prevent bubbling issues
   if (e.currentTarget.classList.contains("drop-zone")) {
     e.currentTarget.classList.remove("active");
-    // Append the dragged item to the drop zone (using currentTarget)
-    e.currentTarget.appendChild(draggedItem);
+    console.log("Drop event fired on:", e.currentTarget);
+    if (draggedItem) {
+      console.log("Dropped item:", draggedItem.innerText);
+      // Append dragged item to the drop zone using currentTarget
+      e.currentTarget.appendChild(draggedItem);
+    } else {
+      console.warn("No dragged item available on drop.");
+    }
   }
 }
 
@@ -357,7 +364,7 @@ function nextPuzzle() {
     displayCurrentPuzzle();
   } else {
     alert("Session complete! You have finished 5 questions for this level.");
-    // Optionally, here you might prompt to move to the next level.
+    // Optionally, you might prompt the user to move to the next level.
   }
 }
 
