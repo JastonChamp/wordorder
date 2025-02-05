@@ -11,55 +11,62 @@ function speak(text) {
 }
 
 /* === Level Sentence Pools === */
-// Primary 1: Very simple sentences (20)
+
+// -------------------------
+// Primary 1: Very simple sentences
+// -------------------------
 const sentencesP1 = [
-  "Cat is black.",
-  "Dog runs.",
-  "Bird flies.",
-  "Sun is hot.",
+  "I like milk.",
+  "The cat sleeps.",
+  "The dog runs.",
+  "Bird sings.",
+  "The sun is hot.",
   "Mom cooks.",
   "Dad works.",
-  "Milk is white.",
-  "Fish swim.",
-  "Ants crawl.",
-  "Tree grows.",
-  "Car is red.",
+  "Apple is red.",
   "Ball is round.",
-  "Egg is oval.",
-  "Frog jumps.",
-  "Bee buzzes.",
-  "Leaf is green.",
-  "Rain falls.",
-  "Snow is cold.",
+  "Car is blue.",
+  "Toy is fun.",
   "Cup is full.",
-  "Book is open."
+  "Tree grows tall.",
+  "Fish swim fast.",
+  "Bear is big.",
+  "Moon is bright.",
+  "Star shines.",
+  "Flower is pretty.",
+  "Book is open.",
+  "Rain falls."
 ];
 
-// Primary 2: Simple sentences with adjectives (20)
+// -------------------------
+// Primary 2: Simple sentences with adjectives
+// -------------------------
 const sentencesP2 = [
   "The red ball bounces.",
   "A small dog barks.",
-  "Big cat sleeps.",
-  "The sun is bright.",
-  "Blue bird sings.",
-  "Yellow flower blooms.",
-  "Green apple tastes sweet.",
-  "Cute puppy plays.",
-  "Little mouse squeaks.",
-  "Tall tree stands.",
-  "Soft pillow comforts.",
+  "The big cat sleeps.",
+  "The bright sun shines.",
+  "A blue bird sings.",
+  "A yellow flower blooms.",
+  "The green apple tastes sweet.",
+  "The cute puppy plays.",
+  "The little mouse squeaks.",
+  "A tall tree stands.",
+  "A soft pillow comforts.",
   "Hot soup warms.",
   "Fresh milk nourishes.",
   "Cold ice melts.",
-  "Small fish swims.",
-  "Happy kid laughs.",
-  "Slow snail crawls.",
-  "Bright star shines.",
-  "Heavy cloud rains.",
-  "Big truck moves."
+  "A small fish swims.",
+  "Happy kids laugh.",
+  "A slow snail crawls.",
+  "A bright star shines.",
+  "Heavy clouds rain.",
+  "A big truck moves."
 ];
 
-// Primary 3: Complete subject-verb-object sentences (20)
+// -------------------------
+// Primary 3: Complete subject-verb-object sentences
+// -------------------------
 const sentencesP3 = [
   "The boy eats an apple.",
   "The girl plays with a toy.",
@@ -83,7 +90,9 @@ const sentencesP3 = [
   "The student solves a puzzle."
 ];
 
-// Primary 4: Sentences with modifiers (20)
+// -------------------------
+// Primary 4: Sentences with modifiers (adjectives/adverbs)
+// -------------------------
 const sentencesP4 = [
   "The happy girl sings beautifully.",
   "The boy quickly runs to school.",
@@ -107,7 +116,9 @@ const sentencesP4 = [
   "The pretty garden blooms in spring."
 ];
 
-// Primary 5: Compound or multi-clause sentences (20)
+// -------------------------
+// Primary 5: Compound or multi-clause sentences
+// -------------------------
 const sentencesP5 = [
   "The teacher reads a story, and the children listen attentively.",
   "The boy finished his homework before dinner.",
@@ -131,7 +142,9 @@ const sentencesP5 = [
   "The book is open on the desk, and the student reads silently."
 ];
 
-// Primary 6: Complex sentences with subordinate clauses (20)
+// -------------------------
+// Primary 6: Complex sentences with subordinate clauses
+// -------------------------
 const sentencesP6 = [
   "After finishing his homework, the student went to the library.",
   "Although it was raining, the children played outside happily.",
