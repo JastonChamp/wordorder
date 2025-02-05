@@ -13,159 +13,159 @@ function speak(text) {
 /* === Level Sentence Pools === */
 
 // -------------------------
-// Primary 1: Very simple sentences
+// Primary 1: Comparable to the reference P1 test examples (20 sentences)
 // -------------------------
 const sentencesP1 = [
-  "I like milk.",
-  "The cat sleeps.",
-  "The dog runs.",
-  "Bird sings.",
-  "The sun is hot.",
-  "Mom cooks.",
-  "Dad works.",
-  "Apple is red.",
-  "Ball is round.",
-  "Car is blue.",
-  "Toy is fun.",
-  "Cup is full.",
-  "Tree grows tall.",
-  "Fish swim fast.",
-  "Bear is big.",
-  "Moon is bright.",
-  "Star shines.",
-  "Flower is pretty.",
-  "Book is open.",
-  "Rain falls."
+  "I made mistakes in my test.",
+  "Do you know the answer to this puzzle?",
+  "Ann lives in that house over there.",
+  "Tony had cereal for breakfast.",
+  "Which animal is the largest in the world?",
+  "The cat sleeps under the warm sun.",
+  "My brother plays with his toy.",
+  "I see a red ball in the park.",
+  "Do you like to play games?",
+  "The bird flies high in the sky.",
+  "She sings a lovely song.",
+  "He eats a juicy apple.",
+  "We went to school on time.",
+  "My dad drives a blue car.",
+  "Can you solve this simple puzzle?",
+  "The dog runs fast in the yard.",
+  "They watch a fun cartoon.",
+  "I love to read a book.",
+  "Is this your favorite color?",
+  "The boy rides a small bicycle."
 ];
 
 // -------------------------
-// Primary 2: Simple sentences with adjectives
+// Primary 2: Simple sentences with adjectives (20 sentences)
 // -------------------------
 const sentencesP2 = [
-  "The red ball bounces.",
-  "A small dog barks.",
-  "The big cat sleeps.",
-  "The bright sun shines.",
-  "A blue bird sings.",
-  "A yellow flower blooms.",
-  "The green apple tastes sweet.",
-  "The cute puppy plays.",
-  "The little mouse squeaks.",
-  "A tall tree stands.",
-  "A soft pillow comforts.",
-  "Hot soup warms.",
-  "Fresh milk nourishes.",
-  "Cold ice melts.",
-  "A small fish swims.",
-  "Happy kids laugh.",
-  "A slow snail crawls.",
-  "A bright star shines.",
-  "Heavy clouds rain.",
-  "A big truck moves."
+  "The small boy kicks a red ball.",
+  "A happy girl sings a joyful song.",
+  "The green apple tastes very sweet.",
+  "A little dog barks at a stranger.",
+  "The bright sun shines over the park.",
+  "My mother cooks a delicious meal.",
+  "The old man walks slowly on the road.",
+  "A big cat sleeps under a warm roof.",
+  "The blue car zooms down the street.",
+  "Do you like the colorful playground?",
+  "The cute kitten plays with a ball.",
+  "A tall tree grows near our school.",
+  "The small bird chirps in the garden.",
+  "My sister draws a beautiful picture.",
+  "The gentle breeze cools the busy street.",
+  "He wears a bright hat every day.",
+  "The red flower blooms in spring.",
+  "A friendly dog greets its owner.",
+  "The white cloud floats in the clear sky.",
+  "Can you see the shining stars tonight?"
 ];
 
 // -------------------------
-// Primary 3: Complete subject-verb-object sentences
+// Primary 3: Complete subject-verb-object sentences (20 sentences)
 // -------------------------
 const sentencesP3 = [
-  "The boy eats an apple.",
-  "The girl plays with a toy.",
-  "The dog chases the ball.",
-  "The teacher reads a book.",
-  "The cat drinks milk.",
-  "The boy kicks the ball.",
-  "The girl draws a picture.",
-  "The dog barks at the stranger.",
-  "The student writes a letter.",
-  "The mother cooks dinner.",
-  "The father drives a car.",
-  "The boy catches a frog.",
-  "The girl rides a bike.",
-  "The dog fetches the stick.",
-  "The teacher explains the lesson.",
-  "The child opens the door.",
-  "The boy climbs a tree.",
-  "The girl sings a song.",
-  "The cat chases a mouse.",
-  "The student solves a puzzle."
+  "The boy eats a crunchy apple during lunch break.",
+  "The girl plays with a shiny toy in the classroom.",
+  "The dog chases the ball across the green field.",
+  "The teacher reads an interesting story to the students.",
+  "The cat drinks fresh milk from a small bowl.",
+  "The boy kicks the ball with great enthusiasm.",
+  "The girl draws a colorful picture on the board.",
+  "The dog barks loudly at the passing stranger.",
+  "The student writes a letter to his best friend.",
+  "The mother cooks a healthy dinner for the family.",
+  "The father drives the car carefully on busy roads.",
+  "The boy catches a slippery frog near the pond.",
+  "The girl rides a bicycle along the quiet street.",
+  "The dog fetches the stick thrown by its owner.",
+  "The teacher explains the lesson clearly to the class.",
+  "The child opens the door to let in the sunshine.",
+  "The boy climbs the tall tree in the schoolyard.",
+  "The girl sings a soft song during morning assembly.",
+  "The cat chases a small mouse in the garden.",
+  "The student solves a tricky puzzle on his desk."
 ];
 
 // -------------------------
-// Primary 4: Sentences with modifiers (adjectives/adverbs)
+// Primary 4: Sentences with modifiers (20 sentences)
 // -------------------------
 const sentencesP4 = [
-  "The happy girl sings beautifully.",
-  "The boy quickly runs to school.",
-  "The teacher explains the lesson clearly.",
-  "The children play in the park.",
-  "The red car moves fast.",
-  "The little boy smiles brightly.",
-  "The old man walks slowly.",
-  "The smart student solves problems.",
-  "The busy mother prepares breakfast.",
-  "The gentle wind blows softly.",
-  "The excited child jumps high.",
-  "The kind teacher helps everyone.",
-  "The little girl reads a colorful book.",
-  "The brave boy climbs the tall tree.",
-  "The cheerful students study hard.",
-  "The calm lake reflects the sky.",
-  "The fast train zooms by.",
-  "The playful puppy chases its tail.",
-  "The thoughtful boy shares his toys.",
-  "The pretty garden blooms in spring."
+  "The cheerful girl sings beautifully during the school assembly.",
+  "The boy quickly runs to school, eager to learn new things.",
+  "The teacher patiently explains the complex lesson to her students.",
+  "The children happily play in the park on a sunny afternoon.",
+  "The shiny red car moves fast on the busy city road.",
+  "The little boy smiles brightly as he enjoys his cartoon.",
+  "The elderly man walks slowly while carrying his umbrella.",
+  "The smart student diligently solves problems in class.",
+  "The busy mother prepares a delicious breakfast for the family.",
+  "The gentle wind blows softly, making the leaves dance.",
+  "The excited child jumps high, celebrating his small victory.",
+  "The kind teacher helps every student with their homework.",
+  "The little girl reads a colorful book in the shade.",
+  "The brave boy climbs the tall tree with determination.",
+  "The cheerful class listens attentively as the teacher explains a story.",
+  "The calm lake reflects the clear blue sky on a sunny day.",
+  "The fast train zooms past the station with impressive speed.",
+  "The playful puppy chases its tail with endless energy.",
+  "The thoughtful boy shares his toys with his friends.",
+  "The pretty garden blooms vibrantly in early spring."
 ];
 
 // -------------------------
-// Primary 5: Compound or multi-clause sentences
+// Primary 5: Compound or multi-clause sentences (20 sentences)
 // -------------------------
 const sentencesP5 = [
-  "The teacher reads a story, and the children listen attentively.",
-  "The boy finished his homework before dinner.",
-  "The little girl happily skipped to school.",
-  "The bright sun shines over the calm sea.",
-  "The busy bees buzz around the blooming flowers.",
-  "The students study in the library, and they take notes carefully.",
-  "The father cooks dinner, and the children set the table.",
-  "The dog barks loudly, but the cat remains calm.",
-  "The rain poured outside, yet the class continued indoors.",
-  "The bird sings in the morning, and the flowers open up.",
-  "The boy plays soccer, while his friend rides a bike.",
-  "The teacher writes on the board, and the students copy the notes.",
-  "The car stops at the red light, and the driver waits patiently.",
-  "The children laugh during recess, and they return to class happily.",
-  "The sun sets in the west, and the sky turns orange.",
-  "The little girl draws a picture, and her mother praises her work.",
-  "The student answers the question, and the teacher smiles.",
-  "The dog runs in the park, and the kids cheer.",
-  "The wind blows gently, and the leaves rustle.",
-  "The book is open on the desk, and the student reads silently."
+  "The teacher reads a fascinating story, and the children listen with great attention.",
+  "The boy finished his homework before dinner, so he went out to play.",
+  "The little girl happily skipped to school, and her friends cheered her on.",
+  "The bright sun shines over the calm sea, while a gentle breeze soothes everyone.",
+  "The busy bees buzz around the blooming flowers, and the children watch in wonder.",
+  "The students study in the library, and they take notes carefully during the lesson.",
+  "The father cooks dinner, and the children help set the table for a family meal.",
+  "The dog barks loudly, but the cat remains calm and watches quietly.",
+  "The rain poured outside, yet the class continued their lesson indoors.",
+  "The bird sings in the morning, and the flowers open up to welcome the day.",
+  "The boy plays soccer, while his friend rides a bike around the playground.",
+  "The teacher writes on the board, and the students copy the notes attentively.",
+  "The car stops at the red light, and the driver waits patiently for the signal.",
+  "The children laugh during recess, and they return to class full of energy.",
+  "The sun sets in the west, and the sky turns a beautiful shade of orange.",
+  "The little girl draws a picture, and her mother praises her creative work.",
+  "The student answers the question correctly, and the teacher smiles proudly.",
+  "The dog runs in the park, and the kids cheer as it chases a ball.",
+  "The wind blows gently, and the leaves rustle softly in the evening.",
+  "The book is open on the desk, and the student reads quietly while taking notes."
 ];
 
 // -------------------------
-// Primary 6: Complex sentences with subordinate clauses
+// Primary 6: Complex sentences with subordinate clauses (20 sentences)
 // -------------------------
 const sentencesP6 = [
-  "After finishing his homework, the student went to the library.",
-  "Although it was raining, the children played outside happily.",
-  "The teacher, who was very kind, explained the lesson in detail.",
-  "Despite the heavy traffic, she arrived at school on time.",
-  "When the bell rang, the students hurried to their classrooms.",
-  "Since the exam was challenging, the teacher reviewed the material thoroughly.",
-  "Even though it was late, the boy continued reading his favorite book.",
-  "While the sun was setting, the family enjoyed a picnic in the park.",
-  "If you study hard, you will achieve great results.",
-  "After the game ended, the players celebrated their victory.",
-  "Although the movie was long, the audience remained engaged.",
-  "Because the weather was cool, the picnic lasted longer than expected.",
-  "Since the library was quiet, the students concentrated on their studies.",
-  "When the storm passed, the children went outside to play.",
-  "After receiving his award, the student thanked his parents.",
-  "Although she was tired, the teacher continued to prepare lessons.",
-  "If you practice regularly, your skills will improve over time.",
-  "While the bell was ringing, the students gathered in the hall.",
-  "Because the assignment was difficult, the students worked in groups.",
-  "After the concert ended, the crowd applauded enthusiastically."
+  "After finishing his homework, the student went to the library to search for more books.",
+  "Although it was raining heavily, the children played outside happily during recess.",
+  "The teacher, who was known for her kindness, explained the lesson in remarkable detail.",
+  "Despite the heavy traffic, she arrived at school on time and greeted everyone warmly.",
+  "When the bell rang, the students hurried to their classrooms, eager to start the day.",
+  "Since the exam was extremely challenging, the teacher reviewed the material thoroughly after class.",
+  "Even though it was late, the boy continued reading his favorite book with great enthusiasm.",
+  "While the sun was setting, the family enjoyed a delightful picnic in the nearby park.",
+  "If you study diligently every day, you will achieve excellent results in your exams.",
+  "After the game ended, the players celebrated their victory by cheering and clapping loudly.",
+  "Although the movie was quite long, the audience remained engaged and watched until the end.",
+  "Because the weather was unexpectedly cool, the picnic lasted longer than anticipated.",
+  "Since the library was exceptionally quiet, the students concentrated deeply on their research.",
+  "When the storm finally passed, the children went outside to play and enjoy the fresh air.",
+  "After receiving his award, the student thanked his parents and promised to work harder.",
+  "Although she was extremely tired, the teacher continued to prepare lessons for the week.",
+  "If you practice regularly and pay attention in class, your skills will improve significantly.",
+  "While the bell was ringing, the students gathered in the hall and listened to the announcements.",
+  "Because the assignment was particularly difficult, the students worked in groups to complete it.",
+  "After the concert ended, the crowd applauded enthusiastically, and the performers took a bow."
 ];
 
 /* === Global Variables === */
