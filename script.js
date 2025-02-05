@@ -11,48 +11,148 @@ function speak(text) {
 }
 
 /* === Level Sentence Pools === */
-// Sample sentences for each level (P1–P6)
+// Primary 1: Very simple sentences (20)
 const sentencesP1 = [
   "Cat is black.",
   "Dog runs.",
   "Bird flies.",
   "Sun is hot.",
-  "Mom cooks."
+  "Mom cooks.",
+  "Dad works.",
+  "Milk is white.",
+  "Fish swim.",
+  "Ants crawl.",
+  "Tree grows.",
+  "Car is red.",
+  "Ball is round.",
+  "Egg is oval.",
+  "Frog jumps.",
+  "Bee buzzes.",
+  "Leaf is green.",
+  "Rain falls.",
+  "Snow is cold.",
+  "Cup is full.",
+  "Book is open."
 ];
+
+// Primary 2: Simple sentences with adjectives (20)
 const sentencesP2 = [
   "The red ball bounces.",
   "A small dog barks.",
   "Big cat sleeps.",
   "The sun is bright.",
-  "Blue bird sings."
+  "Blue bird sings.",
+  "Yellow flower blooms.",
+  "Green apple tastes sweet.",
+  "Cute puppy plays.",
+  "Little mouse squeaks.",
+  "Tall tree stands.",
+  "Soft pillow comforts.",
+  "Hot soup warms.",
+  "Fresh milk nourishes.",
+  "Cold ice melts.",
+  "Small fish swims.",
+  "Happy kid laughs.",
+  "Slow snail crawls.",
+  "Bright star shines.",
+  "Heavy cloud rains.",
+  "Big truck moves."
 ];
+
+// Primary 3: Complete subject-verb-object sentences (20)
 const sentencesP3 = [
   "The boy eats an apple.",
   "The girl plays with a toy.",
   "The dog chases the ball.",
   "The teacher reads a book.",
-  "The cat drinks milk."
+  "The cat drinks milk.",
+  "The boy kicks the ball.",
+  "The girl draws a picture.",
+  "The dog barks at the stranger.",
+  "The student writes a letter.",
+  "The mother cooks dinner.",
+  "The father drives a car.",
+  "The boy catches a frog.",
+  "The girl rides a bike.",
+  "The dog fetches the stick.",
+  "The teacher explains the lesson.",
+  "The child opens the door.",
+  "The boy climbs a tree.",
+  "The girl sings a song.",
+  "The cat chases a mouse.",
+  "The student solves a puzzle."
 ];
+
+// Primary 4: Sentences with modifiers (20)
 const sentencesP4 = [
   "The happy girl sings beautifully.",
   "The boy quickly runs to school.",
   "The teacher explains the lesson clearly.",
   "The children play in the park.",
-  "The red car moves fast."
+  "The red car moves fast.",
+  "The little boy smiles brightly.",
+  "The old man walks slowly.",
+  "The smart student solves problems.",
+  "The busy mother prepares breakfast.",
+  "The gentle wind blows softly.",
+  "The excited child jumps high.",
+  "The kind teacher helps everyone.",
+  "The little girl reads a colorful book.",
+  "The brave boy climbs the tall tree.",
+  "The cheerful students study hard.",
+  "The calm lake reflects the sky.",
+  "The fast train zooms by.",
+  "The playful puppy chases its tail.",
+  "The thoughtful boy shares his toys.",
+  "The pretty garden blooms in spring."
 ];
+
+// Primary 5: Compound or multi-clause sentences (20)
 const sentencesP5 = [
   "The teacher reads a story, and the children listen attentively.",
   "The boy finished his homework before dinner.",
   "The little girl happily skipped to school.",
   "The bright sun shines over the calm sea.",
-  "The busy bees buzz around the blooming flowers."
+  "The busy bees buzz around the blooming flowers.",
+  "The students study in the library, and they take notes carefully.",
+  "The father cooks dinner, and the children set the table.",
+  "The dog barks loudly, but the cat remains calm.",
+  "The rain poured outside, yet the class continued indoors.",
+  "The bird sings in the morning, and the flowers open up.",
+  "The boy plays soccer, while his friend rides a bike.",
+  "The teacher writes on the board, and the students copy the notes.",
+  "The car stops at the red light, and the driver waits patiently.",
+  "The children laugh during recess, and they return to class happily.",
+  "The sun sets in the west, and the sky turns orange.",
+  "The little girl draws a picture, and her mother praises her work.",
+  "The student answers the question, and the teacher smiles.",
+  "The dog runs in the park, and the kids cheer.",
+  "The wind blows gently, and the leaves rustle.",
+  "The book is open on the desk, and the student reads silently."
 ];
+
+// Primary 6: Complex sentences with subordinate clauses (20)
 const sentencesP6 = [
   "After finishing his homework, the student went to the library.",
   "Although it was raining, the children played outside happily.",
   "The teacher, who was very kind, explained the lesson in detail.",
   "Despite the heavy traffic, she arrived at school on time.",
-  "When the bell rang, the students hurried to their classrooms."
+  "When the bell rang, the students hurried to their classrooms.",
+  "Since the exam was challenging, the teacher reviewed the material thoroughly.",
+  "Even though it was late, the boy continued reading his favorite book.",
+  "While the sun was setting, the family enjoyed a picnic in the park.",
+  "If you study hard, you will achieve great results.",
+  "After the game ended, the players celebrated their victory.",
+  "Although the movie was long, the audience remained engaged.",
+  "Because the weather was cool, the picnic lasted longer than expected.",
+  "Since the library was quiet, the students concentrated on their studies.",
+  "When the storm passed, the children went outside to play.",
+  "After receiving his award, the student thanked his parents.",
+  "Although she was tired, the teacher continued to prepare lessons.",
+  "If you practice regularly, your skills will improve over time.",
+  "While the bell was ringing, the students gathered in the hall.",
+  "Because the assignment was difficult, the students worked in groups.",
+  "After the concert ended, the crowd applauded enthusiastically."
 ];
 
 /* === Global Variables === */
@@ -60,6 +160,7 @@ let puzzles = [];  // Array of puzzle objects: { correct: Array, submitted: Bool
 let currentPuzzleIndex = 0;
 let score = 0;
 let currentLevel = 'p3'; // Default level is Primary 3
+const sessionLength = 5;  // Only 5 puzzles per session
 
 /* === Get Sentences for the Selected Level === */
 function getSentencesForLevel(level) {
@@ -88,8 +189,8 @@ function shuffle(array) {
 /* === Generate Puzzles === */
 function generatePuzzles() {
   const sentencePool = getSentencesForLevel(currentLevel);
-  // For this version, we use all sentences from the pool (shuffled order)
-  const selectedSentences = shuffle([...sentencePool]);
+  // Randomly select 'sessionLength' sentences from the pool
+  const selectedSentences = shuffle([...sentencePool]).slice(0, sessionLength);
   puzzles = selectedSentences.map(sentence => ({
     correct: sentence.split(" "),
     submitted: false,
@@ -115,7 +216,7 @@ function displayCurrentPuzzle() {
   
   // Puzzle header
   const header = document.createElement("h3");
-  header.innerText = `Question ${currentPuzzleIndex + 1}: Arrange the words:`;
+  header.innerText = `Question ${currentPuzzleIndex + 1} of ${sessionLength}: Arrange the words:`;
   container.appendChild(header);
   
   // Create Word Bank and Drop Zone
@@ -146,7 +247,7 @@ function displayCurrentPuzzle() {
       wordBank.appendChild(wordDiv);
     });
   } else {
-    // If already submitted, display the student's answer in the drop zone with highlighting,
+    // If submitted, display the student's answer in the drop zone with highlighting,
     // and show the correct order in the word bank for review.
     puzzle.userAnswer.forEach((word, index) => {
       const wordDiv = document.createElement("div");
@@ -170,7 +271,7 @@ function displayCurrentPuzzle() {
   puzzleContainer.appendChild(container);
   
   // Update progress and score display
-  document.getElementById("progress").innerText = `Question ${currentPuzzleIndex + 1} of ${puzzles.length}`;
+  document.getElementById("progress").innerText = `Question ${currentPuzzleIndex + 1} of ${sessionLength}`;
   document.getElementById("score").innerText = `Score: ${score}`;
 }
 
@@ -204,9 +305,8 @@ function handleDrop(e) {
   e.preventDefault();
   if (e.currentTarget.classList.contains("drop-zone")) {
     e.currentTarget.classList.remove("active");
-  }
-  if (e.target.classList.contains("word-bank") || e.target.classList.contains("drop-zone")) {
-    e.target.appendChild(draggedItem);
+    // Append the dragged item to the drop zone (using currentTarget)
+    e.currentTarget.appendChild(draggedItem);
   }
 }
 
@@ -256,7 +356,8 @@ function nextPuzzle() {
     currentPuzzleIndex++;
     displayCurrentPuzzle();
   } else {
-    alert("This is the last question.");
+    alert("Session complete! You have finished 5 questions for this level.");
+    // Optionally, here you might prompt to move to the next level.
   }
 }
 
