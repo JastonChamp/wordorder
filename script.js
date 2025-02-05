@@ -233,7 +233,7 @@ function displayCurrentPuzzle() {
   container.appendChild(wordBank);
   container.appendChild(dropZone);
   
-  // Add event listeners for drop zone
+  // Attach event listeners for drop zone and word bank
   [wordBank, dropZone].forEach(zone => {
     zone.addEventListener("dragover", handleDragOver);
     zone.addEventListener("dragleave", handleDragLeave);
@@ -314,7 +314,7 @@ function handleDragLeave(e) {
 
 function handleDrop(e) {
   e.preventDefault();
-  e.stopPropagation(); // Prevent bubbling issues
+  e.stopPropagation();
   if (e.currentTarget.classList.contains("drop-zone")) {
     e.currentTarget.classList.remove("active");
     console.log("Drop event fired on:", e.currentTarget);
