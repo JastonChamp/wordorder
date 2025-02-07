@@ -11,8 +11,8 @@
   <header>
     <h1>Word Order Adventure</h1>
     <p class="instructions">
-      Drag and drop the words from the <strong>Word Bank</strong> into the <strong>Drop Zone</strong> to form the correct sentence.
-      When you're ready, click <em>Submit Answer</em> to check your answer.
+      Rearrange the words to form a correct sentence or question.
+      Begin with a capital letter and end with a full stop or question mark.
     </p>
     <div class="controls">
       <label for="level-select">Select Level:</label>
@@ -35,13 +35,16 @@
     <!-- Navigation Buttons -->
     <div class="nav-buttons">
       <button id="prev-btn">Previous</button>
+      <button id="hint-btn">Show Hint</button>
       <button id="submit-btn">Submit Answer</button>
       <button id="next-btn">Next</button>
     </div>
     
-    <!-- Progress and Score Display -->
+    <!-- Progress, Score, and Hint Display -->
     <p id="progress"></p>
     <p id="score"></p>
+    <p id="hint"></p>
+    
     <button id="reset-btn">Reset Quiz</button>
   </main>
 
