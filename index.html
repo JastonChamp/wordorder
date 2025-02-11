@@ -2,8 +2,11 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
+  <!-- Responsive meta tag -->
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Word Order Adventure</title>
+  <!-- Optional: Link to a Google Font for better readability -->
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans:400,600&display=swap" rel="stylesheet">
   <!-- Link to external CSS file -->
   <link rel="stylesheet" href="styles.css">
 </head>
@@ -11,8 +14,7 @@
   <header>
     <h1>Word Order Adventure</h1>
     <p class="instructions">
-      Rearrange the words to form a correct sentence or question.
-      Begin with a capital letter and end with a full stop or question mark.
+      Rearrange the words to form a correct sentence or question. Begin with a capital letter and end with a full stop or question mark.
     </p>
     <div class="controls">
       <label for="level-select">Select Level:</label>
@@ -29,8 +31,13 @@
   </header>
 
   <main class="game-container">
-    <!-- The current puzzle will be displayed here one at a time -->
+    <!-- Puzzle display -->
     <div id="puzzle-container"></div>
+    
+    <!-- Progress Bar -->
+    <div id="progress-bar-container">
+      <div id="progress-bar"></div>
+    </div>
     
     <!-- Navigation Buttons -->
     <div class="nav-buttons">
@@ -40,10 +47,11 @@
       <button id="next-btn">Next</button>
     </div>
     
-    <!-- Progress, Score, and Hint Display -->
+    <!-- Progress, Score, Hint and Success Feedback -->
     <p id="progress"></p>
     <p id="score"></p>
     <p id="hint"></p>
+    <p id="success-message" aria-live="polite"></p>
     
     <button id="reset-btn">Reset Quiz</button>
   </main>
