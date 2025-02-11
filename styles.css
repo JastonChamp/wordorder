@@ -1,21 +1,38 @@
-/* styles.css – Updated styling inspired by top games for a vibrant, modern look */
+/* styles.css – Enhanced styling with gamification elements */
 
-/* CSS Variables for theme customization */
+/* CSS Variables for Default (Dark) Theme */
 :root {
-  --primary-color: #1abc9c;       /* Turquoise accent */
-  --secondary-color: #16a085;     /* Darker turquoise */
-  --accent-color: #e74c3c;        /* Bold red accent */
-  --background-color: #2c3e50;    /* Deep navy background */
-  --text-color: #ecf0f1;          /* Light text */
-  --correct-bg: #27ae60;          /* Green for correct answers */
+  --primary-color: #1abc9c;
+  --secondary-color: #16a085;
+  --accent-color: #e74c3c;
+  --background-color: #2c3e50;
+  --text-color: #ecf0f1;
+  --correct-bg: #27ae60;
   --correct-border: #2ecc71;
-  --incorrect-bg: #c0392b;        /* Red for incorrect answers */
+  --incorrect-bg: #c0392b;
   --incorrect-border: #e74c3c;
-  --word-bg: #f39c12;             /* Bright orange word tiles */
+  --word-bg: #f39c12;
   --word-border: #d35400;
-  --dropzone-active-bg: #34495e;  /* Highlighted dropzone background */
+  --dropzone-active-bg: #34495e;
   --progress-bar-bg: #1abc9c;
   --progress-bar-height: 12px;
+}
+
+/* Alternative Light Theme (Toggle via .light-theme on body) */
+body.light-theme {
+  --primary-color: #3498db;
+  --secondary-color: #2980b9;
+  --accent-color: #e74c3c;
+  --background-color: #ecf0f1;
+  --text-color: #2c3e50;
+  --correct-bg: #2ecc71;
+  --correct-border: #27ae60;
+  --incorrect-bg: #e74c3c;
+  --incorrect-border: #c0392b;
+  --word-bg: #f1c40f;
+  --word-border: #f39c12;
+  --dropzone-active-bg: #bdc3c7;
+  --progress-bar-bg: #3498db;
 }
 
 /* Global Reset */
@@ -28,7 +45,7 @@
 /* Base Body */
 body {
   font-family: 'Poppins', Arial, sans-serif;
-  background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+  background: linear-gradient(135deg, var(--background-color) 0%, #34495e 100%);
   color: var(--text-color);
   display: flex;
   flex-direction: column;
@@ -36,7 +53,7 @@ body {
   padding: 15px;
 }
 
-/* Header Styles */
+/* Header */
 header {
   text-align: center;
   margin-bottom: 20px;
@@ -106,12 +123,24 @@ h1 {
   transition: width 0.5s ease;
 }
 
-/* Puzzle Container */
+/* Gamification Panel */
+#gamification-panel {
+  margin: 10px 0;
+  background-color: rgba(255, 255, 255, 0.1);
+  padding: 10px;
+  border-radius: 5px;
+  text-align: center;
+  color: var(--text-color);
+}
+#gamification-panel p,
+#gamification-panel div {
+  margin: 5px;
+}
+
+/* Puzzle Container & Sentence Container */
 #puzzle-container {
   margin-bottom: 15px;
 }
-
-/* Sentence Container (Puzzle Box) */
 .sentence-container {
   margin: 0 auto 15px;
   padding: 15px;
@@ -168,7 +197,7 @@ h1 {
   outline: none;
 }
 
-/* Bounce Animation */
+/* Bounce Animation for Correct Answers */
 @keyframes bounce {
   0% { transform: scale(1); }
   30% { transform: scale(1.2); }
@@ -235,6 +264,33 @@ h1 {
 }
 #reset-btn:hover {
   background-color: var(--secondary-color);
+}
+
+/* Confetti Styles */
+.confetti-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 9999;
+}
+.confetti {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  opacity: 0.8;
+  animation: confetti-fall 3s linear infinite;
+}
+@keyframes confetti-fall {
+  0% {
+    transform: translateY(0) rotate(0deg);
+  }
+  100% {
+    transform: translateY(100vh) rotate(360deg);
+  }
 }
 
 /* Responsive Adjustments */
