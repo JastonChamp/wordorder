@@ -1,13 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <!-- Responsive meta tag -->
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="UTF-8">
+  <!-- Ensure proper scaling on mobile devices -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Word Order Adventure</title>
-  <!-- Google Fonts for improved typography -->
-  <link href="https://fonts.googleapis.com/css?family=Poppins:400,600&display=swap" rel="stylesheet">
-  <!-- Link to external CSS file -->
+  <!-- Google Fonts for modern typography -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <!-- Link to the improved CSS -->
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -15,7 +15,7 @@
     <h1>Word Order Adventure</h1>
     <p class="instructions">
       Rearrange the words to form a correct sentence or question.
-      Begin with a capital letter and end with a full stop or question mark.
+      Start with a capital letter and end with a full stop or question mark.
     </p>
     <div class="controls">
       <label for="level-select">Select Level:</label>
@@ -31,34 +31,36 @@
       <button id="fullscreen-btn" class="instruction-btn">Fullscreen</button>
     </div>
   </header>
-
-  <main class="game-container">
-    <!-- Puzzle display -->
-    <div id="puzzle-container"></div>
+  
+  <main class="game-container" id="game-container">
+    <!-- Puzzle Section: dynamically populated with puzzles -->
+    <section id="puzzle-container" aria-live="polite"></section>
     
     <!-- Progress Bar -->
-    <div id="progress-bar-container">
+    <section id="progress-bar-container">
       <div id="progress-bar"></div>
-    </div>
+    </section>
     
     <!-- Navigation Buttons -->
-    <div class="nav-buttons">
+    <nav class="nav-buttons">
       <button id="prev-btn">Previous</button>
       <button id="hint-btn">Show Hint</button>
       <button id="submit-btn">Submit Answer</button>
       <button id="next-btn">Next</button>
-    </div>
+    </nav>
     
-    <!-- Feedback -->
-    <p id="progress"></p>
-    <p id="score"></p>
-    <p id="hint"></p>
-    <p id="success-message" aria-live="polite"></p>
+    <!-- Feedback Area -->
+    <div class="feedback">
+      <p id="progress"></p>
+      <p id="score"></p>
+      <p id="hint"></p>
+      <p id="success-message" aria-live="polite"></p>
+    </div>
     
     <button id="reset-btn">Reset Quiz</button>
   </main>
 
-  <!-- Link to external JavaScript file -->
-  <script src="script.js"></script>
+  <!-- Defer loading of JavaScript until after the document is parsed -->
+  <script src="script.js" defer></script>
 </body>
 </html>
