@@ -2,7 +2,7 @@
 function speak(text) {
   if ('speechSynthesis' in window) {
     const utterance = new SpeechSynthesisUtterance(text);
-    utterance.rate = 1;   // Normal speed
+    utterance.rate = 1;   // Normal speed for clarity
     utterance.pitch = 1;  // Normal pitch
     window.speechSynthesis.speak(utterance);
   } else {
@@ -237,26 +237,25 @@ function displayCurrentPuzzle() {
   container.appendChild(wordBank);
   container.appendChild(dropZone);
   
-  // Attach pointer event listeners for drop zone (for visual active feedback)
-  dropZone.addEventListener("pointerenter", () => {
-    dropZone.classList.add("active");
-  });
-  dropZone.addEventListener("pointerleave", () => {
-    dropZone.classList.remove("active");
+  // Attach event listeners for drop zone and word bank (HTML5 drag-and-drop)
+  [wordBank, dropZone].forEach(zone => {
+    zone.addEventListener("dragover", handleDragOver);
+    zone.addEventListener("dragleave", handleDragLeave);
+    zone.addEventListener("drop", handleDrop);
   });
   
-  // For each word in the puzzle, if not submitted, create a word tile with pointer events.
+  // If not submitted, add shuffled words to the word bank
   if (!puzzle.submitted) {
     const wordsShuffled = shuffle([...puzzle.correct]);
     wordsShuffled.forEach(word => {
       const wordDiv = document.createElement("div");
       wordDiv.className = "word";
       wordDiv.setAttribute("role", "listitem");
+      wordDiv.draggable = true;
       wordDiv.tabIndex = 0;  // Enable keyboard focus
       wordDiv.innerText = word;
-      // Use pointer events instead of drag events for better touch support
-      wordDiv.addEventListener("pointerdown", handlePointerDown);
-      // No need for pointermove/up on the word itself; we'll use document-level listeners.
+      wordDiv.addEventListener("dragstart", handleDragStart);
+      wordDiv.addEventListener("dragend", handleDragEnd);
       wordBank.appendChild(wordDiv);
     });
   } else {
@@ -292,53 +291,50 @@ function displayCurrentPuzzle() {
   progressBar.style.width = `${((currentPuzzleIndex + 1) / sessionLength) * 100}%`;
 }
 
-/* === Pointer-based Drag & Drop Handlers === */
-let currentDrag = null;
-let offsetX = 0, offsetY = 0;
+/* === HTML5 Drag & Drop Handlers (Working on Desktop) === */
+let draggedItem = null;
 
-function handlePointerDown(e) {
-  // Only consider primary pointer (mouse left-button or primary touch)
-  if (e.pointerType === "mouse" && e.button !== 0) return;
-  currentDrag = e.target;
-  currentDrag.setPointerCapture(e.pointerId);
-  currentDrag.classList.add("dragging");
-  const rect = currentDrag.getBoundingClientRect();
-  offsetX = e.clientX - rect.left;
-  offsetY = e.clientY - rect.top;
-  // Bring element to front and set absolute position so it follows the pointer
-  currentDrag.style.position = "absolute";
-  currentDrag.style.zIndex = "1000";
+function handleDragStart(e) {
+  draggedItem = e.target;
+  e.target.style.opacity = "0.5";
+  e.dataTransfer.setData("text/plain", e.target.innerText);
+  console.log("Drag started for:", e.target.innerText);
 }
 
-function handlePointerMove(e) {
-  if (!currentDrag) return;
-  currentDrag.style.left = (e.clientX - offsetX) + "px";
-  currentDrag.style.top = (e.clientY - offsetY) + "px";
+function handleDragEnd(e) {
+  e.target.style.opacity = "1";
+  console.log("Drag ended for:", e.target.innerText);
 }
 
-function handlePointerUp(e) {
-  if (!currentDrag) return;
-  currentDrag.releasePointerCapture(e.pointerId);
-  currentDrag.classList.remove("dragging");
-  // Determine drop target based on pointer coordinates
-  const dropElem = document.elementFromPoint(e.clientX, e.clientY);
-  let dropZone = dropElem;
-  while (dropZone && !dropZone.classList.contains("drop-zone")) {
-    dropZone = dropZone.parentElement;
+function handleDragOver(e) {
+  e.preventDefault();
+  if (e.currentTarget.classList.contains("drop-zone")) {
+    e.currentTarget.classList.add("active");
+    console.log("Drag over drop-zone:", e.currentTarget);
   }
-  if (dropZone) {
-    dropZone.appendChild(currentDrag);
-  }
-  // Reset styles
-  currentDrag.style.position = "";
-  currentDrag.style.left = "";
-  currentDrag.style.top = "";
-  currentDrag = null;
 }
 
-/* Attach global pointermove and pointerup events */
-document.addEventListener("pointermove", handlePointerMove);
-document.addEventListener("pointerup", handlePointerUp);
+function handleDragLeave(e) {
+  if (e.currentTarget.classList.contains("drop-zone")) {
+    e.currentTarget.classList.remove("active");
+    console.log("Drag left drop-zone:", e.currentTarget);
+  }
+}
+
+function handleDrop(e) {
+  e.preventDefault();
+  e.stopPropagation();
+  if (e.currentTarget.classList.contains("drop-zone")) {
+    e.currentTarget.classList.remove("active");
+    console.log("Drop event fired on:", e.currentTarget);
+    if (draggedItem) {
+      console.log("Dropped item:", draggedItem.innerText);
+      e.currentTarget.appendChild(draggedItem);
+    } else {
+      console.warn("No dragged item available on drop.");
+    }
+  }
+}
 
 /* === Show Hint Function === */
 function showHint() {
@@ -379,7 +375,6 @@ function submitAnswer() {
   
   const isCorrect = (userWords.join(" ") === puzzle.correct.join(" "));
   
-  // Highlight words in the drop zone.
   Array.from(dropZone.children).forEach((wordElem, index) => {
     wordElem.classList.remove("correct", "incorrect");
     if (wordElem.innerText === puzzle.correct[index]) {
