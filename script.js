@@ -205,8 +205,9 @@ function displayCurrentPuzzle() {
   const puzzleContainer = document.getElementById("puzzle-container");
   puzzleContainer.innerHTML = "";
   
-  // Clear any previous hint
+  // Clear any previous hint or success message
   document.getElementById("hint").innerText = "";
+  document.getElementById("success-message").innerText = "";
   
   if (currentPuzzleIndex < 0 || currentPuzzleIndex >= puzzles.length) {
     puzzleContainer.innerHTML = "<p>No puzzle available.</p>";
@@ -251,6 +252,7 @@ function displayCurrentPuzzle() {
       wordDiv.className = "word";
       wordDiv.setAttribute("role", "listitem");
       wordDiv.draggable = true;
+      wordDiv.tabIndex = 0;  // Allow keyboard focus
       wordDiv.innerText = word;
       wordDiv.addEventListener("dragstart", handleDragStart);
       wordDiv.addEventListener("dragend", handleDragEnd);
@@ -283,6 +285,10 @@ function displayCurrentPuzzle() {
   // Update progress and score display
   document.getElementById("progress").innerText = `Question ${currentPuzzleIndex + 1} of ${sessionLength}`;
   document.getElementById("score").innerText = `Score: ${score}`;
+  
+  // Update progress bar
+  const progressBar = document.getElementById("progress-bar");
+  progressBar.style.width = `${((currentPuzzleIndex + 1) / sessionLength) * 100}%`;
 }
 
 /* === Drag & Drop Handlers === */
@@ -334,17 +340,17 @@ function handleDrop(e) {
 function showHint() {
   const hintElem = document.getElementById("hint");
   const puzzle = puzzles[currentPuzzleIndex];
-  // If the puzzle hasn't been submitted, show the first correct word.
   if (!puzzle.submitted) {
+    // Show the first word of the correct sentence as a hint
     hintElem.innerText = `Hint: The sentence begins with "${puzzle.correct[0]}".`;
   } else {
-    // If submitted but incorrect, show partial feedback.
+    // If submitted but incorrect, show partial feedback
     let correctCount = 0;
     puzzle.userAnswer.forEach((word, index) => {
       if (word === puzzle.correct[index]) correctCount++;
     });
     if (correctCount < puzzle.correct.length) {
-      hintElem.innerText = `Partial Credit: You got ${correctCount} out of ${puzzle.correct.length} words correct.`;
+      hintElem.innerText = `Partial Feedback: ${correctCount} out of ${puzzle.correct.length} words are in the correct position.`;
     } else {
       hintElem.innerText = "";
     }
@@ -384,8 +390,22 @@ function submitAnswer() {
   if (isCorrect) {
     score++;
     speak("Great job! The sentence is: " + puzzle.correct.join(" "));
+    // Show a success message that fades out
+    const successElem = document.getElementById("success-message");
+    successElem.innerText = "✓ Correct!";
+    setTimeout(() => { successElem.innerText = ""; }, 3000);
   } else {
     speak("That's not quite right. The correct sentence is: " + puzzle.correct.join(" "));
+  }
+  
+  // Show partial credit if not 100%
+  if (!isCorrect) {
+    let correctCount = 0;
+    puzzle.userAnswer.forEach((word, index) => {
+      if (word === puzzle.correct[index]) correctCount++;
+    });
+    const hintElem = document.getElementById("hint");
+    hintElem.innerText = `Partial Credit: ${correctCount} out of ${puzzle.correct.length} words are in the correct position.`;
   }
   
   displayCurrentPuzzle();
@@ -398,7 +418,7 @@ function nextPuzzle() {
     displayCurrentPuzzle();
   } else {
     alert("Session complete! You have finished 5 questions for this level.");
-    // Optionally prompt to move to the next level.
+    // Optionally, prompt for next level or review.
   }
 }
 
