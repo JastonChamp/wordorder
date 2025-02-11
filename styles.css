@@ -1,4 +1,4 @@
-/* CSS Variables for easy theme customization */
+/* CSS Variables for theme customization */
 :root {
   --primary-color: #4a90e2;
   --secondary-color: #fdd835;
@@ -11,14 +11,18 @@
   --word-bg: #ffeb3b;
   --word-border: #fdd835;
   --dropzone-active-bg: #e0f7fa;
+  --progress-bar-bg: #4a90e2;
+  --progress-bar-height: 10px;
 }
 
+/* Global Reset */
 * {
   box-sizing: border-box;
 }
 
+/* Base Body */
 body {
-  font-family: "Comic Sans MS", Arial, sans-serif;
+  font-family: 'Open Sans', Arial, sans-serif;
   background-color: var(--background-color);
   margin: 0;
   padding: 15px;
@@ -28,29 +32,28 @@ body {
   color: var(--text-color);
 }
 
+/* Header Styles */
 header {
   text-align: center;
-  margin-bottom: 15px;
+  margin-bottom: 20px;
 }
-
 h1 {
   font-size: 2.4em;
-  margin-bottom: 5px;
+  margin-bottom: 10px;
 }
-
 p.instructions {
-  font-size: 1.1em;
+  font-size: 1.2em;
   margin: 0 auto 10px;
-  padding: 8px 10px;
-  font-weight: bold;
+  padding: 10px;
+  font-weight: 600;
   background-color: #fff;
-  border: 1px solid var(--primary-color);
-  display: inline-block;
+  border: 2px solid var(--primary-color);
   border-radius: 5px;
 }
 
+/* Controls Section */
 .controls {
-  margin-top: 8px;
+  margin-top: 10px;
 }
 .controls label {
   font-size: 1em;
@@ -58,12 +61,11 @@ p.instructions {
 }
 .controls select {
   font-size: 1em;
-  padding: 3px;
+  padding: 4px;
 }
-
 .instruction-btn {
   margin-left: 8px;
-  padding: 6px 12px;
+  padding: 8px 14px;
   font-size: 1em;
   border: none;
   border-radius: 5px;
@@ -76,50 +78,67 @@ p.instructions {
   background-color: #357abd;
 }
 
+/* Main Game Container */
 .game-container {
   max-width: 800px;
   width: 100%;
-  padding: 15px;
+  padding: 20px;
   background-color: #fff;
   border-radius: 10px;
-  box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
   text-align: center;
+  margin-bottom: 20px;
 }
 
+/* Puzzle Container */
 #puzzle-container {
   margin-bottom: 15px;
 }
 
-/* Puzzle container styles */
+/* Progress Bar Container */
+#progress-bar-container {
+  width: 100%;
+  background-color: #ddd;
+  border-radius: 5px;
+  overflow: hidden;
+  margin-bottom: 15px;
+}
+#progress-bar {
+  width: 0%;
+  height: var(--progress-bar-height);
+  background-color: var(--progress-bar-bg);
+  transition: width 0.5s ease;
+}
+
+/* Sentence Container (Puzzle Box) */
 .sentence-container {
-  margin: 0 auto 10px;
-  padding: 12px;
-  border: 2px solid var(--primary-color);
+  margin: 0 auto 15px;
+  padding: 15px;
+  border: 3px solid var(--primary-color);
   border-radius: 8px;
   background-color: #e9f2fb;
   max-width: 600px;
 }
-
 .sentence-container h3 {
-  margin: 0 0 8px;
+  margin: 0 0 10px;
   color: var(--primary-color);
-  font-size: 1.3em;
+  font-size: 1.4em;
 }
 
-/* Word bank and drop zone */
+/* Word Bank and Drop Zone */
 .word-bank, .drop-zone {
   display: flex;
   flex-wrap: wrap;
-  gap: 6px;
-  min-height: 80px; /* Ensure a larger drop target */
+  gap: 8px;
+  min-height: 80px; /* Larger drop target */
   border: 2px dashed #ccc;
   border-radius: 5px;
-  padding: 8px;
+  padding: 10px;
   background-color: #f9f9f9;
-  transition: background-color 0.3s ease, border-color 0.3s ease;
-  margin-bottom: 8px;
+  transition: background-color 0.3s, border-color 0.3s;
+  margin-bottom: 10px;
   pointer-events: auto;
-  touch-action: none; /* Disable default touch actions for better drag-drop support */
+  touch-action: none; /* Improve touch behavior */
 }
 .word-bank:hover, .drop-zone:hover {
   background-color: #fff;
@@ -129,8 +148,9 @@ p.instructions {
   border-color: var(--primary-color);
 }
 
+/* Word Tiles */
 .word {
-  padding: 8px 12px;
+  padding: 10px 14px;
   background-color: var(--word-bg);
   border: 1px solid var(--word-border);
   border-radius: 5px;
@@ -140,11 +160,12 @@ p.instructions {
   transition: transform 0.2s, background-color 0.3s;
   font-size: 1em;
 }
-.word:active {
+.word:active, .word:focus {
   transform: scale(1.1);
+  outline: none;
 }
 
-/* Bounce animation for correct word drop */
+/* Bounce Animation for Correct Word Drop */
 @keyframes bounce {
   0% { transform: scale(1); }
   30% { transform: scale(1.2); }
@@ -162,16 +183,16 @@ p.instructions {
   border-color: var(--incorrect-border) !important;
 }
 
-/* Navigation buttons */
+/* Navigation Buttons */
 .nav-buttons {
   display: flex;
   justify-content: center;
   gap: 15px;
-  margin-bottom: 8px;
   flex-wrap: wrap;
+  margin-bottom: 10px;
 }
 .nav-buttons button {
-  padding: 8px 16px;
+  padding: 10px 18px;
   font-size: 1em;
   border: none;
   border-radius: 5px;
@@ -184,20 +205,32 @@ p.instructions {
   background-color: #357abd;
 }
 
-/* Progress, Score, and Hint */
-#progress, #score, #hint {
+/* Progress, Score, Hint, and Success Message */
+#progress, #score, #hint, #success-message {
   font-size: 1.1em;
-  margin-top: 6px;
+  margin-top: 8px;
   font-weight: bold;
 }
 #hint {
   color: #555;
 }
+#success-message {
+  color: green;
+  animation: fadeOut 3s forwards;
+  opacity: 0;
+}
+
+/* Fade-out Animation */
+@keyframes fadeOut {
+  0% { opacity: 1; }
+  80% { opacity: 1; }
+  100% { opacity: 0; }
+}
 
 /* Reset Button */
 #reset-btn {
-  margin-top: 12px;
-  padding: 8px 16px;
+  margin-top: 15px;
+  padding: 10px 18px;
   font-size: 1em;
   border: none;
   border-radius: 5px;
