@@ -35,7 +35,7 @@ const sentencesP1 = [
   "The bird flies high."
 ];
 
-// Primary 2: Revised sentences (more challenging, similar to P3 complexity) (20)
+// Primary 2: Revised for increased challenge (20)
 const sentencesP2 = [
   "The small boy eats a crunchy apple.",
   "The girl plays with a bright, shiny toy.",
@@ -43,18 +43,18 @@ const sentencesP2 = [
   "The teacher reads an interesting book aloud.",
   "The cat drinks cold milk from a bowl.",
   "The boy kicks the red ball with energy.",
-  "The girl draws a colorful picture at school.",
-  "The dog barks at a passing stranger.",
-  "The student writes a neat letter.",
+  "The girl draws a neat picture in class.",
+  "The dog barks at a stranger on the street.",
+  "The student writes a short letter.",
   "The mother cooks a tasty dinner.",
   "The father drives a blue car carefully.",
   "The boy catches a slippery frog near the pond.",
-  "The girl rides a small bicycle around the block.",
-  "The dog fetches a stick thrown by its owner.",
+  "The girl rides her bicycle around the block.",
+  "The dog fetches the stick with enthusiasm.",
   "The teacher explains the lesson clearly.",
   "The child opens the door to welcome the day.",
   "The boy climbs a tall tree in the park.",
-  "The girl sings a happy song during recess.",
+  "The girl sings a joyful song at recess.",
   "The cat chases a tiny mouse in the garden.",
   "The student solves a simple puzzle."
 ];
@@ -256,6 +256,10 @@ function displayCurrentPuzzle() {
       wordDiv.innerText = word;
       wordDiv.addEventListener("dragstart", handleDragStart);
       wordDiv.addEventListener("dragend", handleDragEnd);
+      // Add touch event listeners for better mobile support:
+      wordDiv.addEventListener("touchstart", handleTouchStart, {passive: false});
+      wordDiv.addEventListener("touchmove", handleTouchMove, {passive: false});
+      wordDiv.addEventListener("touchend", handleTouchEnd, {passive: false});
       wordBank.appendChild(wordDiv);
     });
   } else {
@@ -336,12 +340,46 @@ function handleDrop(e) {
   }
 }
 
+/* === Touch Event Handlers for Mobile Devices === */
+let touchDragItem = null;
+
+function handleTouchStart(e) {
+  e.preventDefault();
+  touchDragItem = e.target;
+  touchDragItem.classList.add("dragging");
+  // Simulate dragstart by storing touch coordinates
+}
+
+function handleTouchMove(e) {
+  e.preventDefault();
+  const touch = e.touches[0];
+  // Move the element under the touch
+  touchDragItem.style.position = "absolute";
+  touchDragItem.style.left = touch.pageX - touchDragItem.offsetWidth / 2 + "px";
+  touchDragItem.style.top = touch.pageY - touchDragItem.offsetHeight / 2 + "px";
+}
+
+function handleTouchEnd(e) {
+  e.preventDefault();
+  // Determine the drop target
+  const touch = e.changedTouches[0];
+  const dropTarget = document.elementFromPoint(touch.clientX, touch.clientY);
+  if (dropTarget && dropTarget.classList.contains("drop-zone")) {
+    dropTarget.appendChild(touchDragItem);
+  }
+  // Reset style and class
+  touchDragItem.style.position = "";
+  touchDragItem.style.left = "";
+  touchDragItem.style.top = "";
+  touchDragItem.classList.remove("dragging");
+  touchDragItem = null;
+}
+
 /* === Show Hint Function === */
 function showHint() {
   const hintElem = document.getElementById("hint");
   const puzzle = puzzles[currentPuzzleIndex];
   if (!puzzle.submitted) {
-    // Show the first word of the correct sentence as a hint.
     hintElem.innerText = `Hint: The sentence begins with "${puzzle.correct[0]}".`;
   } else {
     let correctCount = 0;
@@ -349,7 +387,7 @@ function showHint() {
       if (word === puzzle.correct[index]) correctCount++;
     });
     if (correctCount < puzzle.correct.length) {
-      hintElem.innerText = `Partial Feedback: ${correctCount} out of ${puzzle.correct.length} words are in the correct position.`;
+      hintElem.innerText = `Partial Credit: ${correctCount} out of ${puzzle.correct.length} words are in the correct position.`;
     } else {
       hintElem.innerText = "";
     }
