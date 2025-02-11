@@ -161,363 +161,329 @@ const sentencesP6 = [
   "After the concert ended, the crowd applauded enthusiastically as the performers took a bow."
 ];
 
-/* === Global Variables === */
-let puzzles = [];  // Array of puzzle objects: { correct: Array, submitted: Boolean, userAnswer: Array }
-let currentPuzzleIndex = 0;
-let score = 0;
-let currentLevel = 'p3'; // Default level is Primary 3
-const sessionLength = 5;  // Only 5 puzzles per session
+const sessionLength = 5;
+  let puzzles = [];
+  let currentPuzzleIndex = 0;
+  let score = 0;
+  let currentLevel = 'p3';
 
-/* === Get Sentences for the Selected Level === */
-function getSentencesForLevel(level) {
-  switch (level) {
-    case 'p1': return sentencesP1;
-    case 'p2': return sentencesP2;
-    case 'p3': return sentencesP3;
-    case 'p4': return sentencesP4;
-    case 'p5': return sentencesP5;
-    case 'p6': return sentencesP6;
-    default: return sentencesP3;
-  }
-}
+  /*** Utility Functions ***/
+  const shuffle = (array) => {
+    let currentIndex = array.length, randomIndex;
+    while (currentIndex !== 0) {
+      randomIndex = Math.floor(Math.random() * currentIndex);
+      currentIndex--;
+      [array[currentIndex], array[randomIndex]] = [array[randomIndex], array[currentIndex]];
+    }
+    return array;
+  };
 
-/* === Shuffle Function (Fisher-Yates) === */
-function shuffle(array) {
-  let currentIndex = array.length, randomIndex;
-  while (currentIndex !== 0) {
-    randomIndex = Math.floor(Math.random() * currentIndex);
-    currentIndex--;
-    [array[currentIndex], array[randomIndex]] = [array[randomIndex], array[currentIndex]];
-  }
-  return array;
-}
+  const getSentencesForLevel = (level) => {
+    switch (level) {
+      case 'p1': return sentencesP1;
+      case 'p2': return sentencesP2;
+      case 'p3': return sentencesP3;
+      case 'p4': return sentencesP4;
+      case 'p5': return sentencesP5;
+      case 'p6': return sentencesP6;
+      default: return sentencesP3;
+    }
+  };
 
-/* === Generate Puzzles === */
-function generatePuzzles() {
-  const sentencePool = getSentencesForLevel(currentLevel);
-  // Randomly select 'sessionLength' sentences from the pool
-  const selectedSentences = shuffle([...sentencePool]).slice(0, sessionLength);
-  puzzles = selectedSentences.map(sentence => ({
-    correct: sentence.split(" "),
-    submitted: false,
-    userAnswer: null
-  }));
-  currentPuzzleIndex = 0;
-  score = 0;
-}
+  /*** Puzzle Generation ***/
+  const generatePuzzles = () => {
+    const sentencePool = getSentencesForLevel(currentLevel);
+    const selectedSentences = shuffle([...sentencePool]).slice(0, sessionLength);
+    puzzles = selectedSentences.map(sentence => ({
+      correct: sentence.split(" "),
+      submitted: false,
+      userAnswer: []
+    }));
+    currentPuzzleIndex = 0;
+    score = 0;
+  };
 
-/* === Display the Current Puzzle === */
-function displayCurrentPuzzle() {
-  const puzzleContainer = document.getElementById("puzzle-container");
-  puzzleContainer.innerHTML = "";
-  
-  // Clear any previous hint or success message
-  document.getElementById("hint").innerText = "";
-  document.getElementById("success-message").innerText = "";
-  
-  if (currentPuzzleIndex < 0 || currentPuzzleIndex >= puzzles.length) {
-    puzzleContainer.innerHTML = "<p>No puzzle available.</p>";
-    return;
-  }
-  
-  const puzzle = puzzles[currentPuzzleIndex];
-  const container = document.createElement("div");
-  container.className = "sentence-container";
-  
-  // Puzzle header
-  const header = document.createElement("h3");
-  header.innerText = `Question ${currentPuzzleIndex + 1} of ${sessionLength}: Arrange the words:`;
-  container.appendChild(header);
-  
-  // Create Word Bank and Drop Zone
-  const wordBank = document.createElement("div");
-  wordBank.className = "word-bank";
-  wordBank.setAttribute("aria-label", "Word Bank");
-  wordBank.setAttribute("role", "list");
-  
-  const dropZone = document.createElement("div");
-  dropZone.className = "drop-zone";
-  dropZone.setAttribute("aria-label", "Drop Zone");
-  dropZone.setAttribute("role", "list");
-  
-  container.appendChild(wordBank);
-  container.appendChild(dropZone);
-  
-  // Attach HTML5 drag-and-drop event listeners for the drop zone
-  [wordBank, dropZone].forEach(zone => {
-    zone.addEventListener("dragover", handleDragOver);
-    zone.addEventListener("dragleave", handleDragLeave);
-    zone.addEventListener("drop", handleDrop);
-  });
-  
-  // If not submitted, add shuffled words to the word bank
-  if (!puzzle.submitted) {
-    const wordsShuffled = shuffle([...puzzle.correct]);
-    wordsShuffled.forEach(word => {
-      const wordDiv = document.createElement("div");
-      wordDiv.className = "word";
-      wordDiv.setAttribute("role", "listitem");
-      wordDiv.draggable = true;
-      wordDiv.tabIndex = 0;
-      wordDiv.innerText = word;
-      // Attach pointer-based events if supported, else fallback to HTML5 drag events
-      if (window.PointerEvent) {
-        wordDiv.addEventListener("pointerdown", handlePointerDown);
-      } else {
-        wordDiv.addEventListener("dragstart", handleDragStart);
-        wordDiv.addEventListener("dragend", handleDragEnd);
-      }
-      wordBank.appendChild(wordDiv);
+  /*** Display Current Puzzle ***/
+  const displayCurrentPuzzle = () => {
+    const puzzleContainer = document.getElementById("puzzle-container");
+    puzzleContainer.innerHTML = "";
+    document.getElementById("hint").textContent = "";
+    document.getElementById("success-message").textContent = "";
+
+    if (currentPuzzleIndex < 0 || currentPuzzleIndex >= puzzles.length) {
+      puzzleContainer.innerHTML = "<p>No puzzle available.</p>";
+      return;
+    }
+
+    const puzzle = puzzles[currentPuzzleIndex];
+    const container = document.createElement("div");
+    container.className = "sentence-container";
+
+    const header = document.createElement("h3");
+    header.textContent = `Question ${currentPuzzleIndex + 1} of ${sessionLength}: Arrange the words:`;
+    container.appendChild(header);
+
+    const wordBank = document.createElement("div");
+    wordBank.className = "word-bank";
+    wordBank.setAttribute("aria-label", "Word Bank");
+    wordBank.setAttribute("role", "list");
+
+    const dropZone = document.createElement("div");
+    dropZone.className = "drop-zone";
+    dropZone.setAttribute("aria-label", "Drop Zone");
+    dropZone.setAttribute("role", "list");
+
+    container.appendChild(wordBank);
+    container.appendChild(dropZone);
+
+    // Attach HTML5 drag events to drop zones
+    [wordBank, dropZone].forEach(zone => {
+      zone.addEventListener("dragover", handleDragOver);
+      zone.addEventListener("dragleave", handleDragLeave);
+      zone.addEventListener("drop", handleDrop);
     });
-  } else {
-    // If submitted, display the student's answer in the drop zone with highlighting,
-    // and show the correct order in the word bank for review.
-    puzzle.userAnswer.forEach((word, index) => {
-      const wordDiv = document.createElement("div");
-      wordDiv.className = "word";
-      wordDiv.innerText = word;
-      if (word === puzzle.correct[index]) {
-        wordDiv.classList.add("correct");
-      } else {
-        wordDiv.classList.add("incorrect");
-      }
-      dropZone.appendChild(wordDiv);
-    });
-    puzzle.correct.forEach(word => {
-      const wordDiv = document.createElement("div");
-      wordDiv.className = "word";
-      wordDiv.innerText = word;
-      wordBank.appendChild(wordDiv);
-    });
-  }
-  
-  puzzleContainer.appendChild(container);
-  
-  // Update progress and score display
-  document.getElementById("progress").innerText = `Question ${currentPuzzleIndex + 1} of ${sessionLength}`;
-  document.getElementById("score").innerText = `Score: ${score}`;
-  
-  // Update progress bar
-  const progressBar = document.getElementById("progress-bar");
-  progressBar.style.width = `${((currentPuzzleIndex + 1) / sessionLength) * 100}%`;
-}
 
-/* === HTML5 Drag & Drop Handlers (for Desktop) === */
-let draggedItem = null;
+    if (!puzzle.submitted) {
+      const wordsShuffled = shuffle([...puzzle.correct]);
+      wordsShuffled.forEach(word => {
+        const wordDiv = document.createElement("div");
+        wordDiv.className = "word";
+        wordDiv.setAttribute("role", "listitem");
+        // Use pointer events if supported; otherwise fallback to HTML5 drag events.
+        if (window.PointerEvent) {
+          wordDiv.addEventListener("pointerdown", handlePointerDown);
+          wordDiv.draggable = false;
+        } else {
+          wordDiv.draggable = true;
+          wordDiv.addEventListener("dragstart", handleDragStart);
+          wordDiv.addEventListener("dragend", handleDragEnd);
+        }
+        wordDiv.textContent = word;
+        wordBank.appendChild(wordDiv);
+      });
+    } else {
+      // Display submitted answer with highlighting
+      puzzle.userAnswer.forEach((word, index) => {
+        const wordDiv = document.createElement("div");
+        wordDiv.className = "word";
+        wordDiv.textContent = word;
+        wordDiv.classList.add(word === puzzle.correct[index] ? "correct" : "incorrect");
+        dropZone.appendChild(wordDiv);
+      });
+      // Show correct answer in word bank for review
+      puzzle.correct.forEach(word => {
+        const wordDiv = document.createElement("div");
+        wordDiv.className = "word";
+        wordDiv.textContent = word;
+        wordBank.appendChild(wordDiv);
+      });
+    }
 
-function handleDragStart(e) {
-  draggedItem = e.target;
-  e.target.style.opacity = "0.5";
-  e.dataTransfer.setData("text/plain", e.target.innerText);
-  console.log("Drag started for:", e.target.innerText);
-}
+    puzzleContainer.appendChild(container);
+    document.getElementById("progress").textContent = `Question ${currentPuzzleIndex + 1} of ${sessionLength}`;
+    document.getElementById("score").textContent = `Score: ${score}`;
+    document.getElementById("progress-bar").style.width = `${((currentPuzzleIndex + 1) / sessionLength) * 100}%`;
+  };
 
-function handleDragEnd(e) {
-  e.target.style.opacity = "1";
-  console.log("Drag ended for:", e.target.innerText);
-}
+  /*** Drag-and-Drop Handlers ***/
+  let draggedItem = null;
 
-function handleDragOver(e) {
-  e.preventDefault();
-  if (e.currentTarget.classList.contains("drop-zone")) {
-    e.currentTarget.classList.add("active");
-    console.log("Drag over drop-zone:", e.currentTarget);
-  }
-}
+  // Fallback HTML5 drag events (if pointer events are not supported)
+  const handleDragStart = (e) => {
+    draggedItem = e.target;
+    e.target.style.opacity = "0.5";
+    e.dataTransfer.setData("text/plain", e.target.textContent);
+  };
 
-function handleDragLeave(e) {
-  if (e.currentTarget.classList.contains("drop-zone")) {
-    e.currentTarget.classList.remove("active");
-    console.log("Drag left drop-zone:", e.currentTarget);
-  }
-}
+  const handleDragEnd = (e) => {
+    e.target.style.opacity = "1";
+  };
 
-function handleDrop(e) {
-  e.preventDefault();
-  e.stopPropagation();
-  if (e.currentTarget.classList.contains("drop-zone")) {
-    e.currentTarget.classList.remove("active");
-    console.log("Drop event fired on:", e.currentTarget);
-    if (draggedItem) {
-      console.log("Dropped item:", draggedItem.innerText);
+  const handleDragOver = (e) => {
+    e.preventDefault();
+    if (e.currentTarget.classList.contains("drop-zone")) {
+      e.currentTarget.classList.add("active");
+    }
+  };
+
+  const handleDragLeave = (e) => {
+    if (e.currentTarget.classList.contains("drop-zone")) {
+      e.currentTarget.classList.remove("active");
+    }
+  };
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (e.currentTarget.classList.contains("drop-zone") && draggedItem) {
+      e.currentTarget.classList.remove("active");
       e.currentTarget.appendChild(draggedItem);
-    } else {
-      console.warn("No dragged item available on drop.");
     }
+  };
+
+  // Pointer-based drag events for modern browsers / touch devices
+  let pointerDragItem = null;
+  let pointerOffsetX = 0, pointerOffsetY = 0;
+
+  const handlePointerDown = (e) => {
+    if (e.button && e.button !== 0) return; // Only primary button or touch
+    pointerDragItem = e.currentTarget;
+    pointerDragItem.setPointerCapture(e.pointerId);
+    pointerDragItem.style.opacity = "0.7";
+    pointerDragItem.style.zIndex = "1000";
+    const rect = pointerDragItem.getBoundingClientRect();
+    pointerOffsetX = e.clientX - rect.left;
+    pointerOffsetY = e.clientY - rect.top;
+  };
+
+  const handlePointerMove = (e) => {
+    if (!pointerDragItem) return;
+    pointerDragItem.style.position = "absolute";
+    pointerDragItem.style.left = `${e.clientX - pointerOffsetX}px`;
+    pointerDragItem.style.top = `${e.clientY - pointerOffsetY}px`;
+    e.preventDefault();
+  };
+
+  const handlePointerUp = (e) => {
+    if (!pointerDragItem) return;
+    pointerDragItem.releasePointerCapture(e.pointerId);
+    pointerDragItem.style.opacity = "1";
+    // Temporarily hide the dragged element so document.elementFromPoint doesn't return it
+    const originalDisplay = pointerDragItem.style.display;
+    pointerDragItem.style.display = "none";
+    const dropTarget = document.elementFromPoint(e.clientX, e.clientY);
+    pointerDragItem.style.display = originalDisplay;
+    let validDropZone = dropTarget;
+    while (validDropZone && !validDropZone.classList.contains("drop-zone")) {
+      validDropZone = validDropZone.parentElement;
+    }
+    if (validDropZone) {
+      validDropZone.appendChild(pointerDragItem);
+    }
+    pointerDragItem.style.position = "";
+    pointerDragItem.style.left = "";
+    pointerDragItem.style.top = "";
+    pointerDragItem.style.zIndex = "";
+    pointerDragItem = null;
+  };
+
+  const handlePointerCancel = (e) => {
+    if (pointerDragItem) {
+      pointerDragItem.style.opacity = "1";
+      pointerDragItem.style.position = "";
+      pointerDragItem.style.left = "";
+      pointerDragItem.style.top = "";
+      pointerDragItem.style.zIndex = "";
+      pointerDragItem = null;
+    }
+  };
+
+  if (window.PointerEvent) {
+    document.addEventListener("pointermove", handlePointerMove);
+    document.addEventListener("pointerup", handlePointerUp);
+    document.addEventListener("pointercancel", handlePointerCancel);
   }
-}
 
-/* === Pointer-based Drag & Drop Handlers (for Touch Devices) === */
-let pointerDragItem = null;
-let pointerOffsetX = 0, pointerOffsetY = 0;
+  /*** Hint & Answer Submission ***/
+  const showHint = () => {
+    const hintElem = document.getElementById("hint");
+    const puzzle = puzzles[currentPuzzleIndex];
+    if (!puzzle.submitted) {
+      hintElem.textContent = `Hint: The sentence begins with "${puzzle.correct[0]}".`;
+    } else {
+      const correctCount = puzzle.userAnswer.reduce((count, word, idx) =>
+        word === puzzle.correct[idx] ? count + 1 : count, 0);
+      hintElem.textContent = `Partial Feedback: ${correctCount} out of ${puzzle.correct.length} words are correctly placed.`;
+    }
+  };
 
-function handlePointerDown(e) {
-  // Only act on primary pointer button
-  if (e.button !== 0) return;
-  pointerDragItem = e.target;
-  pointerDragItem.setPointerCapture(e.pointerId);
-  pointerDragItem.style.opacity = "0.7";
-  pointerDragItem.style.zIndex = "1000";
-  const rect = pointerDragItem.getBoundingClientRect();
-  pointerOffsetX = e.clientX - rect.left;
-  pointerOffsetY = e.clientY - rect.top;
-  console.log("Pointer down for:", pointerDragItem.innerText);
-}
-
-function handlePointerMove(e) {
-  if (!pointerDragItem) return;
-  pointerDragItem.style.position = "absolute";
-  pointerDragItem.style.left = (e.clientX - pointerOffsetX) + "px";
-  pointerDragItem.style.top = (e.clientY - pointerOffsetY) + "px";
-}
-
-function handlePointerUp(e) {
-  if (!pointerDragItem) return;
-  pointerDragItem.releasePointerCapture(e.pointerId);
-  pointerDragItem.style.opacity = "1";
-  // Determine drop target using elementFromPoint
-  const dropTarget = document.elementFromPoint(e.clientX, e.clientY);
-  let validDropZone = dropTarget;
-  while (validDropZone && !validDropZone.classList.contains("drop-zone")) {
-    validDropZone = validDropZone.parentElement;
-  }
-  if (validDropZone) {
-    validDropZone.appendChild(pointerDragItem);
-    console.log("Pointer drop: moved", pointerDragItem.innerText, "to", validDropZone);
-  }
-  pointerDragItem.style.position = "";
-  pointerDragItem.style.left = "";
-  pointerDragItem.style.top = "";
-  pointerDragItem = null;
-}
-
-/* Attach pointer event listeners if supported */
-if (window.PointerEvent) {
-  document.addEventListener("pointermove", handlePointerMove);
-  document.addEventListener("pointerup", handlePointerUp);
-}
-
-/* === Show Hint Function === */
-function showHint() {
-  const hintElem = document.getElementById("hint");
-  const puzzle = puzzles[currentPuzzleIndex];
-  if (!puzzle.submitted) {
-    hintElem.innerText = `Hint: The sentence begins with "${puzzle.correct[0]}".`;
-  } else {
-    let correctCount = 0;
-    puzzle.userAnswer.forEach((word, index) => {
-      if (word === puzzle.correct[index]) correctCount++;
+  const submitAnswer = () => {
+    const puzzleContainer = document.getElementById("puzzle-container");
+    const currentContainer = puzzleContainer.querySelector(".sentence-container");
+    if (!currentContainer) return;
+    const dropZone = currentContainer.querySelector(".drop-zone");
+    const userWords = Array.from(dropZone.children).map(word => word.textContent);
+    const puzzle = puzzles[currentPuzzleIndex];
+    if (userWords.length !== puzzle.correct.length) {
+      alert("Please arrange all words before submitting.");
+      return;
+    }
+    puzzle.submitted = true;
+    puzzle.userAnswer = userWords;
+    const isCorrect = userWords.join(" ") === puzzle.correct.join(" ");
+    Array.from(dropZone.children).forEach((wordElem, index) => {
+      wordElem.classList.remove("correct", "incorrect");
+      wordElem.classList.add(wordElem.textContent === puzzle.correct[index] ? "correct" : "incorrect");
+      // Force reflow to re-trigger the bounce animation if needed
+      void wordElem.offsetWidth;
     });
-    if (correctCount < puzzle.correct.length) {
-      hintElem.innerText = `Partial Feedback: ${correctCount} out of ${puzzle.correct.length} words are in the correct position.`;
+    if (isCorrect) {
+      score++;
+      speak(`Great job! The sentence is: ${puzzle.correct.join(" ")}`);
+      const successElem = document.getElementById("success-message");
+      successElem.textContent = "✓ Correct!";
+      setTimeout(() => successElem.textContent = "", 3000);
     } else {
-      hintElem.innerText = "";
+      speak(`That's not quite right. The correct sentence is: ${puzzle.correct.join(" ")}`);
+      const correctCount = puzzle.userAnswer.reduce((count, word, idx) =>
+        word === puzzle.correct[idx] ? count + 1 : count, 0);
+      document.getElementById("hint").textContent = `Partial Credit: ${correctCount} out of ${puzzle.correct.length} words are correctly placed.`;
     }
-  }
-}
+    displayCurrentPuzzle();
+  };
 
-/* === Submit Answer for Current Puzzle === */
-function submitAnswer() {
-  const puzzleContainer = document.getElementById("puzzle-container");
-  const currentPuzzleElem = puzzleContainer.querySelector(".sentence-container");
-  if (!currentPuzzleElem) return;
-  
-  const dropZone = currentPuzzleElem.querySelector(".drop-zone");
-  const userWords = Array.from(dropZone.children).map(word => word.innerText);
-  const puzzle = puzzles[currentPuzzleIndex];
-  
-  if (userWords.length !== puzzle.correct.length) {
-    alert("Please arrange all words before submitting.");
-    return;
-  }
-  
-  puzzle.submitted = true;
-  puzzle.userAnswer = userWords;
-  
-  const isCorrect = (userWords.join(" ") === puzzle.correct.join(" "));
-  
-  // Highlight each word in the drop zone
-  Array.from(dropZone.children).forEach((wordElem, index) => {
-    wordElem.classList.remove("correct", "incorrect");
-    if (wordElem.innerText === puzzle.correct[index]) {
-      wordElem.classList.add("correct");
+  /*** Navigation Functions ***/
+  const nextPuzzle = () => {
+    if (currentPuzzleIndex < puzzles.length - 1) {
+      currentPuzzleIndex++;
+      displayCurrentPuzzle();
     } else {
-      wordElem.classList.add("incorrect");
+      alert("Session complete! You have finished 5 questions for this level.");
     }
+  };
+
+  const prevPuzzle = () => {
+    if (currentPuzzleIndex > 0) {
+      currentPuzzleIndex--;
+      displayCurrentPuzzle();
+    } else {
+      alert("This is the first question.");
+    }
+  };
+
+  const resetQuiz = () => {
+    generatePuzzles();
+    displayCurrentPuzzle();
+  };
+
+  const toggleFullScreen = () => {
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen().catch(err => {
+        console.warn(`Error attempting to enable full-screen mode: ${err.message} (${err.name})`);
+      });
+    } else {
+      document.exitFullscreen();
+    }
+  };
+
+  /*** Global Event Listeners ***/
+  document.getElementById("listen-instructions-btn").addEventListener("click", () => {
+    const instructions = document.querySelector("p.instructions").textContent;
+    speak(instructions);
   });
-  
-  if (isCorrect) {
-    score++;
-    speak("Great job! The sentence is: " + puzzle.correct.join(" "));
-    const successElem = document.getElementById("success-message");
-    successElem.innerText = "✓ Correct!";
-    setTimeout(() => { successElem.innerText = ""; }, 3000);
-  } else {
-    speak("That's not quite right. The correct sentence is: " + puzzle.correct.join(" "));
-    let correctCount = 0;
-    puzzle.userAnswer.forEach((word, index) => {
-      if (word === puzzle.correct[index]) correctCount++;
-    });
-    document.getElementById("hint").innerText = `Partial Credit: ${correctCount} out of ${puzzle.correct.length} words are in the correct position.`;
-  }
-  
-  displayCurrentPuzzle();
-}
+  document.getElementById("hint-btn").addEventListener("click", showHint);
+  document.getElementById("submit-btn").addEventListener("click", submitAnswer);
+  document.getElementById("next-btn").addEventListener("click", nextPuzzle);
+  document.getElementById("prev-btn").addEventListener("click", prevPuzzle);
+  document.getElementById("reset-btn").addEventListener("click", resetQuiz);
+  document.getElementById("level-select").addEventListener("change", (e) => {
+    currentLevel = e.target.value;
+    resetQuiz();
+  });
+  document.getElementById("fullscreen-btn").addEventListener("click", toggleFullScreen);
 
-/* === Navigation Functions === */
-function nextPuzzle() {
-  if (currentPuzzleIndex < puzzles.length - 1) {
-    currentPuzzleIndex++;
+  document.addEventListener("DOMContentLoaded", () => {
+    generatePuzzles();
     displayCurrentPuzzle();
-  } else {
-    alert("Session complete! You have finished 5 questions for this level.");
-  }
-}
-
-function prevPuzzle() {
-  if (currentPuzzleIndex > 0) {
-    currentPuzzleIndex--;
-    displayCurrentPuzzle();
-  } else {
-    alert("This is the first question.");
-  }
-}
-
-/* === Reset Quiz === */
-function resetQuiz() {
-  generatePuzzles();
-  displayCurrentPuzzle();
-}
-
-/* === Fullscreen Toggle Function === */
-function toggleFullScreen() {
-  if (!document.fullscreenElement) {
-    document.documentElement.requestFullscreen().catch((err) => {
-      console.warn(`Error attempting to enable full-screen mode: ${err.message} (${err.name})`);
-    });
-  } else {
-    document.exitFullscreen();
-  }
-}
-
-/* === Global Event Listeners === */
-document.getElementById("listen-instructions-btn").addEventListener("click", () => {
-  const instructions = document.querySelector("p.instructions").innerText;
-  speak(instructions);
-});
-document.getElementById("hint-btn").addEventListener("click", showHint);
-document.getElementById("submit-btn").addEventListener("click", submitAnswer);
-document.getElementById("next-btn").addEventListener("click", nextPuzzle);
-document.getElementById("prev-btn").addEventListener("click", prevPuzzle);
-document.getElementById("reset-btn").addEventListener("click", resetQuiz);
-document.getElementById("level-select").addEventListener("change", (e) => {
-  currentLevel = e.target.value;
-  resetQuiz();
-});
-document.getElementById("fullscreen-btn").addEventListener("click", toggleFullScreen);
-
-/* === Initialize Quiz on DOM Ready === */
-document.addEventListener("DOMContentLoaded", () => {
-  generatePuzzles();
-  displayCurrentPuzzle();
-});
+  });
+})();
