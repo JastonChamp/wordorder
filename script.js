@@ -1,4 +1,4 @@
-/* Revised Word Order Adventure JavaScript */
+/* Revised Word Order Adventure JavaScript with Enhanced Gamification */
 
 'use strict';
 
@@ -7,7 +7,6 @@
   function speak(text) {
     if ('speechSynthesis' in window) {
       const utterance = new SpeechSynthesisUtterance(text);
-      // Try to choose a natural-sounding voice, e.g., one containing "Google"
       const setVoice = () => {
         const voices = window.speechSynthesis.getVoices();
         const preferredVoice = voices.find(v => v.name.includes("Google")) || voices[0];
@@ -15,19 +14,20 @@
           utterance.voice = preferredVoice;
         }
       };
-      // If voices are already available, set immediately; otherwise wait for 'voiceschanged'
       if (window.speechSynthesis.getVoices().length) {
         setVoice();
       } else {
         window.speechSynthesis.addEventListener('voiceschanged', setVoice);
       }
-      utterance.rate = 1;   // Adjust rate for clarity
-      utterance.pitch = 1;  // Adjust pitch as desired
+      utterance.rate = 1;
+      utterance.pitch = 1;
       window.speechSynthesis.speak(utterance);
     } else {
       console.warn("Speech Synthesis API is not supported in this browser.");
     }
   }
+
+  /*** Level Sentence Pools ***/
 
   /*** Level Sentence Pools ***/
   const sentencesP1 = [
@@ -199,6 +199,42 @@
     }
   };
 
+  // Session and game variables
+  const sessionLength = 5;
+  let puzzles = [];
+  let currentPuzzleIndex = 0;
+  let score = 0;
+  let currentLevel = 'p3';
+
+  // Gamification variables
+  let xp = 0;
+  let streak = 0;
+  let badges = [];
+
+  /*** Utility Function: Shuffle (Fisher-Yates) ***/
+  const shuffle = (array) => {
+    let currentIndex = array.length, randomIndex;
+    while (currentIndex !== 0) {
+      randomIndex = Math.floor(Math.random() * currentIndex);
+      currentIndex--;
+      [array[currentIndex], array[randomIndex]] = [array[randomIndex], array[currentIndex]];
+    }
+    return array;
+  };
+
+  /*** Utility Function: Get Sentence Pool ***/
+  const getSentencesForLevel = (level) => {
+    switch (level) {
+      case 'p1': return sentencesP1;
+      case 'p2': return sentencesP2;
+      case 'p3': return sentencesP3;
+      case 'p4': return sentencesP4;
+      case 'p5': return sentencesP5;
+      case 'p6': return sentencesP6;
+      default: return sentencesP3;
+    }
+  };
+
   /*** Puzzle Generation ***/
   const generatePuzzles = () => {
     const sentencePool = getSentencesForLevel(currentLevel);
@@ -210,9 +246,14 @@
     }));
     currentPuzzleIndex = 0;
     score = 0;
+    // Reset gamification metrics for a new session
+    xp = 0;
+    streak = 0;
+    badges = [];
+    updateGamificationPanel();
   };
 
-  /*** Display the Current Puzzle ***/
+  /*** Display Current Puzzle ***/
   const displayCurrentPuzzle = () => {
     const puzzleContainer = document.getElementById("puzzle-container");
     puzzleContainer.innerHTML = "";
@@ -228,12 +269,10 @@
     const container = document.createElement("div");
     container.className = "sentence-container";
 
-    // Header indicating the current question number
     const header = document.createElement("h3");
     header.textContent = `Question ${currentPuzzleIndex + 1} of ${sessionLength}: Arrange the words:`;
     container.appendChild(header);
 
-    // Create the Word Bank and Drop Zone containers
     const wordBank = document.createElement("div");
     wordBank.className = "word-bank";
     wordBank.setAttribute("aria-label", "Word Bank");
@@ -247,21 +286,18 @@
     container.appendChild(wordBank);
     container.appendChild(dropZone);
 
-    // Attach HTML5 drag events to drop zones
     [wordBank, dropZone].forEach(zone => {
       zone.addEventListener("dragover", handleDragOver);
       zone.addEventListener("dragleave", handleDragLeave);
       zone.addEventListener("drop", handleDrop);
     });
 
-    // If the puzzle is not yet submitted, show shuffled words in the Word Bank
     if (!puzzle.submitted) {
       const wordsShuffled = shuffle([...puzzle.correct]);
       wordsShuffled.forEach(word => {
         const wordDiv = document.createElement("div");
         wordDiv.className = "word";
         wordDiv.setAttribute("role", "listitem");
-        // Use pointer events if supported; otherwise, fallback to HTML5 drag events.
         if (window.PointerEvent) {
           wordDiv.addEventListener("pointerdown", handlePointerDown);
           wordDiv.draggable = false;
@@ -274,7 +310,7 @@
         wordBank.appendChild(wordDiv);
       });
     } else {
-      // If submitted, display the user's answer with highlighting in the Drop Zone...
+      // Show user's answer with highlighting in Drop Zone
       puzzle.userAnswer.forEach((word, index) => {
         const wordDiv = document.createElement("div");
         wordDiv.className = "word";
@@ -282,7 +318,7 @@
         wordDiv.classList.add(word === puzzle.correct[index] ? "correct" : "incorrect");
         dropZone.appendChild(wordDiv);
       });
-      // ...and also show the correct sentence in the Word Bank for review.
+      // Show correct answer in Word Bank for review
       puzzle.correct.forEach(word => {
         const wordDiv = document.createElement("div");
         wordDiv.className = "word";
@@ -298,10 +334,9 @@
   };
 
   /*** Drag-and-Drop Handlers ***/
-
-  // --- HTML5 Drag Events (Fallback) ---
   let draggedItem = null;
 
+  // HTML5 Drag Events (Fallback)
   const handleDragStart = (e) => {
     draggedItem = e.target;
     e.target.style.opacity = "0.5";
@@ -334,12 +369,12 @@
     }
   };
 
-  // --- Pointer-based Drag Events (Modern Browsers / Touch Devices) ---
+  // Pointer-based Drag Events (Modern / Touch Devices)
   let pointerDragItem = null;
   let pointerOffsetX = 0, pointerOffsetY = 0;
 
   const handlePointerDown = (e) => {
-    if (e.button && e.button !== 0) return; // Only respond to primary button or touch
+    if (e.button && e.button !== 0) return;
     pointerDragItem = e.currentTarget;
     pointerDragItem.setPointerCapture(e.pointerId);
     pointerDragItem.style.opacity = "0.7";
@@ -361,7 +396,7 @@
     if (!pointerDragItem) return;
     pointerDragItem.releasePointerCapture(e.pointerId);
     pointerDragItem.style.opacity = "1";
-    // Temporarily hide the dragged element so it isn't detected as the drop target
+    // Temporarily hide to avoid self-detection as drop target
     const originalDisplay = pointerDragItem.style.display;
     pointerDragItem.style.display = "none";
     const dropTarget = document.elementFromPoint(e.clientX, e.clientY);
@@ -373,7 +408,6 @@
     if (validDropZone) {
       validDropZone.appendChild(pointerDragItem);
     }
-    // Reset styles
     pointerDragItem.style.position = "";
     pointerDragItem.style.left = "";
     pointerDragItem.style.top = "";
@@ -396,6 +430,33 @@
     document.addEventListener("pointermove", handlePointerMove);
     document.addEventListener("pointerup", handlePointerUp);
     document.addEventListener("pointercancel", handlePointerCancel);
+  }
+
+  /*** Gamification Update Function ***/
+  function updateGamificationPanel() {
+    document.getElementById('xp-display').textContent = `XP: ${xp}`;
+    document.getElementById('streak-display').textContent = `Streak: ${streak}`;
+    document.getElementById('badges-list').textContent = badges.join(', ');
+  }
+
+  /*** Confetti Animation ***/
+  function displayConfetti() {
+    const confettiContainer = document.createElement('div');
+    confettiContainer.className = 'confetti-container';
+    document.body.appendChild(confettiContainer);
+    for (let i = 0; i < 50; i++) {
+      const confetti = document.createElement('div');
+      confetti.className = 'confetti';
+      confetti.style.left = Math.random() * 100 + 'vw';
+      confetti.style.animationDelay = Math.random() * 2 + 's';
+      confetti.style.backgroundColor = getRandomColor();
+      confettiContainer.appendChild(confetti);
+    }
+    setTimeout(() => confettiContainer.remove(), 5000);
+  }
+  function getRandomColor() {
+    const colors = ['#1abc9c', '#3498db', '#9b59b6', '#e74c3c', '#f39c12'];
+    return colors[Math.floor(Math.random() * colors.length)];
   }
 
   /*** Hint & Answer Submission ***/
@@ -425,6 +486,7 @@
     puzzle.submitted = true;
     puzzle.userAnswer = userWords;
     const isCorrect = userWords.join(" ") === puzzle.correct.join(" ");
+
     // Provide visual feedback and trigger bounce animation
     Array.from(dropZone.children).forEach((wordElem, index) => {
       wordElem.classList.remove("correct", "incorrect");
@@ -432,18 +494,32 @@
       // Force reflow to re-trigger CSS animations if needed
       void wordElem.offsetWidth;
     });
+
     if (isCorrect) {
       score++;
+      // Update gamification metrics: Increase streak and XP
+      streak++;
+      xp += 10; // Base XP for a correct answer
+      // Award a bonus badge every 3 consecutive correct answers
+      if (streak % 3 === 0) {
+        xp += 5; // bonus XP
+        const badge = `Streak ${streak}`;
+        badges.push(badge);
+        // (Optional) Display a badge notification (could be animated)
+      }
       speak(`Great job! The sentence is: ${puzzle.correct.join(" ")}`);
-      const successElem = document.getElementById("success-message");
-      successElem.textContent = "✓ Correct!";
-      setTimeout(() => successElem.textContent = "", 3000);
+      document.getElementById("success-message").textContent = "✓ Correct!";
+      displayConfetti();
+      setTimeout(() => document.getElementById("success-message").textContent = "", 3000);
     } else {
       speak(`That's not quite right. The correct sentence is: ${puzzle.correct.join(" ")}`);
+      // Reset the streak if the answer is wrong
+      streak = 0;
       const correctCount = puzzle.userAnswer.reduce((count, word, idx) =>
         word === puzzle.correct[idx] ? count + 1 : count, 0);
       document.getElementById("hint").textContent = `Partial Credit: ${correctCount} out of ${puzzle.correct.length} words are correctly placed.`;
     }
+    updateGamificationPanel();
     displayCurrentPuzzle();
   };
 
@@ -474,12 +550,17 @@
   const toggleFullScreen = () => {
     if (!document.fullscreenElement) {
       document.documentElement.requestFullscreen().catch(err => {
-        console.warn(`Error attempting to enable full-screen mode: ${err.message} (${err.name})`);
+        console.warn(`Error enabling full-screen mode: ${err.message} (${err.name})`);
       });
     } else {
       document.exitFullscreen();
     }
   };
+
+  /*** Theme Toggle (Optional) ***/
+  document.getElementById("theme-toggle").addEventListener("click", () => {
+    document.body.classList.toggle("light-theme");
+  });
 
   /*** Global Event Listeners ***/
   document.getElementById("listen-instructions-btn").addEventListener("click", () => {
@@ -497,7 +578,7 @@
   });
   document.getElementById("fullscreen-btn").addEventListener("click", toggleFullScreen);
 
-  // Initialize the quiz when the DOM is ready
+  // Initialize the quiz once the DOM is fully loaded
   document.addEventListener("DOMContentLoaded", () => {
     generatePuzzles();
     displayCurrentPuzzle();
