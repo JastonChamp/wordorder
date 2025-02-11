@@ -1,173 +1,181 @@
-/* === Speech API Utility with Natural Voice Selection === */
-function speak(text) {
-  if ('speechSynthesis' in window) {
-    const utterance = new SpeechSynthesisUtterance(text);
-    // Try to choose a natural-sounding voice, e.g., one containing "Google"
-    const voices = window.speechSynthesis.getVoices();
-    const preferredVoice = voices.find(v => v.name.includes("Google")) || voices[0];
-    if (preferredVoice) {
-      utterance.voice = preferredVoice;
+/* Revised Word Order Adventure JavaScript */
+
+'use strict';
+
+(() => {
+  /*** Speech API Utility with Natural Voice Selection ***/
+  function speak(text) {
+    if ('speechSynthesis' in window) {
+      const utterance = new SpeechSynthesisUtterance(text);
+      // Try to choose a natural-sounding voice, e.g., one containing "Google"
+      const setVoice = () => {
+        const voices = window.speechSynthesis.getVoices();
+        const preferredVoice = voices.find(v => v.name.includes("Google")) || voices[0];
+        if (preferredVoice) {
+          utterance.voice = preferredVoice;
+        }
+      };
+      // If voices are already available, set immediately; otherwise wait for 'voiceschanged'
+      if (window.speechSynthesis.getVoices().length) {
+        setVoice();
+      } else {
+        window.speechSynthesis.addEventListener('voiceschanged', setVoice);
+      }
+      utterance.rate = 1;   // Adjust rate for clarity
+      utterance.pitch = 1;  // Adjust pitch as desired
+      window.speechSynthesis.speak(utterance);
+    } else {
+      console.warn("Speech Synthesis API is not supported in this browser.");
     }
-    utterance.rate = 1;   // Adjust rate for clarity
-    utterance.pitch = 1;  // Adjust pitch as desired
-    window.speechSynthesis.speak(utterance);
-  } else {
-    console.warn("Speech Synthesis API is not supported in this browser.");
   }
-}
 
-/* === Level Sentence Pools === */
-// Primary 1: P1 test–style sentences (20)
-const sentencesP1 = [
-  "I made mistakes in my test.",
-  "Do you know the answer to this puzzle?",
-  "Ann lives in that house over there.",
-  "Tony had cereal for breakfast.",
-  "Which animal is the largest in the world?",
-  "Can you solve this puzzle?",
-  "I like my new book.",
-  "Do you see the red ball?",
-  "My cat sleeps on the mat.",
-  "Is this your favorite toy?",
-  "I need help with my homework.",
-  "Do you want to play with me?",
-  "The dog runs in the park.",
-  "She sings a pretty song.",
-  "Can you come to my party?",
-  "I lost my pencil today.",
-  "He rides a small bicycle.",
-  "Are you ready for school?",
-  "My friend smiles brightly.",
-  "The bird flies high."
-];
+  /*** Level Sentence Pools ***/
+  const sentencesP1 = [
+    "I made mistakes in my test.",
+    "Do you know the answer to this puzzle?",
+    "Ann lives in that house over there.",
+    "Tony had cereal for breakfast.",
+    "Which animal is the largest in the world?",
+    "Can you solve this puzzle?",
+    "I like my new book.",
+    "Do you see the red ball?",
+    "My cat sleeps on the mat.",
+    "Is this your favorite toy?",
+    "I need help with my homework.",
+    "Do you want to play with me?",
+    "The dog runs in the park.",
+    "She sings a pretty song.",
+    "Can you come to my party?",
+    "I lost my pencil today.",
+    "He rides a small bicycle.",
+    "Are you ready for school?",
+    "My friend smiles brightly.",
+    "The bird flies high."
+  ];
 
-// Primary 2: Revised for increased challenge (20)
-const sentencesP2 = [
-  "The small boy eats a crunchy apple.",
-  "The girl plays with a bright, shiny toy.",
-  "The dog chases the bouncing ball.",
-  "The teacher reads an interesting book aloud.",
-  "The cat drinks cold milk from a bowl.",
-  "The boy kicks the red ball with energy.",
-  "The girl draws a neat picture in class.",
-  "The dog barks at a stranger on the street.",
-  "The student writes a short letter.",
-  "The mother cooks a tasty dinner.",
-  "The father drives a blue car carefully.",
-  "The boy catches a slippery frog near the pond.",
-  "The girl rides her bicycle around the block.",
-  "The dog fetches the stick with enthusiasm.",
-  "The teacher explains the lesson clearly.",
-  "The child opens the door to welcome the day.",
-  "The boy climbs a tall tree in the park.",
-  "The girl sings a joyful song at recess.",
-  "The cat chases a tiny mouse in the garden.",
-  "The student solves a simple puzzle."
-];
+  const sentencesP2 = [
+    "The small boy eats a crunchy apple.",
+    "The girl plays with a bright, shiny toy.",
+    "The dog chases the bouncing ball.",
+    "The teacher reads an interesting book aloud.",
+    "The cat drinks cold milk from a bowl.",
+    "The boy kicks the red ball with energy.",
+    "The girl draws a neat picture in class.",
+    "The dog barks at a stranger on the street.",
+    "The student writes a short letter.",
+    "The mother cooks a tasty dinner.",
+    "The father drives a blue car carefully.",
+    "The boy catches a slippery frog near the pond.",
+    "The girl rides her bicycle around the block.",
+    "The dog fetches the stick with enthusiasm.",
+    "The teacher explains the lesson clearly.",
+    "The child opens the door to welcome the day.",
+    "The boy climbs a tall tree in the park.",
+    "The girl sings a joyful song at recess.",
+    "The cat chases a tiny mouse in the garden.",
+    "The student solves a simple puzzle."
+  ];
 
-// Primary 3: Complete subject–verb–object sentences (20)
-const sentencesP3 = [
-  "The boy eats an apple during recess.",
-  "The girl plays with a shiny toy in class.",
-  "The dog chases the ball across the field.",
-  "The teacher reads an interesting story to the students.",
-  "The cat drinks milk from a small bowl.",
-  "The boy kicks the ball with enthusiasm.",
-  "The girl draws a colorful picture on the board.",
-  "The dog barks at the stranger outside.",
-  "The student writes a letter to his friend.",
-  "The mother cooks dinner for the family.",
-  "The father drives a car on busy roads.",
-  "The boy catches a slippery frog near the pond.",
-  "The girl rides her bicycle along the street.",
-  "The dog fetches the stick in the yard.",
-  "The teacher explains the lesson clearly to the class.",
-  "The child opens the door to let in the sunshine.",
-  "The boy climbs a tall tree in the park.",
-  "The girl sings a sweet song during assembly.",
-  "The cat chases a little mouse in the garden.",
-  "The student solves a challenging puzzle."
-];
+  const sentencesP3 = [
+    "The boy eats an apple during recess.",
+    "The girl plays with a shiny toy in class.",
+    "The dog chases the ball across the field.",
+    "The teacher reads an interesting story to the students.",
+    "The cat drinks milk from a small bowl.",
+    "The boy kicks the ball with enthusiasm.",
+    "The girl draws a colorful picture on the board.",
+    "The dog barks at the stranger outside.",
+    "The student writes a letter to his friend.",
+    "The mother cooks dinner for the family.",
+    "The father drives a car on busy roads.",
+    "The boy catches a slippery frog near the pond.",
+    "The girl rides her bicycle along the street.",
+    "The dog fetches the stick in the yard.",
+    "The teacher explains the lesson clearly to the class.",
+    "The child opens the door to let in the sunshine.",
+    "The boy climbs a tall tree in the park.",
+    "The girl sings a sweet song during assembly.",
+    "The cat chases a little mouse in the garden.",
+    "The student solves a challenging puzzle."
+  ];
 
-// Primary 4: Sentences with modifiers (20)
-const sentencesP4 = [
-  "The cheerful girl sings beautifully during the assembly.",
-  "The boy quickly runs to school, eager to learn.",
-  "The teacher patiently explains the lesson to her students.",
-  "The children happily play in the spacious park.",
-  "The shiny red car moves fast on the busy road.",
-  "The little boy smiles brightly when he sees his friend.",
-  "The elderly man walks slowly with a steady pace.",
-  "The smart student solves problems with ease.",
-  "The busy mother prepares a delicious breakfast every morning.",
-  "The gentle wind blows softly, rustling the leaves.",
-  "The excited child jumps high in joyful celebration.",
-  "The kind teacher helps every student after class.",
-  "The little girl reads a colorful book under a tree.",
-  "The brave boy climbs the tall tree with determination.",
-  "The attentive class listens carefully to the teacher.",
-  "The calm lake reflects the clear blue sky perfectly.",
-  "The fast train zooms past the station with speed.",
-  "The playful puppy chases its tail with energy.",
-  "The thoughtful boy shares his toys generously.",
-  "The pretty garden blooms vibrantly in early spring."
-];
+  const sentencesP4 = [
+    "The cheerful girl sings beautifully during the assembly.",
+    "The boy quickly runs to school, eager to learn.",
+    "The teacher patiently explains the lesson to her students.",
+    "The children happily play in the spacious park.",
+    "The shiny red car moves fast on the busy road.",
+    "The little boy smiles brightly when he sees his friend.",
+    "The elderly man walks slowly with a steady pace.",
+    "The smart student solves problems with ease.",
+    "The busy mother prepares a delicious breakfast every morning.",
+    "The gentle wind blows softly, rustling the leaves.",
+    "The excited child jumps high in joyful celebration.",
+    "The kind teacher helps every student after class.",
+    "The little girl reads a colorful book under a tree.",
+    "The brave boy climbs the tall tree with determination.",
+    "The attentive class listens carefully to the teacher.",
+    "The calm lake reflects the clear blue sky perfectly.",
+    "The fast train zooms past the station with speed.",
+    "The playful puppy chases its tail with energy.",
+    "The thoughtful boy shares his toys generously.",
+    "The pretty garden blooms vibrantly in early spring."
+  ];
 
-// Primary 5: Compound/multi-clause sentences (20)
-const sentencesP5 = [
-  "The teacher reads a fascinating story, and the children listen attentively.",
-  "The boy finished his homework before dinner, so he went outside to play.",
-  "The little girl happily skipped to school, and her friends cheered her on.",
-  "The bright sun shines over the calm sea, while a gentle breeze cools the air.",
-  "The busy bees buzz around the blooming flowers, and the children watch in wonder.",
-  "The students study in the library, and they take notes carefully.",
-  "The father cooks dinner, and the children help set the table.",
-  "The dog barks loudly, but the cat remains calm and sleeps.",
-  "The rain poured outside, yet the class continued their lesson indoors.",
-  "The bird sings in the morning, and the flowers open gracefully.",
-  "The boy plays soccer, while his friend rides a bicycle around the field.",
-  "The teacher writes on the board, and the students copy the notes precisely.",
-  "The car stops at the red light, and the driver waits patiently for the signal.",
-  "The children laugh during recess, and they return to class full of energy.",
-  "The sun sets in the west, and the sky turns a beautiful orange.",
-  "The little girl draws a picture, and her mother praises her creativity.",
-  "The student answers the question correctly, and the teacher smiles proudly.",
-  "The dog runs in the park, and the kids cheer excitedly.",
-  "The wind blows gently, and the leaves rustle softly.",
-  "The book is open on the desk, and the student reads silently."
-];
+  const sentencesP5 = [
+    "The teacher reads a fascinating story, and the children listen attentively.",
+    "The boy finished his homework before dinner, so he went outside to play.",
+    "The little girl happily skipped to school, and her friends cheered her on.",
+    "The bright sun shines over the calm sea, while a gentle breeze cools the air.",
+    "The busy bees buzz around the blooming flowers, and the children watch in wonder.",
+    "The students study in the library, and they take notes carefully.",
+    "The father cooks dinner, and the children help set the table.",
+    "The dog barks loudly, but the cat remains calm and sleeps.",
+    "The rain poured outside, yet the class continued their lesson indoors.",
+    "The bird sings in the morning, and the flowers open gracefully.",
+    "The boy plays soccer, while his friend rides a bicycle around the field.",
+    "The teacher writes on the board, and the students copy the notes precisely.",
+    "The car stops at the red light, and the driver waits patiently for the signal.",
+    "The children laugh during recess, and they return to class full of energy.",
+    "The sun sets in the west, and the sky turns a beautiful orange.",
+    "The little girl draws a picture, and her mother praises her creativity.",
+    "The student answers the question correctly, and the teacher smiles proudly.",
+    "The dog runs in the park, and the kids cheer excitedly.",
+    "The wind blows gently, and the leaves rustle softly.",
+    "The book is open on the desk, and the student reads silently."
+  ];
 
-// Primary 6: Complex sentences with subordinate clauses (20)
-const sentencesP6 = [
-  "After finishing his homework, the student went to the library to study more.",
-  "Although it was raining heavily, the children played outside happily during recess.",
-  "The teacher, who was known for her kindness, explained the lesson in remarkable detail.",
-  "Despite the heavy traffic, she arrived at school on time and greeted everyone warmly.",
-  "When the bell rang, the students hurried to their classrooms with excitement.",
-  "Since the exam was extremely challenging, the teacher reviewed the material thoroughly afterward.",
-  "Even though it was late, the boy continued reading his favorite book with great enthusiasm.",
-  "While the sun was setting, the family enjoyed a delightful picnic in the park.",
-  "If you study hard every day, you will achieve excellent results in your exams.",
-  "After the game ended, the players celebrated their victory with cheers and applause.",
-  "Although the movie was quite long, the audience remained engaged until the very end.",
-  "Because the weather was unexpectedly cool, the picnic lasted longer than anticipated.",
-  "Since the library was exceptionally quiet, the students concentrated deeply on their research.",
-  "When the storm passed, the children went outside to play joyfully.",
-  "After receiving his award, the student thanked his parents for their unwavering support.",
-  "Although she was extremely tired, the teacher continued to prepare engaging lessons.",
-  "If you practice regularly, your skills will improve significantly over time.",
-  "While the bell was ringing, the students gathered in the hall to listen attentively.",
-  "Because the assignment was particularly difficult, the students worked in groups to complete it.",
-  "After the concert ended, the crowd applauded enthusiastically as the performers took a bow."
-];
+  const sentencesP6 = [
+    "After finishing his homework, the student went to the library to study more.",
+    "Although it was raining heavily, the children played outside happily during recess.",
+    "The teacher, who was known for her kindness, explained the lesson in remarkable detail.",
+    "Despite the heavy traffic, she arrived at school on time and greeted everyone warmly.",
+    "When the bell rang, the students hurried to their classrooms with excitement.",
+    "Since the exam was extremely challenging, the teacher reviewed the material thoroughly afterward.",
+    "Even though it was late, the boy continued reading his favorite book with great enthusiasm.",
+    "While the sun was setting, the family enjoyed a delightful picnic in the park.",
+    "If you study hard every day, you will achieve excellent results in your exams.",
+    "After the game ended, the players celebrated their victory with cheers and applause.",
+    "Although the movie was quite long, the audience remained engaged until the very end.",
+    "Because the weather was unexpectedly cool, the picnic lasted longer than anticipated.",
+    "Since the library was exceptionally quiet, the students concentrated deeply on their research.",
+    "When the storm passed, the children went outside to play joyfully.",
+    "After receiving his award, the student thanked his parents for their unwavering support.",
+    "Although she was extremely tired, the teacher continued to prepare engaging lessons.",
+    "If you practice regularly, your skills will improve significantly over time.",
+    "While the bell was ringing, the students gathered in the hall to listen attentively.",
+    "Because the assignment was particularly difficult, the students worked in groups to complete it.",
+    "After the concert ended, the crowd applauded enthusiastically as the performers took a bow."
+  ];
 
-const sessionLength = 5;
+  // Session and global variables
+  const sessionLength = 5;
   let puzzles = [];
   let currentPuzzleIndex = 0;
   let score = 0;
   let currentLevel = 'p3';
 
-  /*** Utility Functions ***/
+  /*** Utility Function: Shuffle an Array (Fisher-Yates) ***/
   const shuffle = (array) => {
     let currentIndex = array.length, randomIndex;
     while (currentIndex !== 0) {
@@ -178,6 +186,7 @@ const sessionLength = 5;
     return array;
   };
 
+  /*** Utility Function: Get Sentence Pool for Selected Level ***/
   const getSentencesForLevel = (level) => {
     switch (level) {
       case 'p1': return sentencesP1;
@@ -203,7 +212,7 @@ const sessionLength = 5;
     score = 0;
   };
 
-  /*** Display Current Puzzle ***/
+  /*** Display the Current Puzzle ***/
   const displayCurrentPuzzle = () => {
     const puzzleContainer = document.getElementById("puzzle-container");
     puzzleContainer.innerHTML = "";
@@ -219,10 +228,12 @@ const sessionLength = 5;
     const container = document.createElement("div");
     container.className = "sentence-container";
 
+    // Header indicating the current question number
     const header = document.createElement("h3");
     header.textContent = `Question ${currentPuzzleIndex + 1} of ${sessionLength}: Arrange the words:`;
     container.appendChild(header);
 
+    // Create the Word Bank and Drop Zone containers
     const wordBank = document.createElement("div");
     wordBank.className = "word-bank";
     wordBank.setAttribute("aria-label", "Word Bank");
@@ -243,13 +254,14 @@ const sessionLength = 5;
       zone.addEventListener("drop", handleDrop);
     });
 
+    // If the puzzle is not yet submitted, show shuffled words in the Word Bank
     if (!puzzle.submitted) {
       const wordsShuffled = shuffle([...puzzle.correct]);
       wordsShuffled.forEach(word => {
         const wordDiv = document.createElement("div");
         wordDiv.className = "word";
         wordDiv.setAttribute("role", "listitem");
-        // Use pointer events if supported; otherwise fallback to HTML5 drag events.
+        // Use pointer events if supported; otherwise, fallback to HTML5 drag events.
         if (window.PointerEvent) {
           wordDiv.addEventListener("pointerdown", handlePointerDown);
           wordDiv.draggable = false;
@@ -262,7 +274,7 @@ const sessionLength = 5;
         wordBank.appendChild(wordDiv);
       });
     } else {
-      // Display submitted answer with highlighting
+      // If submitted, display the user's answer with highlighting in the Drop Zone...
       puzzle.userAnswer.forEach((word, index) => {
         const wordDiv = document.createElement("div");
         wordDiv.className = "word";
@@ -270,7 +282,7 @@ const sessionLength = 5;
         wordDiv.classList.add(word === puzzle.correct[index] ? "correct" : "incorrect");
         dropZone.appendChild(wordDiv);
       });
-      // Show correct answer in word bank for review
+      // ...and also show the correct sentence in the Word Bank for review.
       puzzle.correct.forEach(word => {
         const wordDiv = document.createElement("div");
         wordDiv.className = "word";
@@ -286,9 +298,10 @@ const sessionLength = 5;
   };
 
   /*** Drag-and-Drop Handlers ***/
+
+  // --- HTML5 Drag Events (Fallback) ---
   let draggedItem = null;
 
-  // Fallback HTML5 drag events (if pointer events are not supported)
   const handleDragStart = (e) => {
     draggedItem = e.target;
     e.target.style.opacity = "0.5";
@@ -321,12 +334,12 @@ const sessionLength = 5;
     }
   };
 
-  // Pointer-based drag events for modern browsers / touch devices
+  // --- Pointer-based Drag Events (Modern Browsers / Touch Devices) ---
   let pointerDragItem = null;
   let pointerOffsetX = 0, pointerOffsetY = 0;
 
   const handlePointerDown = (e) => {
-    if (e.button && e.button !== 0) return; // Only primary button or touch
+    if (e.button && e.button !== 0) return; // Only respond to primary button or touch
     pointerDragItem = e.currentTarget;
     pointerDragItem.setPointerCapture(e.pointerId);
     pointerDragItem.style.opacity = "0.7";
@@ -348,7 +361,7 @@ const sessionLength = 5;
     if (!pointerDragItem) return;
     pointerDragItem.releasePointerCapture(e.pointerId);
     pointerDragItem.style.opacity = "1";
-    // Temporarily hide the dragged element so document.elementFromPoint doesn't return it
+    // Temporarily hide the dragged element so it isn't detected as the drop target
     const originalDisplay = pointerDragItem.style.display;
     pointerDragItem.style.display = "none";
     const dropTarget = document.elementFromPoint(e.clientX, e.clientY);
@@ -360,6 +373,7 @@ const sessionLength = 5;
     if (validDropZone) {
       validDropZone.appendChild(pointerDragItem);
     }
+    // Reset styles
     pointerDragItem.style.position = "";
     pointerDragItem.style.left = "";
     pointerDragItem.style.top = "";
@@ -411,10 +425,11 @@ const sessionLength = 5;
     puzzle.submitted = true;
     puzzle.userAnswer = userWords;
     const isCorrect = userWords.join(" ") === puzzle.correct.join(" ");
+    // Provide visual feedback and trigger bounce animation
     Array.from(dropZone.children).forEach((wordElem, index) => {
       wordElem.classList.remove("correct", "incorrect");
       wordElem.classList.add(wordElem.textContent === puzzle.correct[index] ? "correct" : "incorrect");
-      // Force reflow to re-trigger the bounce animation if needed
+      // Force reflow to re-trigger CSS animations if needed
       void wordElem.offsetWidth;
     });
     if (isCorrect) {
@@ -482,6 +497,7 @@ const sessionLength = 5;
   });
   document.getElementById("fullscreen-btn").addEventListener("click", toggleFullScreen);
 
+  // Initialize the quiz when the DOM is ready
   document.addEventListener("DOMContentLoaded", () => {
     generatePuzzles();
     displayCurrentPuzzle();
