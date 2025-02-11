@@ -1,3 +1,5 @@
+/* Revised Word Order Adventure JavaScript with Enhanced Animations */
+
 'use strict';
 
 (() => {
@@ -164,17 +166,19 @@
     "After the concert ended, the crowd applauded enthusiastically as the performers took a bow."
   ];
 
-  /*** Global Game Variables ***/
+  // Session and game variables
   const sessionLength = 5;
   let puzzles = [];
   let currentPuzzleIndex = 0;
   let score = 0;
   let currentLevel = 'p3';
+
+  // Gamification variables
   let xp = 0;
   let streak = 0;
   let badges = [];
 
-  /*** Utility Function: Shuffle an Array (Fisher-Yates) ***/
+  /*** Utility Function: Shuffle (Fisher-Yates) ***/
   const shuffle = (array) => {
     let currentIndex = array.length, randomIndex;
     while (currentIndex !== 0) {
@@ -185,7 +189,7 @@
     return array;
   };
 
-  /*** Utility Function: Get Sentence Pool for Selected Level ***/
+  /*** Utility Function: Get Sentence Pool ***/
   const getSentencesForLevel = (level) => {
     switch (level) {
       case 'p1': return sentencesP1;
@@ -216,7 +220,7 @@
     updateGamificationPanel();
   };
 
-  /*** Display Current Puzzle ***/
+  /*** Display the Current Puzzle ***/
   const displayCurrentPuzzle = () => {
     const puzzleContainer = document.getElementById("puzzle-container");
     puzzleContainer.innerHTML = "";
@@ -297,45 +301,42 @@
   };
 
   /*** Drag-and-Drop Handlers ***/
-  let draggedItem = null;
 
   // HTML5 Drag Events (Fallback)
+  let draggedItem = null;
   const handleDragStart = (e) => {
     draggedItem = e.target;
     e.target.style.opacity = "0.5";
     e.dataTransfer.setData("text/plain", e.target.textContent);
   };
-
   const handleDragEnd = (e) => {
     e.target.style.opacity = "1";
   };
-
   const handleDragOver = (e) => {
     e.preventDefault();
     if (e.currentTarget.classList.contains("drop-zone")) {
       e.currentTarget.classList.add("active");
     }
   };
-
   const handleDragLeave = (e) => {
     if (e.currentTarget.classList.contains("drop-zone")) {
       e.currentTarget.classList.remove("active");
     }
   };
-
   const handleDrop = (e) => {
     e.preventDefault();
     e.stopPropagation();
     if (e.currentTarget.classList.contains("drop-zone") && draggedItem) {
       e.currentTarget.classList.remove("active");
       e.currentTarget.appendChild(draggedItem);
+      // Fade in the dropped item using GSAP
+      gsap.fromTo(draggedItem, { opacity: 0 }, { duration: 0.3, opacity: 1 });
     }
   };
 
   // Pointer-based Drag Events (Modern / Touch Devices)
   let pointerDragItem = null;
   let pointerOffsetX = 0, pointerOffsetY = 0;
-
   const handlePointerDown = (e) => {
     if (e.button && e.button !== 0) return;
     pointerDragItem = e.currentTarget;
@@ -346,7 +347,6 @@
     pointerOffsetX = e.clientX - rect.left;
     pointerOffsetY = e.clientY - rect.top;
   };
-
   const handlePointerMove = (e) => {
     if (!pointerDragItem) return;
     pointerDragItem.style.position = "absolute";
@@ -354,12 +354,10 @@
     pointerDragItem.style.top = `${e.clientY - pointerOffsetY}px`;
     e.preventDefault();
   };
-
   const handlePointerUp = (e) => {
     if (!pointerDragItem) return;
     pointerDragItem.releasePointerCapture(e.pointerId);
     pointerDragItem.style.opacity = "1";
-    // Temporarily hide to avoid self-detection as drop target
     const originalDisplay = pointerDragItem.style.display;
     pointerDragItem.style.display = "none";
     const dropTarget = document.elementFromPoint(e.clientX, e.clientY);
@@ -370,6 +368,7 @@
     }
     if (validDropZone) {
       validDropZone.appendChild(pointerDragItem);
+      gsap.fromTo(pointerDragItem, { opacity: 0 }, { duration: 0.3, opacity: 1 });
     }
     pointerDragItem.style.position = "";
     pointerDragItem.style.left = "";
@@ -377,7 +376,6 @@
     pointerDragItem.style.zIndex = "";
     pointerDragItem = null;
   };
-
   const handlePointerCancel = (e) => {
     if (pointerDragItem) {
       pointerDragItem.style.opacity = "1";
@@ -388,14 +386,13 @@
       pointerDragItem = null;
     }
   };
-
   if (window.PointerEvent) {
     document.addEventListener("pointermove", handlePointerMove);
     document.addEventListener("pointerup", handlePointerUp);
     document.addEventListener("pointercancel", handlePointerCancel);
   }
 
-  /*** Gamification Update Function ***/
+  /*** Gamification Panel Update ***/
   function updateGamificationPanel() {
     document.getElementById('xp-display').textContent = `XP: ${xp}`;
     document.getElementById('streak-display').textContent = `Streak: ${streak}`;
@@ -417,10 +414,16 @@
     }
     setTimeout(() => confettiContainer.remove(), 5000);
   }
-  
   function getRandomColor() {
     const colors = ['#1abc9c', '#3498db', '#9b59b6', '#e74c3c', '#f39c12'];
     return colors[Math.floor(Math.random() * colors.length)];
+  }
+
+  /*** GSAP Animation for Success Message ***/
+  function animateSuccessMessage() {
+    const successElem = document.getElementById("success-message");
+    gsap.set(successElem, { scale: 0, opacity: 1 });
+    gsap.to(successElem, { duration: 0.6, scale: 1, ease: "bounce.out" });
   }
 
   /*** Hint & Answer Submission ***/
@@ -451,32 +454,29 @@
     puzzle.userAnswer = userWords;
     const isCorrect = userWords.join(" ") === puzzle.correct.join(" ");
 
-    // Provide visual feedback and trigger bounce animation
     Array.from(dropZone.children).forEach((wordElem, index) => {
       wordElem.classList.remove("correct", "incorrect");
       wordElem.classList.add(wordElem.textContent === puzzle.correct[index] ? "correct" : "incorrect");
-      // Force reflow to re-trigger CSS animations if needed
+      // Force reflow for CSS animation re-trigger
       void wordElem.offsetWidth;
     });
 
     if (isCorrect) {
       score++;
-      // Update gamification metrics: Increase streak and XP
       streak++;
-      xp += 10; // Base XP for a correct answer
-      // Award a bonus badge every 3 consecutive correct answers
+      xp += 10;
       if (streak % 3 === 0) {
-        xp += 5; // bonus XP
+        xp += 5;
         const badge = `Streak ${streak}`;
         badges.push(badge);
       }
       speak(`Great job! The sentence is: ${puzzle.correct.join(" ")}`);
       document.getElementById("success-message").textContent = "✓ Correct!";
+      animateSuccessMessage();
       displayConfetti();
       setTimeout(() => document.getElementById("success-message").textContent = "", 3000);
     } else {
       speak(`That's not quite right. The correct sentence is: ${puzzle.correct.join(" ")}`);
-      // Reset the streak if the answer is wrong
       streak = 0;
       const correctCount = puzzle.userAnswer.reduce((count, word, idx) =>
         word === puzzle.correct[idx] ? count + 1 : count, 0);
@@ -541,7 +541,6 @@
   });
   document.getElementById("fullscreen-btn").addEventListener("click", toggleFullScreen);
 
-  // Initialize the quiz once the DOM is fully loaded
   document.addEventListener("DOMContentLoaded", () => {
     generatePuzzles();
     displayCurrentPuzzle();
