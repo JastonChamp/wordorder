@@ -20,10 +20,10 @@
   box-sizing: border-box;
 }
 
-/* Base Body */
+/* Body styling with a subtle background gradient for improved aesthetics */
 body {
   font-family: 'Open Sans', Arial, sans-serif;
-  background-color: var(--background-color);
+  background: linear-gradient(135deg, #f0f8ff 0%, #e0f7fa 100%);
   margin: 0;
   padding: 15px;
   display: flex;
@@ -90,12 +90,7 @@ p.instructions {
   margin-bottom: 20px;
 }
 
-/* Puzzle Container */
-#puzzle-container {
-  margin-bottom: 15px;
-}
-
-/* Progress Bar Container */
+/* Progress Bar */
 #progress-bar-container {
   width: 100%;
   background-color: #ddd;
@@ -108,6 +103,11 @@ p.instructions {
   height: var(--progress-bar-height);
   background-color: var(--progress-bar-bg);
   transition: width 0.5s ease;
+}
+
+/* Puzzle Container */
+#puzzle-container {
+  margin-bottom: 15px;
 }
 
 /* Sentence Container (Puzzle Box) */
@@ -130,15 +130,15 @@ p.instructions {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
-  min-height: 80px; /* Larger drop target */
+  min-height: 80px; /* Larger target for easier drop */
   border: 2px dashed #ccc;
   border-radius: 5px;
   padding: 10px;
   background-color: #f9f9f9;
-  transition: background-color 0.3s, border-color 0.3s;
+  transition: background-color 0.3s ease, border-color 0.3s ease;
   margin-bottom: 10px;
   pointer-events: auto;
-  touch-action: none; /* Improve touch behavior */
+  touch-action: none;
 }
 .word-bank:hover, .drop-zone:hover {
   background-color: #fff;
@@ -165,7 +165,7 @@ p.instructions {
   outline: none;
 }
 
-/* Bounce Animation for Correct Word Drop */
+/* Bounce Animation for Correct Words */
 @keyframes bounce {
   0% { transform: scale(1); }
   30% { transform: scale(1.2); }
@@ -205,7 +205,7 @@ p.instructions {
   background-color: #357abd;
 }
 
-/* Progress, Score, Hint, and Success Message */
+/* Progress, Score, Hint, and Success Feedback */
 #progress, #score, #hint, #success-message {
   font-size: 1.1em;
   margin-top: 8px;
