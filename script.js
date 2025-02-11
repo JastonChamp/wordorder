@@ -1,5 +1,3 @@
-/* Revised Word Order Adventure JavaScript with Enhanced Gamification */
-
 'use strict';
 
 (() => {
@@ -26,8 +24,6 @@
       console.warn("Speech Synthesis API is not supported in this browser.");
     }
   }
-
-  /*** Level Sentence Pools ***/
 
   /*** Level Sentence Pools ***/
   const sentencesP1 = [
@@ -168,12 +164,15 @@
     "After the concert ended, the crowd applauded enthusiastically as the performers took a bow."
   ];
 
-  // Session and global variables
+  /*** Global Game Variables ***/
   const sessionLength = 5;
   let puzzles = [];
   let currentPuzzleIndex = 0;
   let score = 0;
   let currentLevel = 'p3';
+  let xp = 0;
+  let streak = 0;
+  let badges = [];
 
   /*** Utility Function: Shuffle an Array (Fisher-Yates) ***/
   const shuffle = (array) => {
@@ -187,42 +186,6 @@
   };
 
   /*** Utility Function: Get Sentence Pool for Selected Level ***/
-  const getSentencesForLevel = (level) => {
-    switch (level) {
-      case 'p1': return sentencesP1;
-      case 'p2': return sentencesP2;
-      case 'p3': return sentencesP3;
-      case 'p4': return sentencesP4;
-      case 'p5': return sentencesP5;
-      case 'p6': return sentencesP6;
-      default: return sentencesP3;
-    }
-  };
-
-  // Session and game variables
-  const sessionLength = 5;
-  let puzzles = [];
-  let currentPuzzleIndex = 0;
-  let score = 0;
-  let currentLevel = 'p3';
-
-  // Gamification variables
-  let xp = 0;
-  let streak = 0;
-  let badges = [];
-
-  /*** Utility Function: Shuffle (Fisher-Yates) ***/
-  const shuffle = (array) => {
-    let currentIndex = array.length, randomIndex;
-    while (currentIndex !== 0) {
-      randomIndex = Math.floor(Math.random() * currentIndex);
-      currentIndex--;
-      [array[currentIndex], array[randomIndex]] = [array[randomIndex], array[currentIndex]];
-    }
-    return array;
-  };
-
-  /*** Utility Function: Get Sentence Pool ***/
   const getSentencesForLevel = (level) => {
     switch (level) {
       case 'p1': return sentencesP1;
@@ -454,6 +417,7 @@
     }
     setTimeout(() => confettiContainer.remove(), 5000);
   }
+  
   function getRandomColor() {
     const colors = ['#1abc9c', '#3498db', '#9b59b6', '#e74c3c', '#f39c12'];
     return colors[Math.floor(Math.random() * colors.length)];
@@ -505,7 +469,6 @@
         xp += 5; // bonus XP
         const badge = `Streak ${streak}`;
         badges.push(badge);
-        // (Optional) Display a badge notification (could be animated)
       }
       speak(`Great job! The sentence is: ${puzzle.correct.join(" ")}`);
       document.getElementById("success-message").textContent = "✓ Correct!";
