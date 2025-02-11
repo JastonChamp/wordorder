@@ -1,24 +1,37 @@
-/* Revised Word Order Adventure JavaScript with Enhanced Animations */
+/* Revised Word Order Adventure JavaScript with Enhanced Animations and Updated Voiceover */
 
 'use strict';
 
 (() => {
-  /*** Speech API Utility with Natural Voice Selection ***/
+  /*** Speech API Utility with Updated Voice Selection ***/
   function speak(text) {
     if ('speechSynthesis' in window) {
       const utterance = new SpeechSynthesisUtterance(text);
+      
+      // Function to choose a preferred voice based on updated criteria
       const setVoice = () => {
         const voices = window.speechSynthesis.getVoices();
-        const preferredVoice = voices.find(v => v.name.includes("Google")) || voices[0];
+        // Try to choose a voice with "Google US English" in its name.
+        let preferredVoice = voices.find(v => v.name.includes("Google US English"));
+        // If not available, choose the first voice that does NOT include "Indian" (case-insensitive).
+        if (!preferredVoice) {
+          const nonIndianVoices = voices.filter(v => !v.name.toLowerCase().includes("indian"));
+          preferredVoice = nonIndianVoices[0] || voices[0];
+        }
         if (preferredVoice) {
           utterance.voice = preferredVoice;
+          console.log("Selected voice:", preferredVoice.name);
+        } else {
+          console.warn("No preferred voice found. Using default.");
         }
       };
+
       if (window.speechSynthesis.getVoices().length) {
         setVoice();
       } else {
         window.speechSynthesis.addEventListener('voiceschanged', setVoice);
       }
+      
       utterance.rate = 1;
       utterance.pitch = 1;
       window.speechSynthesis.speak(utterance);
