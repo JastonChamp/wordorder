@@ -35,28 +35,28 @@ const sentencesP1 = [
   "The bird flies high."
 ];
 
-// Primary 2: Simple sentences with adjectives (20)
+// Primary 2: Revised sentences (more challenging, similar to P3 complexity) (20)
 const sentencesP2 = [
-  "The small red ball bounces quickly.",
-  "A little dog barks at the noisy cat.",
-  "The big cat sleeps under a warm roof.",
-  "The bright sun shines over the playground.",
-  "A blue bird sings a lovely tune.",
-  "A yellow flower blooms in the garden.",
-  "The green apple tastes very sweet.",
-  "The cute puppy plays in the yard.",
-  "The little mouse squeaks softly.",
-  "A tall tree stands near our school.",
-  "A soft pillow comforts me at night.",
-  "Hot soup warms the chilly room.",
-  "Fresh milk nourishes my body.",
-  "Cold ice melts in the sun.",
-  "A small fish swims in the pond.",
-  "Happy kids laugh in the playground.",
-  "A slow snail crawls on the leaf.",
-  "A bright star shines in the sky.",
-  "Heavy clouds bring gentle rain.",
-  "A big truck moves on the road."
+  "The small boy eats a crunchy apple.",
+  "The girl plays with a bright, shiny toy.",
+  "The dog chases the bouncing ball.",
+  "The teacher reads an interesting book aloud.",
+  "The cat drinks cold milk from a bowl.",
+  "The boy kicks the red ball with energy.",
+  "The girl draws a colorful picture at school.",
+  "The dog barks at a passing stranger.",
+  "The student writes a neat letter.",
+  "The mother cooks a tasty dinner.",
+  "The father drives a blue car carefully.",
+  "The boy catches a slippery frog near the pond.",
+  "The girl rides a small bicycle around the block.",
+  "The dog fetches a stick thrown by its owner.",
+  "The teacher explains the lesson clearly.",
+  "The child opens the door to welcome the day.",
+  "The boy climbs a tall tree in the park.",
+  "The girl sings a happy song during recess.",
+  "The cat chases a tiny mouse in the garden.",
+  "The student solves a simple puzzle."
 ];
 
 // Primary 3: Complete subject–verb–object sentences (20)
@@ -252,7 +252,7 @@ function displayCurrentPuzzle() {
       wordDiv.className = "word";
       wordDiv.setAttribute("role", "listitem");
       wordDiv.draggable = true;
-      wordDiv.tabIndex = 0;  // Allow keyboard focus
+      wordDiv.tabIndex = 0;  // Enable keyboard focus
       wordDiv.innerText = word;
       wordDiv.addEventListener("dragstart", handleDragStart);
       wordDiv.addEventListener("dragend", handleDragEnd);
@@ -341,10 +341,9 @@ function showHint() {
   const hintElem = document.getElementById("hint");
   const puzzle = puzzles[currentPuzzleIndex];
   if (!puzzle.submitted) {
-    // Show the first word of the correct sentence as a hint
+    // Show the first word of the correct sentence as a hint.
     hintElem.innerText = `Hint: The sentence begins with "${puzzle.correct[0]}".`;
   } else {
-    // If submitted but incorrect, show partial feedback
     let correctCount = 0;
     puzzle.userAnswer.forEach((word, index) => {
       if (word === puzzle.correct[index]) correctCount++;
@@ -377,7 +376,7 @@ function submitAnswer() {
   
   const isCorrect = (userWords.join(" ") === puzzle.correct.join(" "));
   
-  // Highlight each word in the drop zone
+  // Highlight each word in the drop zone.
   Array.from(dropZone.children).forEach((wordElem, index) => {
     wordElem.classList.remove("correct", "incorrect");
     if (wordElem.innerText === puzzle.correct[index]) {
@@ -390,22 +389,16 @@ function submitAnswer() {
   if (isCorrect) {
     score++;
     speak("Great job! The sentence is: " + puzzle.correct.join(" "));
-    // Show a success message that fades out
     const successElem = document.getElementById("success-message");
     successElem.innerText = "✓ Correct!";
     setTimeout(() => { successElem.innerText = ""; }, 3000);
   } else {
     speak("That's not quite right. The correct sentence is: " + puzzle.correct.join(" "));
-  }
-  
-  // Show partial credit if not 100%
-  if (!isCorrect) {
     let correctCount = 0;
     puzzle.userAnswer.forEach((word, index) => {
       if (word === puzzle.correct[index]) correctCount++;
     });
-    const hintElem = document.getElementById("hint");
-    hintElem.innerText = `Partial Credit: ${correctCount} out of ${puzzle.correct.length} words are in the correct position.`;
+    document.getElementById("hint").innerText = `Partial Credit: ${correctCount} out of ${puzzle.correct.length} words are in the correct position.`;
   }
   
   displayCurrentPuzzle();
@@ -418,7 +411,6 @@ function nextPuzzle() {
     displayCurrentPuzzle();
   } else {
     alert("Session complete! You have finished 5 questions for this level.");
-    // Optionally, prompt for next level or review.
   }
 }
 
@@ -437,6 +429,17 @@ function resetQuiz() {
   displayCurrentPuzzle();
 }
 
+/* === Fullscreen Toggle Function === */
+function toggleFullScreen() {
+  if (!document.fullscreenElement) {
+    document.documentElement.requestFullscreen().catch((err) => {
+      console.warn(`Error attempting to enable full-screen mode: ${err.message} (${err.name})`);
+    });
+  } else {
+    document.exitFullscreen();
+  }
+}
+
 /* === Global Event Listeners === */
 document.getElementById("listen-instructions-btn").addEventListener("click", () => {
   const instructions = document.querySelector("p.instructions").innerText;
@@ -451,6 +454,7 @@ document.getElementById("level-select").addEventListener("change", (e) => {
   currentLevel = e.target.value;
   resetQuiz();
 });
+document.getElementById("fullscreen-btn").addEventListener("click", toggleFullScreen);
 
 /* === Initialize Quiz on DOM Ready === */
 document.addEventListener("DOMContentLoaded", () => {
