@@ -20,7 +20,7 @@
   box-sizing: border-box;
 }
 
-/* Body styling with a subtle background gradient for improved aesthetics */
+/* Base Body with a subtle gradient background */
 body {
   font-family: 'Open Sans', Arial, sans-serif;
   background: linear-gradient(135deg, #f0f8ff 0%, #e0f7fa 100%);
@@ -138,7 +138,7 @@ p.instructions {
   transition: background-color 0.3s ease, border-color 0.3s ease;
   margin-bottom: 10px;
   pointer-events: auto;
-  touch-action: none;
+  touch-action: none; /* Better touch behavior */
 }
 .word-bank:hover, .drop-zone:hover {
   background-color: #fff;
@@ -163,6 +163,11 @@ p.instructions {
 .word:active, .word:focus {
   transform: scale(1.1);
   outline: none;
+}
+/* Indicate touch dragging */
+.word.dragging {
+  opacity: 0.7;
+  transform: scale(1.1);
 }
 
 /* Bounce Animation for Correct Words */
@@ -205,7 +210,7 @@ p.instructions {
   background-color: #357abd;
 }
 
-/* Progress, Score, Hint, and Success Feedback */
+/* Progress, Score, Hint, and Success Message */
 #progress, #score, #hint, #success-message {
   font-size: 1.1em;
   margin-top: 8px;
@@ -219,7 +224,6 @@ p.instructions {
   animation: fadeOut 3s forwards;
   opacity: 0;
 }
-
 /* Fade-out Animation */
 @keyframes fadeOut {
   0% { opacity: 1; }
