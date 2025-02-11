@@ -7,8 +7,8 @@
   <title>Word Order Adventure</title>
   <!-- Google Fonts for modern typography -->
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
-  <!-- Link to the improved CSS; append version query string if needed -->
-  <link rel="stylesheet" href="styles.css?v=2">
+  <!-- Link to the CSS (use a version query string if needed) -->
+  <link rel="stylesheet" href="styles.css?v=3">
 </head>
 <body>
   <header>
@@ -29,16 +29,25 @@
       </select>
       <button id="listen-instructions-btn" class="instruction-btn">Listen Instructions</button>
       <button id="fullscreen-btn" class="instruction-btn">Fullscreen</button>
+      <!-- (Optional) Theme toggle -->
+      <button id="theme-toggle" class="instruction-btn">Toggle Theme</button>
     </div>
   </header>
   
   <main class="game-container" id="game-container">
-    <!-- Puzzle Section: dynamically populated with puzzles -->
+    <!-- Puzzle Section -->
     <section id="puzzle-container" aria-live="polite"></section>
     
     <!-- Progress Bar -->
     <section id="progress-bar-container">
       <div id="progress-bar"></div>
+    </section>
+    
+    <!-- Gamification Panel -->
+    <section id="gamification-panel">
+      <p id="xp-display">XP: 0</p>
+      <p id="streak-display">Streak: 0</p>
+      <div id="badges-container">Badges: <span id="badges-list"></span></div>
     </section>
     
     <!-- Navigation Buttons -->
@@ -60,7 +69,7 @@
     <button id="reset-btn">Reset Quiz</button>
   </main>
 
-  <!-- Defer loading of JavaScript until after the document is parsed -->
+  <!-- Defer JS loading -->
   <script src="script.js" defer></script>
 </body>
 </html>
