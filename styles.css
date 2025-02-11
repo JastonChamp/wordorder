@@ -1,35 +1,39 @@
+/* styles.css – Updated styling inspired by top games for a vibrant, modern look */
+
 /* CSS Variables for theme customization */
 :root {
-  --primary-color: #4a90e2;
-  --secondary-color: #fdd835;
-  --background-color: #f0f8ff;
-  --text-color: #333;
-  --correct-bg: #c8e6c9;
-  --correct-border: #66bb6a;
-  --incorrect-bg: #ffcdd2;
-  --incorrect-border: #e57373;
-  --word-bg: #ffeb3b;
-  --word-border: #fdd835;
-  --dropzone-active-bg: #e0f7fa;
-  --progress-bar-bg: #4a90e2;
-  --progress-bar-height: 10px;
+  --primary-color: #1abc9c;       /* Turquoise accent */
+  --secondary-color: #16a085;     /* Darker turquoise */
+  --accent-color: #e74c3c;        /* Bold red accent */
+  --background-color: #2c3e50;    /* Deep navy background */
+  --text-color: #ecf0f1;          /* Light text */
+  --correct-bg: #27ae60;          /* Green for correct answers */
+  --correct-border: #2ecc71;
+  --incorrect-bg: #c0392b;        /* Red for incorrect answers */
+  --incorrect-border: #e74c3c;
+  --word-bg: #f39c12;             /* Bright orange word tiles */
+  --word-border: #d35400;
+  --dropzone-active-bg: #34495e;  /* Highlighted dropzone background */
+  --progress-bar-bg: #1abc9c;
+  --progress-bar-height: 12px;
 }
 
 /* Global Reset */
 * {
   box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
 
-/* Base Body with a subtle gradient background */
+/* Base Body */
 body {
   font-family: 'Poppins', Arial, sans-serif;
-  background: linear-gradient(135deg, #f0f8ff 0%, #e0f7fa 100%);
-  margin: 0;
-  padding: 15px;
+  background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+  color: var(--text-color);
   display: flex;
   flex-direction: column;
   align-items: center;
-  color: var(--text-color);
+  padding: 15px;
 }
 
 /* Header Styles */
@@ -41,27 +45,24 @@ h1 {
   font-size: 2.4em;
   margin-bottom: 10px;
 }
-p.instructions {
+.instructions {
   font-size: 1.2em;
-  margin: 0 auto 10px;
   padding: 10px;
   font-weight: 600;
-  background-color: #fff;
+  background-color: #34495e;
   border: 2px solid var(--primary-color);
   border-radius: 5px;
+  margin: 0 auto 10px;
 }
 
 /* Controls Section */
 .controls {
   margin-top: 10px;
 }
-.controls label {
-  font-size: 1em;
-  margin-right: 5px;
-}
+.controls label,
 .controls select {
   font-size: 1em;
-  padding: 4px;
+  margin-right: 5px;
 }
 .instruction-btn {
   margin-left: 8px;
@@ -70,22 +71,22 @@ p.instructions {
   border: none;
   border-radius: 5px;
   background-color: var(--primary-color);
-  color: #fff;
+  color: var(--text-color);
   cursor: pointer;
   transition: background-color 0.3s;
 }
 .instruction-btn:hover {
-  background-color: #357abd;
+  background-color: var(--secondary-color);
 }
 
-/* Main Game Container */
+/* Game Container */
 .game-container {
   max-width: 800px;
   width: 100%;
+  background-color: #34495e;
   padding: 20px;
-  background-color: #fff;
   border-radius: 10px;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
   text-align: center;
   margin-bottom: 20px;
 }
@@ -93,7 +94,7 @@ p.instructions {
 /* Progress Bar */
 #progress-bar-container {
   width: 100%;
-  background-color: #ddd;
+  background-color: #2c3e50;
   border-radius: 5px;
   overflow: hidden;
   margin-bottom: 15px;
@@ -116,32 +117,33 @@ p.instructions {
   padding: 15px;
   border: 3px solid var(--primary-color);
   border-radius: 8px;
-  background-color: #e9f2fb;
+  background-color: #3b4a59;
   max-width: 600px;
 }
 .sentence-container h3 {
-  margin: 0 0 10px;
+  margin-bottom: 10px;
   color: var(--primary-color);
   font-size: 1.4em;
 }
 
 /* Word Bank and Drop Zone */
-.word-bank, .drop-zone {
+.word-bank,
+.drop-zone {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
   min-height: 80px;
-  border: 2px dashed #ccc;
+  border: 2px dashed #7f8c8d;
   border-radius: 5px;
   padding: 10px;
-  background-color: #f9f9f9;
-  transition: background-color 0.3s ease, border-color 0.3s ease;
+  background-color: #3b4a59;
+  transition: background-color 0.3s, border-color 0.3s;
   margin-bottom: 10px;
-  pointer-events: auto;
   touch-action: none;
 }
-.word-bank:hover, .drop-zone:hover {
-  background-color: #fff;
+.word-bank:hover,
+.drop-zone:hover {
+  background-color: #4a5a6a;
 }
 .drop-zone.active {
   background-color: var(--dropzone-active-bg);
@@ -154,18 +156,19 @@ p.instructions {
   background-color: var(--word-bg);
   border: 1px solid var(--word-border);
   border-radius: 5px;
-  cursor: move;
+  cursor: pointer;
   user-select: none;
   font-weight: bold;
   transition: transform 0.2s, background-color 0.3s;
   font-size: 1em;
 }
-.word:active, .word:focus {
+.word:active,
+.word:focus {
   transform: scale(1.1);
   outline: none;
 }
 
-/* Bounce Animation for Correct Words */
+/* Bounce Animation */
 @keyframes bounce {
   0% { transform: scale(1); }
   30% { transform: scale(1.2); }
@@ -176,7 +179,7 @@ p.instructions {
 .correct {
   background-color: var(--correct-bg) !important;
   border-color: var(--correct-border) !important;
-  animation: bounce 0.5s;
+  animation: bounce 0.5s ease forwards;
 }
 .incorrect {
   background-color: var(--incorrect-bg) !important;
@@ -198,31 +201,24 @@ p.instructions {
   border-radius: 5px;
   cursor: pointer;
   background-color: var(--primary-color);
-  color: #fff;
+  color: var(--text-color);
   transition: background-color 0.3s;
 }
 .nav-buttons button:hover {
-  background-color: #357abd;
+  background-color: var(--secondary-color);
 }
 
 /* Feedback Text */
-#progress, #score, #hint, #success-message {
+.feedback p {
   font-size: 1.1em;
   margin-top: 8px;
   font-weight: bold;
 }
 #hint {
-  color: #555;
+  color: #bdc3c7;
 }
 #success-message {
-  color: green;
-  animation: fadeOut 3s forwards;
-  opacity: 0;
-}
-@keyframes fadeOut {
-  0% { opacity: 1; }
-  80% { opacity: 1; }
-  100% { opacity: 0; }
+  color: #2ecc71;
 }
 
 /* Reset Button */
@@ -234,13 +230,14 @@ p.instructions {
   border-radius: 5px;
   cursor: pointer;
   background-color: var(--primary-color);
-  color: #fff;
+  color: var(--text-color);
   transition: background-color 0.3s;
 }
 #reset-btn:hover {
-  background-color: #357abd;
+  background-color: var(--secondary-color);
 }
 
+/* Responsive Adjustments */
 @media (max-width: 600px) {
   h1 {
     font-size: 2em;
