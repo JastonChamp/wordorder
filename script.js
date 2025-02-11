@@ -1,9 +1,15 @@
-/* === Speech API Utility === */
+/* === Speech API Utility with Natural Voice Selection === */
 function speak(text) {
   if ('speechSynthesis' in window) {
     const utterance = new SpeechSynthesisUtterance(text);
-    utterance.rate = 1;   // Normal speed for clarity
-    utterance.pitch = 1;  // Normal pitch
+    // Try to choose a natural-sounding voice, e.g., one containing "Google"
+    const voices = window.speechSynthesis.getVoices();
+    const preferredVoice = voices.find(v => v.name.includes("Google")) || voices[0];
+    if (preferredVoice) {
+      utterance.voice = preferredVoice;
+    }
+    utterance.rate = 1;   // Adjust rate for clarity
+    utterance.pitch = 1;  // Adjust pitch as desired
     window.speechSynthesis.speak(utterance);
   } else {
     console.warn("Speech Synthesis API is not supported in this browser.");
@@ -237,7 +243,7 @@ function displayCurrentPuzzle() {
   container.appendChild(wordBank);
   container.appendChild(dropZone);
   
-  // Attach event listeners for drop zone and word bank (HTML5 drag-and-drop)
+  // Attach HTML5 drag-and-drop event listeners for the drop zone
   [wordBank, dropZone].forEach(zone => {
     zone.addEventListener("dragover", handleDragOver);
     zone.addEventListener("dragleave", handleDragLeave);
@@ -252,10 +258,15 @@ function displayCurrentPuzzle() {
       wordDiv.className = "word";
       wordDiv.setAttribute("role", "listitem");
       wordDiv.draggable = true;
-      wordDiv.tabIndex = 0;  // Enable keyboard focus
+      wordDiv.tabIndex = 0;
       wordDiv.innerText = word;
-      wordDiv.addEventListener("dragstart", handleDragStart);
-      wordDiv.addEventListener("dragend", handleDragEnd);
+      // Attach pointer-based events if supported, else fallback to HTML5 drag events
+      if (window.PointerEvent) {
+        wordDiv.addEventListener("pointerdown", handlePointerDown);
+      } else {
+        wordDiv.addEventListener("dragstart", handleDragStart);
+        wordDiv.addEventListener("dragend", handleDragEnd);
+      }
       wordBank.appendChild(wordDiv);
     });
   } else {
@@ -291,7 +302,7 @@ function displayCurrentPuzzle() {
   progressBar.style.width = `${((currentPuzzleIndex + 1) / sessionLength) * 100}%`;
 }
 
-/* === HTML5 Drag & Drop Handlers (Working on Desktop) === */
+/* === HTML5 Drag & Drop Handlers (for Desktop) === */
 let draggedItem = null;
 
 function handleDragStart(e) {
@@ -336,6 +347,56 @@ function handleDrop(e) {
   }
 }
 
+/* === Pointer-based Drag & Drop Handlers (for Touch Devices) === */
+let pointerDragItem = null;
+let pointerOffsetX = 0, pointerOffsetY = 0;
+
+function handlePointerDown(e) {
+  // Only act on primary pointer button
+  if (e.button !== 0) return;
+  pointerDragItem = e.target;
+  pointerDragItem.setPointerCapture(e.pointerId);
+  pointerDragItem.style.opacity = "0.7";
+  pointerDragItem.style.zIndex = "1000";
+  const rect = pointerDragItem.getBoundingClientRect();
+  pointerOffsetX = e.clientX - rect.left;
+  pointerOffsetY = e.clientY - rect.top;
+  console.log("Pointer down for:", pointerDragItem.innerText);
+}
+
+function handlePointerMove(e) {
+  if (!pointerDragItem) return;
+  pointerDragItem.style.position = "absolute";
+  pointerDragItem.style.left = (e.clientX - pointerOffsetX) + "px";
+  pointerDragItem.style.top = (e.clientY - pointerOffsetY) + "px";
+}
+
+function handlePointerUp(e) {
+  if (!pointerDragItem) return;
+  pointerDragItem.releasePointerCapture(e.pointerId);
+  pointerDragItem.style.opacity = "1";
+  // Determine drop target using elementFromPoint
+  const dropTarget = document.elementFromPoint(e.clientX, e.clientY);
+  let validDropZone = dropTarget;
+  while (validDropZone && !validDropZone.classList.contains("drop-zone")) {
+    validDropZone = validDropZone.parentElement;
+  }
+  if (validDropZone) {
+    validDropZone.appendChild(pointerDragItem);
+    console.log("Pointer drop: moved", pointerDragItem.innerText, "to", validDropZone);
+  }
+  pointerDragItem.style.position = "";
+  pointerDragItem.style.left = "";
+  pointerDragItem.style.top = "";
+  pointerDragItem = null;
+}
+
+/* Attach pointer event listeners if supported */
+if (window.PointerEvent) {
+  document.addEventListener("pointermove", handlePointerMove);
+  document.addEventListener("pointerup", handlePointerUp);
+}
+
 /* === Show Hint Function === */
 function showHint() {
   const hintElem = document.getElementById("hint");
@@ -375,6 +436,7 @@ function submitAnswer() {
   
   const isCorrect = (userWords.join(" ") === puzzle.correct.join(" "));
   
+  // Highlight each word in the drop zone
   Array.from(dropZone.children).forEach((wordElem, index) => {
     wordElem.classList.remove("correct", "incorrect");
     if (wordElem.innerText === puzzle.correct[index]) {
