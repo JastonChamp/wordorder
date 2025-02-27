@@ -375,13 +375,14 @@ document.addEventListener("DOMContentLoaded", () => {
       </div>
       <div class="drop-zone"></div>
     `;
-    // Initialize SortableJS for both containers with fallback options.
+    // Initialize SortableJS for both containers.
     new Sortable(document.querySelector(".word-bank"), {
       group: "shared",
       animation: 150,
       fallbackOnBody: true,
       forceFallback: true,
       onEnd: function(evt) {
+        // Ensure words remain in a valid container.
         if (!evt.to.classList.contains("word-bank") && !evt.to.classList.contains("drop-zone")) {
           document.querySelector(".word-bank").appendChild(evt.item);
         }
@@ -393,8 +394,14 @@ document.addEventListener("DOMContentLoaded", () => {
       fallbackOnBody: true,
       forceFallback: true,
       onEnd: function(evt) {
+        // Snap animation on drop.
         if (!evt.to.classList.contains("word-bank") && !evt.to.classList.contains("drop-zone")) {
           document.querySelector(".word-bank").appendChild(evt.item);
+        } else {
+          evt.item.classList.add("dropped");
+          setTimeout(() => {
+            evt.item.classList.remove("dropped");
+          }, 300);
         }
       }
     });
@@ -415,12 +422,34 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("feedback").textContent = "";
   }
 
-  // Update UI stats.
+  // Update UI stats and badge progress.
   function updateUIStats() {
     document.getElementById("score-display").textContent = score;
     document.getElementById("streak-display").textContent = streak;
     document.getElementById("longest-streak-display").textContent = longestStreak;
     document.getElementById("badges-display").textContent = badges.size === 0 ? "None" : Array.from(badges).join(", ");
+    updateBadgeProgress();
+  }
+
+  // Update badge progress indicator.
+  function updateBadgeProgress() {
+    const progressElem = document.getElementById("badge-progress");
+    let nextBadge = "";
+    let needed = 0;
+    if (streak < 3) {
+      nextBadge = "Bronze Star";
+      needed = 3 - streak;
+    } else if (streak >= 3 && streak < 5) {
+      nextBadge = "Silver Star";
+      needed = 5 - streak;
+    } else if (streak >= 5 && streak < 10) {
+      nextBadge = "Gold Star";
+      needed = 10 - streak;
+    } else {
+      progressElem.textContent = "Great job! You've earned all badges!";
+      return;
+    }
+    progressElem.textContent = `${needed} more correct answer(s) for your next badge: ${nextBadge}`;
   }
 
   // Check for badge awards based on streak.
