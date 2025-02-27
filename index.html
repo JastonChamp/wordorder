@@ -1,77 +1,45 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <!-- Ensure proper scaling on mobile devices -->
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Word Order Adventure</title>
-  <!-- Google Fonts for modern typography -->
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
-  <!-- Link to the CSS (append version if needed) -->
-  <link rel="stylesheet" href="styles.css?v=4">
-  <!-- Include GSAP for advanced animations -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Word Order Adventure</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.14.0/Sortable.min.js"></script>
 </head>
 <body>
-  <header>
-    <h1>Word Order Adventure</h1>
-    <p class="instructions">
-      Rearrange the words to form a correct sentence or question.
-      Start with a capital letter and end with a full stop or question mark.
-    </p>
-    <div class="controls">
-      <label for="level-select">Select Level:</label>
-      <select id="level-select">
-        <option value="p1">Primary 1</option>
-        <option value="p2">Primary 2</option>
-        <option value="p3" selected>Primary 3</option>
-        <option value="p4">Primary 4</option>
-        <option value="p5">Primary 5</option>
-        <option value="p6">Primary 6</option>
-      </select>
-      <button id="listen-instructions-btn" class="instruction-btn">Listen Instructions</button>
-      <button id="fullscreen-btn" class="instruction-btn">Fullscreen</button>
-      <!-- Theme toggle (optional) -->
-      <button id="theme-toggle" class="instruction-btn">Toggle Theme</button>
-    </div>
-  </header>
-  
-  <main class="game-container" id="game-container">
-    <!-- Puzzle Section -->
-    <section id="puzzle-container" aria-live="polite"></section>
-    
-    <!-- Progress Bar -->
-    <section id="progress-bar-container">
-      <div id="progress-bar"></div>
-    </section>
-    
-    <!-- Gamification Panel -->
-    <section id="gamification-panel">
-      <p id="xp-display">XP: 0</p>
-      <p id="streak-display">Streak: 0</p>
-      <div id="badges-container">Badges: <span id="badges-list"></span></div>
-    </section>
-    
-    <!-- Navigation Buttons -->
-    <nav class="nav-buttons">
-      <button id="prev-btn">Previous</button>
-      <button id="hint-btn">Show Hint</button>
-      <button id="submit-btn">Submit Answer</button>
-      <button id="next-btn">Next</button>
-    </nav>
-    
-    <!-- Feedback Area -->
-    <div class="feedback">
-      <p id="progress"></p>
-      <p id="score"></p>
-      <p id="hint"></p>
-      <p id="success-message" aria-live="polite"></p>
-    </div>
-    
-    <button id="reset-btn">Reset Quiz</button>
-  </main>
+    <header>
+        <h1>Word Order Adventure</h1>
+        <p class="instructions">Drag and drop the words to form a correct sentence. Earn points and track your progress!</p>
+        <div class="controls">
+            <label for="level-select">Select Level:</label>
+            <select id="level-select">
+                <option value="p1">Primary 1</option>
+                <option value="p2">Primary 2</option>
+                <option value="p3">Primary 3</option>
+                <option value="p4">Primary 4</option>
+                <option value="p5">Primary 5</option>
+                <option value="p6">Primary 6</option>
+            </select>
+            <button id="listen-instructions-btn">🔊 Listen</button>
+        </div>
+    </header>
 
-  <!-- Defer JS loading -->
-  <script src="script.js" defer></script>
+    <main>
+        <div id="progress-bar-container">
+            <div id="progress-bar"></div>
+        </div>
+        <div id="puzzle-container"></div>
+        <div class="nav-buttons">
+            <button id="prev-btn">Previous</button>
+            <button id="submit-btn">Submit Answer</button>
+            <button id="next-btn">Next</button>
+        </div>
+        <p id="score-display">Score: 0</p>
+        <p id="feedback"></p>
+        <button id="reset-btn">Reset Quiz</button>
+    </main>
+
+    <script src="script.js"></script>
 </body>
 </html>
