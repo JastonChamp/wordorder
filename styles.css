@@ -81,6 +81,28 @@ h1 {
   text-align: center;
 }
 
+/* Controls inside instructions box */
+.controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 0.8rem;
+}
+.controls select {
+  font-size: 1em;
+  padding: 0.3rem;
+}
+#listen-instructions-btn {
+  background-color: var(--primary-color);
+  color: #fff;
+  padding: 0.5rem 0.75rem;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
 /* Main content styling */
 main {
   flex: 1;
