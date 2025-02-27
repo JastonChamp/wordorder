@@ -1,99 +1,223 @@
+/* Variables for playful, child-friendly colors */
 :root {
   --primary-color: #4a90e2;
   --secondary-color: #fdd835;
-  --background-color: #f0f8ff;
+  --background-color: #fffbf2; /* Slightly warmer background */
   --text-color: #333;
   --correct-bg: #c8e6c9;
   --incorrect-bg: #ffcdd2;
+  --highlight-bg: #fff59d;
+  --header-font: "Comic Sans MS", cursive, sans-serif; /* Childlike font */
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
 
 body {
   font-family: Arial, sans-serif;
   background-color: var(--background-color);
+  color: var(--text-color);
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* Header section with mascot */
+header {
+  background: linear-gradient(135deg, #ffeeba 0%, #f9d976 100%);
+  padding: 1rem;
   text-align: center;
-  margin: 0;
-  padding: 15px;
+  border-bottom: 4px solid var(--primary-color);
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.mascot {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  border: 3px solid var(--primary-color);
+  object-fit: cover;
 }
 
 h1 {
-  font-size: 2.2em;
+  font-family: var(--header-font);
+  font-size: 2em;
+  margin: 0;
+  color: #4a4a4a;
 }
 
 .instructions {
-  font-size: 1.1em;
-  margin: 10px auto;
-  padding: 8px;
-  background-color: #fff;
-  border: 1px solid var(--primary-color);
-  border-radius: 5px;
+  font-size: 1em;
+  margin: 0.5rem auto 1rem;
+  max-width: 700px;
+  background: #fff;
+  border: 2px solid var(--primary-color);
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
 }
 
 .controls {
-  margin: 10px;
-}
-
-.nav-buttons {
+  margin: 0.5rem auto;
   display: flex;
+  align-items: center;
   justify-content: center;
-  gap: 15px;
-  margin-top: 15px;
-  flex-wrap: wrap;
+  gap: 0.5rem;
 }
 
-.nav-buttons button {
-  padding: 10px 15px;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
+.controls select {
+  font-size: 1rem;
+  padding: 0.2rem;
+}
+
+#listen-instructions-btn {
   background-color: var(--primary-color);
   color: #fff;
-  font-size: 1em;
+  padding: 0.5rem 0.75rem;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+/* Main content */
+main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 1rem;
+}
+
+/* Stats row */
+#game-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  align-items: center;
+  justify-content: center;
+}
+
+.stat-item {
+  background: #fff;
+  border: 2px solid var(--primary-color);
+  border-radius: 6px;
+  padding: 0.5rem 0.75rem;
+  font-size: 1rem;
+}
+
+/* Progress bar */
+#progress-bar-container {
+  width: 80%;
+  background-color: #ddd;
+  border-radius: 10px;
+  margin-bottom: 15px;
+  height: 12px;
+}
+
+#progress-bar {
+  width: 0%;
+  height: 100%;
+  background-color: var(--primary-color);
+  border-radius: 10px;
+  transition: width 0.3s ease;
 }
 
 #puzzle-container {
-  margin-top: 20px;
-  padding: 10px;
+  width: 80%;
+  max-width: 800px;
+  margin: 1rem auto;
+  text-align: center;
 }
 
 .word-bank, .drop-zone {
   display: flex;
   flex-wrap: wrap;
-  justify-content: center;
   gap: 8px;
-  min-height: 50px;
+  min-height: 60px;
   padding: 10px;
   border: 2px dashed #ccc;
   background-color: #f9f9f9;
-  margin-bottom: 15px;
+  margin-bottom: 1rem;
+  border-radius: 8px;
+  justify-content: center;
 }
 
 .word {
-  padding: 10px 15px;
   background-color: var(--secondary-color);
-  border-radius: 5px;
-  cursor: grab;
+  padding: 8px 12px;
+  border-radius: 6px;
   font-weight: bold;
+  cursor: grab;
+  user-select: none;
+  transition: transform 0.2s;
+}
+
+.word:active {
+  transform: scale(1.1);
 }
 
 .correct {
-  background-color: var(--correct-bg);
+  background-color: var(--correct-bg) !important;
 }
 
 .incorrect {
-  background-color: var(--incorrect-bg);
+  background-color: var(--incorrect-bg) !important;
 }
 
-#progress-bar-container {
-  width: 80%;
-  background-color: #ddd;
-  border-radius: 10px;
-  margin: auto;
-  margin-bottom: 15px;
+.nav-buttons {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 0.5rem;
+  flex-wrap: wrap;
+  justify-content: center;
 }
 
-#progress-bar {
-  width: 0%;
-  height: 10px;
+.nav-buttons button {
   background-color: var(--primary-color);
-  border-radius: 10px;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 0.7rem 1.2rem;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+.hint-button {
+  background-color: #ef5350; /* Reddish hint button to stand out */
+}
+
+#feedback {
+  margin-top: 0.5rem;
+  font-size: 1.1rem;
+  min-height: 1.2em;
+}
+
+/* Footer or any final elements */
+footer {
+  background: #fff;
+  padding: 1rem;
+  text-align: center;
+  border-top: 2px solid var(--primary-color);
+}
+
+/* Responsive design for small screens */
+@media (max-width: 600px) {
+  .controls, .header-left {
+    flex-direction: column;
+  }
+  .instructions {
+    font-size: 0.9rem;
+  }
+  .nav-buttons button {
+    font-size: 0.9rem;
+  }
 }
