@@ -19,10 +19,23 @@
     </div>
   </header>
   
+  <!-- Instructions Section with Controls -->
   <section id="instructions-box">
     <p class="instructions">
       Drag and drop the words to form a correct sentence. Remember to start with a capital letter!
     </p>
+    <div class="controls">
+      <label for="level-select">Select Level:</label>
+      <select id="level-select">
+        <option value="p1">Primary 1</option>
+        <option value="p2">Primary 2</option>
+        <option value="p3" selected>Primary 3</option>
+        <option value="p4">Primary 4</option>
+        <option value="p5">Primary 5</option>
+        <option value="p6">Primary 6</option>
+      </select>
+      <button id="listen-instructions-btn" title="Listen to instructions">🔊 Listen</button>
+    </div>
   </section>
   
   <main>
