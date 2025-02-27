@@ -1,15 +1,15 @@
-/* Variables for playful, child-friendly colors */
+/* Variables for a unified, pastel color scheme and modern typography */
 :root {
   --primary-color: #4a90e2;
   --secondary-color: #fdd835;
   --accent-color: #ff7043;
-  --background-color: #fffbf2; /* Slightly warmer background */
+  --background-color: #e0f7fa; /* Soft pastel blue */
   --text-color: #333;
   --correct-bg: #c8e6c9;
   --incorrect-bg: #ffcdd2;
   --highlight-bg: #fff59d;
-  --header-font: 'Fredoka One', cursive;
-  --body-font: 'Nunito', sans-serif;
+  --header-font: 'Poppins', sans-serif;
+  --body-font: 'Open Sans', sans-serif;
 }
 
 * {
@@ -27,7 +27,7 @@ body {
   min-height: 100vh;
 }
 
-/* Header section with mascot */
+/* Header with a friendly banner */
 header {
   background: linear-gradient(135deg, #ffeeba 0%, #f9d976 100%);
   padding: 1rem;
@@ -35,11 +35,11 @@ header {
   border-bottom: 4px solid var(--primary-color);
 }
 
-.header-left {
+.header-content {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: center;
-  gap: 1rem;
+  gap: 0.5rem;
 }
 
 .mascot {
@@ -52,44 +52,36 @@ header {
 
 h1 {
   font-family: var(--header-font);
-  font-size: 2em;
-  margin: 0;
+  font-size: 2.5em;
+  margin: 0.5rem 0;
   color: #4a4a4a;
 }
 
-.instructions {
-  font-size: 1em;
-  margin: 0.5rem auto 1rem;
-  max-width: 700px;
+#xp-display {
+  font-size: 1.1rem;
+  background: var(--secondary-color);
+  padding: 0.3rem 0.6rem;
+  border-radius: 12px;
+  color: #fff;
+}
+
+/* Instructions box with contrasting background */
+#instructions-box {
   background: #fff;
   border: 2px solid var(--primary-color);
-  padding: 0.5rem 1rem;
+  padding: 0.8rem 1rem;
+  margin: 1rem auto;
+  width: 90%;
+  max-width: 700px;
   border-radius: 8px;
 }
 
-.controls {
-  margin: 0.5rem auto;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
+.instructions {
+  font-size: 1.1rem;
+  text-align: center;
 }
 
-.controls select {
-  font-size: 1rem;
-  padding: 0.2rem;
-}
-
-#listen-instructions-btn {
-  background-color: var(--primary-color);
-  color: #fff;
-  padding: 0.5rem 0.75rem;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-}
-
-/* Main content */
+/* Main content styling */
 main {
   flex: 1;
   display: flex;
@@ -140,6 +132,7 @@ main {
   transition: width 0.3s ease;
 }
 
+/* Puzzle area */
 #puzzle-container {
   width: 80%;
   max-width: 800px;
@@ -174,7 +167,7 @@ main {
   transform: scale(1.1);
 }
 
-/* Snap animation when word is dropped */
+/* Snap animation */
 .dropped {
   animation: snap 0.3s ease;
 }
@@ -193,6 +186,7 @@ main {
   background-color: var(--incorrect-bg) !important;
 }
 
+/* Navigation buttons */
 .nav-buttons {
   display: flex;
   gap: 1rem;
@@ -215,10 +209,12 @@ main {
   background-color: #ef5350;
 }
 
+/* Feedback message */
 #feedback {
   margin-top: 0.5rem;
   font-size: 1.1rem;
   min-height: 1.2em;
+  text-align: center;
 }
 
 /* Footer styling */
@@ -231,13 +227,13 @@ footer {
   color: var(--text-color);
 }
 
-/* Responsive design for small screens */
+/* Responsive design */
 @media (max-width: 600px) {
-  .controls, .header-left {
+  .header-content, .controls {
     flex-direction: column;
   }
-  .instructions {
-    font-size: 0.9rem;
+  #instructions-box {
+    font-size: 0.95rem;
   }
   .nav-buttons button {
     font-size: 0.9rem;
