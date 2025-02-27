@@ -1,5 +1,9 @@
 document.addEventListener("DOMContentLoaded", () => {
-  /*** Level Sentence Pools (50 sentences per level) ***/
+  /**
+   * ---------------------------------
+   * 1) Sentence Pools by Level
+   * ---------------------------------
+   */
 
   // Primary 1 – Very simple, basic sentences.
   const sentencesP1 = [
@@ -335,43 +339,51 @@ document.addEventListener("DOMContentLoaded", () => {
     p6: sentencesP6
   };
 
-  // Global variables for state.
+  /**
+   * ---------------------------------
+   * 2) Global State
+   * ---------------------------------
+   */
   let currentLevel = document.getElementById("level-select").value;
   let currentIndex = 0;
   let score = 0;
+  let streak = 0;
+  let longestStreak = 0;
+  let badges = new Set();
+
+  /**
+   * ---------------------------------
+   * 3) Core Functions
+   * ---------------------------------
+   */
 
   // Load the puzzle for the current level and index.
   function loadPuzzle() {
+    clearFeedback();
     const pool = sentencePools[currentLevel];
-    if (!pool || pool.length === 0) return;
+    if (!pool || pool.length === 0) {
+      document.getElementById("puzzle-container").innerHTML = "<p>No sentences for this level.</p>";
+      return;
+    }
     const sentence = pool[currentIndex % pool.length];
-    // Remove punctuation for splitting; you may choose to handle punctuation separately.
+    // Remove punctuation for splitting (for drag-and-drop)
     const words = sentence.replace(/[.,?!]/g, "").split(" ");
     const shuffledWords = words.slice().sort(() => Math.random() - 0.5);
-
     const puzzleContainer = document.getElementById("puzzle-container");
     puzzleContainer.innerHTML = `
       <div class="word-bank">
-        ${shuffledWords.map(word => `<div class="word">${word}</div>`).join('')}
+        ${shuffledWords.map(word => `<div class="word">${word}</div>`).join("")}
       </div>
       <div class="drop-zone"></div>
     `;
-
     // Initialize SortableJS for both containers.
-    new Sortable(document.querySelector('.word-bank'), {
-      group: 'shared',
-      animation: 150,
-    });
-    new Sortable(document.querySelector('.drop-zone'), {
-      group: 'shared',
-      animation: 150,
-    });
-
+    new Sortable(document.querySelector(".word-bank"), { group: "shared", animation: 150 });
+    new Sortable(document.querySelector(".drop-zone"), { group: "shared", animation: 150 });
     updateProgressBar();
-    clearFeedback();
+    updateUIStats();
   }
 
-  // Update the progress bar based on the current index.
+  // Update progress bar.
   function updateProgressBar() {
     const pool = sentencePools[currentLevel];
     const progressBar = document.getElementById("progress-bar");
@@ -379,65 +391,120 @@ document.addEventListener("DOMContentLoaded", () => {
     progressBar.style.width = progressPercent + "%";
   }
 
-  // Clear feedback message.
+  // Clear feedback.
   function clearFeedback() {
-    const feedback = document.getElementById("feedback");
-    feedback.textContent = "";
+    document.getElementById("feedback").textContent = "";
   }
 
-  // Submit the current answer.
-  document.getElementById("submit-btn").addEventListener("click", () => {
+  // Update UI stats.
+  function updateUIStats() {
+    document.getElementById("score-display").textContent = score;
+    document.getElementById("streak-display").textContent = streak;
+    document.getElementById("longest-streak-display").textContent = longestStreak;
+    document.getElementById("badges-display").textContent = badges.size === 0 ? "None" : Array.from(badges).join(", ");
+  }
+
+  // Check for badge awards based on streak.
+  function checkForBadges() {
+    if (streak >= 3) badges.add("Bronze Star");
+    if (streak >= 5) badges.add("Silver Star");
+    if (streak >= 10) badges.add("Gold Star");
+  }
+
+  // Evaluate the user's answer.
+  function submitAnswer() {
     const pool = sentencePools[currentLevel];
     const sentence = pool[currentIndex % pool.length];
     const correctWords = sentence.replace(/[.,?!]/g, "").split(" ");
     const dropZone = document.querySelector(".drop-zone");
     const userWords = Array.from(dropZone.children).map(el => el.textContent);
-    const userSentence = userWords.join(" ");
-    const feedback = document.getElementById("feedback");
-
-    if (userSentence === correctWords.join(" ")) {
-      score += 10;
-      feedback.textContent = "Great job!";
-      feedback.style.color = "green";
-    } else {
-      feedback.textContent = "Not quite right. Try again!";
-      feedback.style.color = "red";
+    if (userWords.length !== correctWords.length) {
+      setFeedback("You must place all words into the drop zone first!", "orange");
+      return;
     }
-    document.getElementById("score-display").textContent = `Score: ${score}`;
-  });
+    let correctCount = 0;
+    dropZone.childNodes.forEach((child, i) => {
+      if (userWords[i] === correctWords[i]) {
+        child.classList.add("correct");
+        correctCount++;
+      } else {
+        child.classList.add("incorrect");
+      }
+    });
+    let gained = correctCount * 2;
+    let fullyCorrect = (correctCount === correctWords.length);
+    if (fullyCorrect) {
+      gained += 5;
+      streak++;
+      if (streak > longestStreak) longestStreak = streak;
+      checkForBadges();
+      setFeedback("Excellent! You got it all correct!", "green");
+    } else {
+      streak = 0;
+      setFeedback(`You got ${correctCount} word(s) in the correct spot. Keep trying!`, "red");
+    }
+    score += gained;
+    updateUIStats();
+  }
 
-  // Navigate to the next puzzle.
+  // Provide a hint: show the correct first word.
+  function giveHint() {
+    const pool = sentencePools[currentLevel];
+    const sentence = pool[currentIndex % pool.length];
+    const correctWords = sentence.replace(/[.,?!]/g, "").split(" ");
+    const correctFirstWord = correctWords[0];
+    const wordBank = document.querySelector(".word-bank");
+    const dropZone = document.querySelector(".drop-zone");
+    const wordElement = Array.from(wordBank.children).find(el => el.textContent === correctFirstWord);
+    if (wordElement) {
+      dropZone.appendChild(wordElement);
+      setFeedback(`Hint used! The first word is "${correctFirstWord}".`, "#ef5350");
+    } else {
+      setFeedback("Hint: The first word is already placed or not found!", "#ef5350");
+    }
+  }
+
+  // Helper to set feedback message.
+  function setFeedback(message, color) {
+    const feedback = document.getElementById("feedback");
+    feedback.textContent = message;
+    feedback.style.color = color;
+  }
+
+  /**
+   * ---------------------------------
+   * 4) Event Listeners
+   * ---------------------------------
+   */
+  document.getElementById("submit-btn").addEventListener("click", submitAnswer);
   document.getElementById("next-btn").addEventListener("click", () => {
     const pool = sentencePools[currentLevel];
     currentIndex = (currentIndex + 1) % pool.length;
     loadPuzzle();
   });
-
-  // Navigate to the previous puzzle.
   document.getElementById("prev-btn").addEventListener("click", () => {
     const pool = sentencePools[currentLevel];
     currentIndex = (currentIndex - 1 + pool.length) % pool.length;
     loadPuzzle();
   });
-
-  // Reset the quiz.
   document.getElementById("reset-btn").addEventListener("click", () => {
     score = 0;
+    streak = 0;
+    longestStreak = 0;
+    badges.clear();
     currentIndex = 0;
-    document.getElementById("score-display").textContent = `Score: ${score}`;
     loadPuzzle();
   });
-
-  // Update level when selection changes.
-  document.getElementById("level-select").addEventListener("change", (e) => {
+  document.getElementById("level-select").addEventListener("change", e => {
     currentLevel = e.target.value;
-    currentIndex = 0;
     score = 0;
-    document.getElementById("score-display").textContent = `Score: ${score}`;
+    streak = 0;
+    longestStreak = 0;
+    badges.clear();
+    currentIndex = 0;
     loadPuzzle();
   });
-
-  // Speech Synthesis for instructions.
+  document.getElementById("hint-btn").addEventListener("click", giveHint);
   document.getElementById("listen-instructions-btn").addEventListener("click", () => {
     const instructions = document.querySelector(".instructions").innerText;
     speak(instructions);
@@ -452,6 +519,10 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // Initialize the first puzzle.
+  /**
+   * ---------------------------------
+   * 5) Initialization
+   * ---------------------------------
+   */
   loadPuzzle();
 });
