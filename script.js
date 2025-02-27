@@ -365,7 +365,7 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
     const sentence = pool[currentIndex % pool.length];
-    // Remove punctuation for splitting.
+    // Remove punctuation for splitting
     const words = sentence.replace(/[.,?!]/g, "").split(" ");
     const shuffledWords = words.slice().sort(() => Math.random() - 0.5);
     const puzzleContainer = document.getElementById("puzzle-container");
@@ -373,7 +373,9 @@ document.addEventListener("DOMContentLoaded", () => {
       <div class="word-bank">
         ${shuffledWords.map(word => `<div class="word">${word}</div>`).join("")}
       </div>
-      <div class="drop-zone"></div>
+      <div class="drop-zone">
+        <!-- Drop zone for sentence construction -->
+      </div>
     `;
     // Initialize SortableJS for both containers.
     new Sortable(document.querySelector(".word-bank"), {
@@ -386,9 +388,7 @@ document.addEventListener("DOMContentLoaded", () => {
           document.querySelector(".word-bank").appendChild(evt.item);
         } else {
           evt.item.classList.add("dropped");
-          setTimeout(() => {
-            evt.item.classList.remove("dropped");
-          }, 300);
+          setTimeout(() => evt.item.classList.remove("dropped"), 300);
         }
       }
     });
@@ -402,9 +402,7 @@ document.addEventListener("DOMContentLoaded", () => {
           document.querySelector(".word-bank").appendChild(evt.item);
         } else {
           evt.item.classList.add("dropped");
-          setTimeout(() => {
-            evt.item.classList.remove("dropped");
-          }, 300);
+          setTimeout(() => evt.item.classList.remove("dropped"), 300);
         }
       }
     });
@@ -425,13 +423,11 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("feedback").textContent = "";
   }
 
-  // Update UI stats, including XP.
+  // Update UI stats and badge progress.
   function updateUIStats() {
     document.getElementById("score-display").textContent = score;
     document.getElementById("streak-display").textContent = streak;
-    document.getElementById("longest-streak-display").textContent = longestStreak;
     document.getElementById("badges-display").textContent = badges.size === 0 ? "None" : Array.from(badges).join(", ");
-    document.getElementById("xp").textContent = score; // XP mirrors score.
     updateBadgeProgress();
   }
 
@@ -443,10 +439,10 @@ document.addEventListener("DOMContentLoaded", () => {
     if (streak < 3) {
       nextBadge = "Bronze Star";
       needed = 3 - streak;
-    } else if (streak >= 3 && streak < 5) {
+    } else if (streak < 5) {
       nextBadge = "Silver Star";
       needed = 5 - streak;
-    } else if (streak >= 5 && streak < 10) {
+    } else if (streak < 10) {
       nextBadge = "Gold Star";
       needed = 10 - streak;
     } else {
@@ -496,11 +492,11 @@ document.addEventListener("DOMContentLoaded", () => {
       streak++;
       if (streak > longestStreak) longestStreak = streak;
       checkForBadges();
-      setFeedback("Excellent! You got it all correct!", "green");
+      setFeedback("Excellent! You got it all correct! The sentence is: " + sentence, "green");
       speak("Great job! The sentence is: " + sentence);
     } else {
       streak = 0;
-      setFeedback(`You got ${correctCount} word(s) in the correct spot. Keep trying!`, "red");
+      setFeedback("You got " + correctCount + " word(s) in the correct spot. The correct sentence is: " + sentence, "red");
       speak("That's not quite right. The correct sentence is: " + sentence);
     }
 
@@ -576,7 +572,7 @@ document.addEventListener("DOMContentLoaded", () => {
     loadPuzzle();
   });
   document.getElementById("hint-btn").addEventListener("click", giveHint);
-  document.getElementById("listen-instructions-btn")?.addEventListener("click", () => {
+  document.getElementById("listen-instructions-btn").addEventListener("click", () => {
     const instructions = document.querySelector(".instructions").innerText;
     speak(instructions);
   });
