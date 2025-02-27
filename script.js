@@ -382,9 +382,13 @@ document.addEventListener("DOMContentLoaded", () => {
       fallbackOnBody: true,
       forceFallback: true,
       onEnd: function(evt) {
-        // Ensure words remain in a valid container.
-        if (!evt.to.classList.contains("word-bank") && !evt.to.classList.contains("drop-zone")) {
+        if (!evt.to || (!evt.to.classList.contains("word-bank") && !evt.to.classList.contains("drop-zone"))) {
           document.querySelector(".word-bank").appendChild(evt.item);
+        } else {
+          evt.item.classList.add("dropped");
+          setTimeout(() => {
+            evt.item.classList.remove("dropped");
+          }, 300);
         }
       }
     });
@@ -394,8 +398,7 @@ document.addEventListener("DOMContentLoaded", () => {
       fallbackOnBody: true,
       forceFallback: true,
       onEnd: function(evt) {
-        // Snap animation on drop.
-        if (!evt.to.classList.contains("word-bank") && !evt.to.classList.contains("drop-zone")) {
+        if (!evt.to || (!evt.to.classList.contains("word-bank") && !evt.to.classList.contains("drop-zone"))) {
           document.querySelector(".word-bank").appendChild(evt.item);
         } else {
           evt.item.classList.add("dropped");
