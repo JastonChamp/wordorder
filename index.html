@@ -11,7 +11,6 @@
 <body>
   <header>
     <div class="header-left">
-      <!-- Updated mascot image file path -->
       <img src="word-order-mascot.png" alt="Word Order Mascot" class="mascot">
       <h1>Word Order Adventure</h1>
     </div>
@@ -28,7 +27,7 @@
         <option value="p5">Primary 5</option>
         <option value="p6">Primary 6</option>
       </select>
-      <button id="listen-instructions-btn">🔊 Listen</button>
+      <button id="listen-instructions-btn" title="Listen to the instructions">🔊 Listen</button>
     </div>
   </header>
 
@@ -47,27 +46,33 @@
         <strong>Badges:</strong> <span id="badges-display">None</span>
       </div>
     </div>
-
-    <!-- Progress bar to show how many sentences have been attempted -->
+    <!-- Badge progress indicator -->
+    <div id="badge-progress"></div>
+    
+    <!-- Progress bar -->
     <div id="progress-bar-container">
       <div id="progress-bar"></div>
     </div>
 
-    <!-- The puzzle area: Word Bank & Drop Zone -->
+    <!-- Puzzle area -->
     <div id="puzzle-container"></div>
 
     <div class="nav-buttons">
-      <button id="hint-btn" class="hint-button">Hint (Show First Word)</button>
-      <button id="submit-btn">Submit Answer</button>
+      <button id="hint-btn" class="hint-button" title="Reveal the first word in the correct sentence if you need a hint.">Hint (Show First Word)</button>
+      <button id="submit-btn" title="Check if your arranged sentence is correct.">Submit Answer</button>
     </div>
     <div class="nav-buttons">
-      <button id="prev-btn">Previous</button>
-      <button id="next-btn">Next</button>
-      <button id="reset-btn">Reset Quiz</button>
+      <button id="prev-btn" title="Go to the previous sentence">Previous</button>
+      <button id="next-btn" title="Go to the next sentence">Next</button>
+      <button id="reset-btn" title="Restart the quiz from the beginning">Reset Quiz</button>
     </div>
 
     <p id="feedback"></p>
   </main>
+
+  <footer>
+    <p id="fun-fact">Fun Fact: Did you know that the word "alphabet" comes from the first two letters of the Greek alphabet, alpha and beta?</p>
+  </footer>
 
   <script src="script.js"></script>
 </body>
