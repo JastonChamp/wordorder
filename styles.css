@@ -8,7 +8,8 @@
   --correct-bg: #c8e6c9;
   --incorrect-bg: #ffcdd2;
   --highlight-bg: #fff59d;
-  --header-font: "Comic Sans MS", cursive, sans-serif;
+  --header-font: 'Fredoka One', cursive;
+  --body-font: 'Nunito', sans-serif;
 }
 
 * {
@@ -18,7 +19,7 @@
 }
 
 body {
-  font-family: Arial, sans-serif;
+  font-family: var(--body-font);
   background-color: var(--background-color);
   color: var(--text-color);
   display: flex;
