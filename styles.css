@@ -2,12 +2,13 @@
 :root {
   --primary-color: #4a90e2;
   --secondary-color: #fdd835;
+  --accent-color: #ff7043;
   --background-color: #fffbf2; /* Slightly warmer background */
   --text-color: #333;
   --correct-bg: #c8e6c9;
   --incorrect-bg: #ffcdd2;
   --highlight-bg: #fff59d;
-  --header-font: "Comic Sans MS", cursive, sans-serif; /* Childlike font */
+  --header-font: "Comic Sans MS", cursive, sans-serif;
 }
 
 * {
@@ -114,6 +115,13 @@ main {
   font-size: 1rem;
 }
 
+/* Badge progress indicator */
+#badge-progress {
+  margin-bottom: 1rem;
+  font-size: 0.9rem;
+  color: var(--accent-color);
+}
+
 /* Progress bar */
 #progress-bar-container {
   width: 80%;
@@ -165,6 +173,17 @@ main {
   transform: scale(1.1);
 }
 
+/* Snap animation when word is dropped */
+.dropped {
+  animation: snap 0.3s ease;
+}
+
+@keyframes snap {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+  100% { transform: scale(1); }
+}
+
 .correct {
   background-color: var(--correct-bg) !important;
 }
@@ -192,7 +211,7 @@ main {
 }
 
 .hint-button {
-  background-color: #ef5350; /* Reddish hint button to stand out */
+  background-color: #ef5350;
 }
 
 #feedback {
@@ -201,12 +220,14 @@ main {
   min-height: 1.2em;
 }
 
-/* Footer or any final elements */
+/* Footer styling */
 footer {
   background: #fff;
   padding: 1rem;
   text-align: center;
   border-top: 2px solid var(--primary-color);
+  font-size: 0.9rem;
+  color: var(--text-color);
 }
 
 /* Responsive design for small screens */
