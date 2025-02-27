@@ -365,7 +365,7 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
     const sentence = pool[currentIndex % pool.length];
-    // Remove punctuation for splitting
+    // Remove punctuation for splitting.
     const words = sentence.replace(/[.,?!]/g, "").split(" ");
     const shuffledWords = words.slice().sort(() => Math.random() - 0.5);
     const puzzleContainer = document.getElementById("puzzle-container");
@@ -425,12 +425,13 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("feedback").textContent = "";
   }
 
-  // Update UI stats and badge progress.
+  // Update UI stats, including XP.
   function updateUIStats() {
     document.getElementById("score-display").textContent = score;
     document.getElementById("streak-display").textContent = streak;
     document.getElementById("longest-streak-display").textContent = longestStreak;
     document.getElementById("badges-display").textContent = badges.size === 0 ? "None" : Array.from(badges).join(", ");
+    document.getElementById("xp").textContent = score; // XP mirrors score.
     updateBadgeProgress();
   }
 
@@ -575,7 +576,7 @@ document.addEventListener("DOMContentLoaded", () => {
     loadPuzzle();
   });
   document.getElementById("hint-btn").addEventListener("click", giveHint);
-  document.getElementById("listen-instructions-btn").addEventListener("click", () => {
+  document.getElementById("listen-instructions-btn")?.addEventListener("click", () => {
     const instructions = document.querySelector(".instructions").innerText;
     speak(instructions);
   });
