@@ -4,7 +4,6 @@ document.addEventListener("DOMContentLoaded", () => {
    * 1) Sentence Pools by Level
    * ---------------------------------
    */
-
   // Primary 1 – Very simple, basic sentences.
   const sentencesP1 = [
     "Doreen had a huge birthday party.",
@@ -366,7 +365,7 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
     const sentence = pool[currentIndex % pool.length];
-    // Remove punctuation for splitting (for drag-and-drop)
+    // Remove punctuation for splitting
     const words = sentence.replace(/[.,?!]/g, "").split(" ");
     const shuffledWords = words.slice().sort(() => Math.random() - 0.5);
     const puzzleContainer = document.getElementById("puzzle-container");
@@ -376,9 +375,29 @@ document.addEventListener("DOMContentLoaded", () => {
       </div>
       <div class="drop-zone"></div>
     `;
-    // Initialize SortableJS for both containers.
-    new Sortable(document.querySelector(".word-bank"), { group: "shared", animation: 150 });
-    new Sortable(document.querySelector(".drop-zone"), { group: "shared", animation: 150 });
+    // Initialize SortableJS for both containers with fallback options.
+    new Sortable(document.querySelector(".word-bank"), {
+      group: "shared",
+      animation: 150,
+      fallbackOnBody: true,
+      forceFallback: true,
+      onEnd: function(evt) {
+        if (!evt.to.classList.contains("word-bank") && !evt.to.classList.contains("drop-zone")) {
+          document.querySelector(".word-bank").appendChild(evt.item);
+        }
+      }
+    });
+    new Sortable(document.querySelector(".drop-zone"), {
+      group: "shared",
+      animation: 150,
+      fallbackOnBody: true,
+      forceFallback: true,
+      onEnd: function(evt) {
+        if (!evt.to.classList.contains("word-bank") && !evt.to.classList.contains("drop-zone")) {
+          document.querySelector(".word-bank").appendChild(evt.item);
+        }
+      }
+    });
     updateProgressBar();
     updateUIStats();
   }
@@ -417,11 +436,15 @@ document.addEventListener("DOMContentLoaded", () => {
     const sentence = pool[currentIndex % pool.length];
     const correctWords = sentence.replace(/[.,?!]/g, "").split(" ");
     const dropZone = document.querySelector(".drop-zone");
-    const userWords = Array.from(dropZone.children).map(el => el.textContent);
+    const userWords = Array.from(dropZone.children)
+      .map(el => el.textContent.trim())
+      .filter(word => word.length > 0);
+
     if (userWords.length !== correctWords.length) {
       setFeedback("You must place all words into the drop zone first!", "orange");
       return;
     }
+
     let correctCount = 0;
     dropZone.childNodes.forEach((child, i) => {
       if (userWords[i] === correctWords[i]) {
@@ -431,18 +454,23 @@ document.addEventListener("DOMContentLoaded", () => {
         child.classList.add("incorrect");
       }
     });
+
     let gained = correctCount * 2;
     let fullyCorrect = (correctCount === correctWords.length);
+
     if (fullyCorrect) {
       gained += 5;
       streak++;
       if (streak > longestStreak) longestStreak = streak;
       checkForBadges();
       setFeedback("Excellent! You got it all correct!", "green");
+      speak("Great job! The sentence is: " + sentence);
     } else {
       streak = 0;
       setFeedback(`You got ${correctCount} word(s) in the correct spot. Keep trying!`, "red");
+      speak("That's not quite right. The correct sentence is: " + sentence);
     }
+
     score += gained;
     updateUIStats();
   }
@@ -469,6 +497,16 @@ document.addEventListener("DOMContentLoaded", () => {
     const feedback = document.getElementById("feedback");
     feedback.textContent = message;
     feedback.style.color = color;
+  }
+
+  // Speech synthesis helper.
+  function speak(text) {
+    if ("speechSynthesis" in window) {
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.rate = 1;
+      utterance.pitch = 1;
+      window.speechSynthesis.speak(utterance);
+    }
   }
 
   /**
@@ -509,15 +547,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const instructions = document.querySelector(".instructions").innerText;
     speak(instructions);
   });
-
-  function speak(text) {
-    if ("speechSynthesis" in window) {
-      const utterance = new SpeechSynthesisUtterance(text);
-      utterance.rate = 1;
-      utterance.pitch = 1;
-      window.speechSynthesis.speak(utterance);
-    }
-  }
 
   /**
    * ---------------------------------
