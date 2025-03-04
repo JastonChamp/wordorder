@@ -1,31 +1,23 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Word Order Adventure</title>
-  <!-- Google Fonts: Poppins for headings, Open Sans for body -->
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@700&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css">
-  <!-- SortableJS for drag-and-drop -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.14.0/Sortable.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Comic+Neue:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="manifest" href="/manifest.json">
+  <link rel="stylesheet" href="styles.css?v=8">
 </head>
 <body>
   <header>
-    <div class="header-content">
-      <img src="word-order-mascot.png" alt="Word Order Mascot" class="mascot">
-      <h1>Word Order Adventure</h1>
-      <div id="xp-display"><span>XP:</span> <span id="xp">0</span></div>
-    </div>
-  </header>
-  
-  <!-- Instructions Section with Controls -->
-  <section id="instructions-box">
+    <h1>Word Order Adventure</h1>
     <p class="instructions">
-      Drag and drop the words to form a correct sentence. Remember to start with a capital letter!
+      Drag the words below to make a sentence or question!<br>
+      Start with a capital letter and end with a full stop or question mark.<br>
+      <span style="font-size: 0.8em; color: var(--accent-color);">(Tap and hold on phones)</span>
     </p>
     <div class="controls">
-      <label for="level-select">Select Level:</label>
+      <label for="level-select">Pick Your Level:</label>
       <select id="level-select">
         <option value="p1">Primary 1</option>
         <option value="p2">Primary 2</option>
@@ -34,44 +26,54 @@
         <option value="p5">Primary 5</option>
         <option value="p6">Primary 6</option>
       </select>
-      <button id="listen-instructions-btn" title="Listen to instructions">🔊 Listen</button>
+      <label><input type="checkbox" id="timer-mode"> Timer Mode (30s)</label>
+      <button id="listen-instructions-btn" class="instruction-btn">Hear Instructions</button>
+      <button id="fullscreen-btn" class="instruction-btn">Fullscreen</button>
+      <button id="theme-toggle" class="instruction-btn">Change Theme</button>
     </div>
-  </section>
+  </header>
   
-  <main>
-    <div id="game-stats">
-      <div class="stat-item"><strong>Score:</strong> <span id="score-display">0</span></div>
-      <div class="stat-item"><strong>Streak:</strong> <span id="streak-display">0</span></div>
-      <div class="stat-item"><strong>Longest Streak:</strong> <span id="longest-streak-display">0</span></div>
-      <div class="stat-item"><strong>Badges:</strong> <span id="badges-display">None</span></div>
-    </div>
-    
-    <div id="badge-progress"></div>
-    
-    <div id="progress-bar-container">
+  <main class="game-container" id="game-container">
+    <section id="puzzle-container" role="region" aria-label="Current Puzzle" aria-live="polite"></section>
+    <section id="progress-bar-container">
       <div id="progress-bar"></div>
+    </section>
+    <section id="gamification-panel">
+      <p id="xp-display">XP: 0</p>
+      <p id="streak-display">Streak: 0</p>
+      <div id="badges-container">Badges: <span id="badges-list"></span></div>
+    </section>
+    <nav class="nav-buttons">
+      <button id="prev-btn">Back</button>
+      <button id="hint-btn">Get a Hint</button>
+      <button id="submit-btn" disabled>Check Answer</button>
+      <button id="try-again-btn" style="display: none;">Try Again</button>
+      <button id="next-btn">Next</button>
+    </nav>
+    <div class="feedback">
+      <p id="progress"></p>
+      <p id="score"></p>
+      <p id="hint"></p>
+      <p id="success-message" aria-live="polite"></p>
     </div>
-    
-    <div id="puzzle-container"></div>
-    
-    <div class="nav-buttons">
-      <button id="hint-btn" class="hint-button" title="Reveal the first word if you need a hint.">Hint</button>
-      <button id="submit-btn" title="Check your sentence">Submit</button>
-    </div>
-    
-    <div class="nav-buttons">
-      <button id="prev-btn" title="Previous sentence">Previous</button>
-      <button id="next-btn" title="Next sentence">Next</button>
-      <button id="reset-btn" title="Restart the quiz">Reset</button>
-    </div>
-    
-    <p id="feedback"></p>
+    <button id="reset-btn">Start Over</button>
   </main>
-  
-  <footer>
-    <p id="fun-fact">Fun Fact: The word "alphabet" is derived from the first two letters of the Greek alphabet, alpha and beta!</p>
-  </footer>
-  
-  <script src="script.js"></script>
+
+  <audio id="success-sound" src="https://www.soundjay.com/buttons/beep-01a.mp3" preload="auto"></audio>
+  <audio id="error-sound" src="https://www.soundjay.com/buttons/beep-02.mp3" preload="auto"></audio>
+  <script src="script.js" defer></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const script = document.createElement("script");
+      script.src = "https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js";
+      script.onload = () => console.log("GSAP loaded");
+      document.body.appendChild(script);
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('/service-worker.js')
+          .then(() => console.log("Service Worker registered"))
+          .catch(err => console.error("Service Worker registration failed:", err));
+      }
+    });
+  </script>
 </body>
 </html>
