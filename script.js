@@ -1,7 +1,7 @@
-'use strict';
+"use strict";
 
 (() => {
-  // Cached DOM elements
+  // DOM elements for the game
   const elements = {
     puzzleContainer: document.getElementById("puzzle-container"),
     hint: document.getElementById("hint"),
@@ -9,36 +9,63 @@
     progress: document.getElementById("progress"),
     score: document.getElementById("score"),
     progressBar: document.getElementById("progress-bar"),
+    progressLabel: document.getElementById("progress-label"),
+    progressIndicator: document.getElementById("progress-indicator"),
     xpDisplay: document.getElementById("xp-display"),
     streakDisplay: document.getElementById("streak-display"),
     badgesList: document.getElementById("badges-list"),
     submitBtn: document.getElementById("submit-btn"),
-    tryAgainBtn: document.getElementById("try-again-btn")
+    tryAgainBtn: document.getElementById("try-again-btn"),
+    prevBtn: document.getElementById("prev-btn"),
+    nextBtn: document.getElementById("next-btn"),
+    hintBtn: document.getElementById("hint-btn"),
+    clearBtn: document.getElementById("clear-btn"),
+    learnBtn: document.getElementById("learn-btn"),
   };
 
-  // Speech API Utility
+  // Speech Synthesis with UK Female Voice (Fallback to US/AU Female Voice)
   function speak(text) {
-    if ('speechSynthesis' in window) {
-      const utterance = new SpeechSynthesisUtterance(text);
-      const setVoice = () => {
-        const voices = window.speechSynthesis.getVoices();
-        let preferredVoice = voices.find(v => v.name.includes("Google US English")) || 
-                            voices.find(v => v.lang === "en-US" && v.name.includes("Natural")) || 
-                            voices[0];
-        utterance.voice = preferredVoice;
-        console.log("Voice used:", preferredVoice?.name || "None available");
-      };
-      if (window.speechSynthesis.getVoices().length) setVoice();
-      else window.speechSynthesis.addEventListener('voiceschanged', setVoice, { once: true });
-      utterance.rate = 1;
-      utterance.pitch = 1;
+    if (!("speechSynthesis" in window)) {
+      console.warn("Speech synthesis not supported on this device.");
+      return;
+    }
+    const utterance = new SpeechSynthesisUtterance(text);
+    const loadVoices = () => {
+      const voices = window.speechSynthesis.getVoices();
+      let preferredVoice =
+        voices.find((v) => v.lang === "en-GB" && v.name.includes("Female")) ||
+        voices.find(
+          (v) =>
+            v.lang === "en-US" &&
+            (v.name.includes("Samantha") || v.name.includes("Victoria"))
+        ) ||
+        voices.find((v) => v.lang === "en-AU" && v.name.includes("Karen")) ||
+        voices.find((v) => v.lang.includes("en"));
+      utterance.voice = preferredVoice || voices[0];
+      utterance.rate = 0.9;
+      utterance.pitch = 1.1;
+      utterance.volume = 1.0;
       window.speechSynthesis.speak(utterance);
+    };
+    if (window.speechSynthesis.getVoices().length === 0) {
+      window.speechSynthesis.onvoiceschanged = () => {
+        loadVoices();
+        window.speechSynthesis.onvoiceschanged = null;
+      };
     } else {
-      console.warn("Speech Synthesis API not supported.");
+      loadVoices();
     }
   }
 
-  // Sentence Pools (Full arrays from your input)
+  // Hide tooltip helper
+  const hideTooltip = (e) => {
+    const tooltip = document.querySelector(".word-tooltip");
+    if (tooltip) {
+      tooltip.remove();
+    }
+  };
+
+  // Sentence pools for each level
   const sentencesP1 = [
     "Doreen had a huge birthday party.",
     "We can go out to play.",
@@ -60,36 +87,10 @@
     "The boy rides a small bicycle.",
     "My mom cooks tasty food.",
     "The puppy barks at the mailman.",
-    "The car stops at the red light.",
-    "I jump high on the trampoline.",
-    "The book is open on the table.",
-    "The rain falls softly on the roof.",
-    "The school bell rings loudly.",
-    "My friend smiles on a sunny day.",
-    "The dog wags its tail happily.",
-    "The cat purrs when it is happy.",
-    "I like to read fun stories.",
-    "The bird flies across the sky.",
-    "We share our toys with friends.",
-    "The cake tastes very sweet.",
-    "The wind blows gently outside.",
-    "I sing songs with my classmates.",
-    "The flowers bloom in the spring.",
-    "The moon shines in the dark sky.",
-    "I ride my scooter to school.",
-    "The baby laughs at funny faces.",
-    "The ice cream melts in the sun.",
-    "I play with my new puzzle.",
-    "The dog fetches the ball quickly.",
-    "The girl claps her hands loudly.",
-    "My brother runs in the park.",
-    "The water is clear and cool.",
-    "I build a tower with blocks.",
-    "The school is big and bright.",
-    "The bird builds a nest in the tree.",
-    "I draw a picture of my family.",
-    "The sun sets behind the hills.",
-    "I sleep early at night."
+    "Ali plays soccer with his friends.",
+    "Maria dances at the festival.",
+    "Juan paints a bright mural.",
+    "Aisha shares her books with classmates.",
   ];
 
   const sentencesP2 = [
@@ -113,36 +114,10 @@
     "The teacher asked a challenging question during the lesson.",
     "Our class worked together to solve a difficult problem.",
     "I felt excited as I opened my new book.",
-    "The movie was long, but it was very interesting.",
-    "I listened attentively while the teacher explained the experiment.",
-    "The garden was full of colorful and blooming flowers.",
-    "My brother quickly finished his math homework.",
-    "The wind was strong enough to sway the tall trees.",
-    "I enjoyed reading the story because it was very exciting.",
-    "The school bus arrived promptly every morning.",
-    "My friend and I shared our snacks during recess.",
-    "The teacher praised the class for their hard work.",
-    "I carefully followed the instructions for the science project.",
-    "The sun shone brightly on the warm summer day.",
-    "We eagerly awaited the start of the school assembly.",
-    "The classroom was neat and well-organized.",
-    "I learned many new things during our history lesson.",
-    "The concert was amazing and left everyone impressed.",
-    "My family celebrated my birthday with a surprise party.",
-    "The puzzle was challenging, but I solved it step by step.",
-    "The students participated actively in the group discussion.",
-    "I enjoyed the field trip because it was both fun and educational.",
-    "The rain stopped suddenly, and the sky became clear.",
-    "I was proud of my work after I completed the project.",
-    "The teacher encouraged us to ask questions during the lesson.",
-    "Our class visited the museum and learned about history.",
-    "The game was exciting and filled with many surprises.",
-    "I practiced my speech until I felt confident and ready.",
-    "The art project allowed me to express my creativity.",
-    "I reviewed my notes carefully before the big test.",
-    "The library offered a quiet place for everyone to study.",
-    "The teacher organized a fun quiz that everyone enjoyed.",
-    "I finished my homework quickly because I understood the topic well."
+    "Hiro reads a story about Japan.",
+    "Fatima shares dates with her class.",
+    "Luka sings a song from Croatia.",
+    "Priya learns a dance from India.",
   ];
 
   const sentencesP3 = [
@@ -166,41 +141,15 @@
     "The girl sings a sweet song during assembly.",
     "The cat chases a little mouse in the garden.",
     "The student solves a challenging puzzle.",
-    "The boy wears a blue cap every day.",
-    "The girl carefully draws a beautiful flower.",
-    "The dog runs quickly in the green park.",
-    "The teacher writes neat words on the board.",
-    "The child listens carefully to the exciting story.",
-    "The boy enjoys playing under the warm sun.",
-    "The girl shares her lunch with a good friend.",
-    "The cat purrs softly when it is happy.",
-    "The dog wags its tail as it plays.",
-    "The student reads a story aloud with passion.",
-    "The teacher explains the homework in detail.",
-    "The child jumps high during recess time.",
-    "The boy builds a small tower with colorful blocks.",
-    "The girl draws a picture of her loving family.",
-    "The dog barks excitedly at the passing car.",
-    "The teacher smiles as the students learn eagerly.",
-    "The cat sleeps peacefully on the comfy mat.",
-    "The boy rides his bicycle fast along the lane.",
-    "The girl skips along the cheerful path.",
-    "The student writes neatly in his bright notebook.",
-    "The teacher claps for a job well done.",
-    "The child sings a cheerful tune during art class.",
-    "The dog runs across the vast green field.",
-    "The girl reads an interesting book during break time.",
-    "The boy plays a lively game of tag with friends.",
-    "The teacher explains a tricky problem with clarity.",
-    "The student solves the puzzle with careful thought.",
-    "The cat jumps gracefully onto the cozy chair.",
-    "The dog chases its tail happily in the yard.",
-    "The child dreams of a fun and adventurous day."
+    "Kofi builds a sandcastle at the beach.",
+    "Mei paints a dragon for the festival.",
+    "Omar kicks a ball in the park.",
+    "Sana writes a poem for her teacher.",
   ];
 
   const sentencesP4 = [
     "The cheerful girl sings beautifully during the assembly.",
-    "The boy quickly runs to school, eager to learn.",
+    "The boy quickly runs to school eager to learn.",
     "The teacher patiently explains the lesson to her attentive students.",
     "The children happily play together in the spacious park.",
     "The shiny red car moves fast along the busy road.",
@@ -208,7 +157,7 @@
     "The elderly man walks slowly with a calm and steady pace.",
     "The smart student solves difficult problems with ease.",
     "The busy mother prepares a delicious breakfast every single morning.",
-    "The gentle wind blows softly, rustling the vibrant green leaves.",
+    "The gentle wind blows softly rustling the vibrant green leaves.",
     "The excited child jumps high in joyful celebration during recess.",
     "The kind teacher helps every student after class with care.",
     "The little girl reads a colorful book under a large shady tree.",
@@ -218,218 +167,186 @@
     "The fast train zooms past the station with remarkable speed.",
     "The playful puppy chases its tail with endless energy.",
     "The thoughtful boy generously shares his toys with his friends.",
-    "The pretty garden blooms vibrantly in early spring, showcasing many colors.",
-    "The girl carefully draws a detailed picture of her school.",
-    "The boy eagerly practices his favorite sport every day after school.",
-    "The teacher explains a complex concept in a simple and clear manner.",
-    "The children work together on a creative art project with enthusiasm.",
-    "The little girl writes a short poem about nature with vivid words.",
-    "The boy reads a fascinating story about adventure and mystery.",
-    "The teacher encourages the class to ask insightful questions during the lesson.",
-    "The gentle breeze makes the leaves dance gracefully on a warm day.",
-    "The child listens intently during the exciting science demonstration.",
-    "The smart student completes his homework with precision and care.",
-    "The class takes a quiet moment to appreciate the beautiful artwork on the wall.",
-    "The girl hums a gentle tune while reading her favorite book.",
-    "The boy carefully builds a model airplane for the class project.",
-    "The teacher smiles as she watches her students collaborate effectively.",
-    "The children cheerfully participate in the group activity with great spirit.",
-    "The little girl practices her spelling words with focus and determination.",
-    "The boy and his friends explore the wonders of nature during recess.",
-    "The teacher explains historical events with engaging and vivid details.",
-    "During the science experiment, the students observed every detail carefully.",
-    "The passionate student presented his findings with clarity and confidence.",
-    "After a challenging exam, the class discussed strategies to improve their study habits.",
-    "The teacher introduced a new topic that sparked curiosity among the students.",
-    "The art class allowed the students to experiment with different techniques.",
-    "The diligent student revised his notes thoroughly before the big test.",
-    "The class enjoyed a lively discussion about their favorite subjects.",
-    "The creative student painted a vibrant picture of the sunset.",
-    "The boy solved a challenging puzzle with creative thinking.",
-    "The teacher complimented the class on their excellent teamwork.",
-    "The children shared their unique ideas during a fun group discussion.",
-    "The student finished his project with pride and excitement."
+    "The pretty garden blooms vibrantly in early spring showcasing many colors.",
+    "Nia plays a drum from her culture.",
+    "Santiago flies a kite with his brother.",
+    "Amina draws a picture of her family.",
+    "Chen learns to cook dumplings with grandma.",
   ];
 
   const sentencesP5 = [
-    "The teacher reads a fascinating story, and the children listen attentively.",
-    "The boy finished his homework before dinner, so he went outside to play.",
-    "The little girl happily skipped to school, and her friends cheered her on.",
+    "The teacher reads a fascinating story and the children listen attentively.",
+    "The boy finished his homework before dinner so he went outside to play.",
+    "The little girl happily skipped to school and her friends cheered her on.",
     "The bright sun shines over the calm sea while a gentle breeze cools the air.",
     "The busy bees buzz around the blooming flowers as the children watch in wonder.",
     "The students study in the library and take notes carefully on every detail.",
-    "The father cooks dinner, and the children eagerly help set the table.",
-    "The dog barks loudly, but the cat remains calm and sleeps peacefully.",
-    "The rain poured outside, yet the class continued their lesson indoors with focus.",
-    "The bird sings in the morning, and the flowers open gracefully to welcome the day.",
+    "The father cooks dinner and the children eagerly help set the table.",
+    "The dog barks loudly but the cat remains calm and sleeps peacefully.",
+    "The rain poured outside yet the class continued their lesson indoors with focus.",
+    "The bird sings in the morning and the flowers open gracefully to welcome the day.",
     "The boy plays soccer while his friend rides a bicycle around the field.",
-    "The teacher writes on the board, and the students copy the notes precisely.",
-    "The car stops at the red light, and the driver patiently waits for the signal.",
-    "The children laugh during recess, full of energy and joy.",
-    "The sun sets in the west, and the sky turns a beautiful shade of orange.",
-    "The little girl draws a creative picture, and her mother praises her artistic skills.",
-    "The student answers the question correctly, and the teacher smiles with pride.",
-    "The dog runs in the park, and the kids cheer excitedly during playtime.",
-    "The wind blows gently, making the leaves rustle softly in the cool breeze.",
-    "The book is open on the desk, and the student reads silently with concentration.",
-    "The teacher explains a challenging concept in a clear and understandable way.",
-    "The boy listens carefully to the lesson and asks thoughtful questions.",
-    "The little girl practices her handwriting with neat and careful strokes.",
-    "The class works together on a creative project, sharing ideas openly.",
-    "The student completes his assignment with diligence and accuracy.",
-    "The teacher encourages everyone to participate actively in the discussion.",
-    "The children explore new topics with curiosity and excitement.",
-    "The boy shares his favorite story with his classmates during circle time.",
-    "The little girl uses colorful markers to draw an imaginative picture.",
-    "The teacher explains the importance of teamwork during a lively discussion.",
-    "The students listen intently as the teacher reads a captivating tale.",
-    "The class enjoys a fun science experiment that sparks their interest.",
-    "The boy carefully solves a challenging math problem on the board.",
-    "The teacher provides constructive feedback on every student’s work.",
-    "The children take turns presenting their projects with confidence.",
-    "The little girl writes a thoughtful letter to a pen pal from another school.",
-    "The class debates a current event with respect and insight.",
-    "The teacher organizes a creative art session that inspires everyone.",
-    "The students work on group assignments and learn from each other.",
-    "The boy and his friends participate in a friendly sports competition.",
-    "The teacher explains historical events with engaging details.",
-    "The little girl listens carefully to a story about faraway lands.",
-    "The class takes a quiet moment to appreciate the beauty of nature.",
-    "The student researches a topic thoroughly and shares his findings.",
-    "The teacher encourages critical thinking through interactive activities.",
-    "The children learn the value of cooperation during group work.",
-    "The boy practices his musical instrument with dedication and passion.",
-    "The teacher leads a lively discussion on interesting scientific discoveries.",
-    "The class collaborates on a creative writing assignment that sparks imagination.",
-    "The student reflects on his learning journey with enthusiasm and pride."
+    "The teacher writes on the board and the students copy the notes precisely.",
+    "The car stops at the red light and the driver patiently waits for the signal.",
+    "The children laugh during recess full of energy and joy.",
+    "The sun sets in the west and the sky turns a beautiful shade of orange.",
+    "The little girl draws a creative picture and her mother praises her artistic skills.",
+    "The student answers the question correctly and the teacher smiles with pride.",
+    "The dog runs in the park and the kids cheer excitedly during playtime.",
+    "The wind blows gently making the leaves rustle softly in the cool breeze.",
+    "The book is open on the desk and the student reads silently with concentration.",
+    "Zara sings a song from her homeland.",
+    "Diego helps his dad with the garden.",
+    "Leila paints a picture of her cat.",
+    "Ravi plays cricket with his cousins.",
   ];
 
   const sentencesP6 = [
-    "After finishing his homework, the student went to the library to study more in depth.",
-    "Although it was raining heavily, the children played outside happily during recess.",
-    "The teacher, known for her kindness, explained the lesson in remarkable detail.",
-    "Despite the heavy traffic, she arrived at school on time and greeted everyone warmly.",
-    "When the bell rang, the students hurried to their classrooms with eager anticipation.",
-    "Since the exam was extremely challenging, the teacher reviewed the material thoroughly afterward.",
-    "Even though it was late, the boy continued reading his favorite book with great enthusiasm.",
-    "While the sun was setting, the family enjoyed a delightful picnic in the park.",
-    "If you study hard every day, you will achieve excellent results in your exams.",
-    "After the game ended, the players celebrated their victory with cheers and applause.",
-    "Although the movie was quite long, the audience remained engaged until the very end.",
-    "Because the weather was unexpectedly cool, the picnic lasted longer than anticipated.",
-    "Since the library was exceptionally quiet, the students concentrated deeply on their research.",
-    "When the storm passed, the children went outside to play joyfully despite the damp ground.",
-    "After receiving his award, the student thanked his parents for their unwavering support.",
-    "Although she was extremely tired, the teacher continued to prepare engaging lessons for the class.",
-    "If you practice regularly, your skills will improve significantly over time with dedication.",
-    "While the bell was ringing, the students gathered in the hall to listen attentively to the announcement.",
-    "Because the assignment was particularly difficult, the students worked in groups to complete it.",
-    "After the concert ended, the crowd applauded enthusiastically as the performers took a bow.",
-    "The student carefully analyzed the complex problem before writing down his solution.",
-    "The teacher challenged the class with a thought-provoking question during the lesson.",
-    "Despite the unexpected setback, the group continued working diligently on their project.",
-    "The bright, clear sky inspired the students to discuss their favorite outdoor activities.",
-    "In the quiet of the library, the students immersed themselves in research and learning.",
-    "The teacher skillfully connected historical events to modern-day situations during the discussion.",
-    "During the science experiment, the students observed and recorded every detail meticulously.",
-    "The passionate student presented his findings with clarity and confidence to the class.",
-    "After a challenging exam, the class discussed strategies to improve their study habits.",
-    "The teacher introduced a new topic, sparking curiosity and lively debate among the students.",
-    "In the art class, students experimented with different techniques to express their creativity.",
-    "The diligent student revised his notes thoroughly before the upcoming test.",
-    "A group of students collaborated on a project that explored the wonders of the natural world.",
-    "The teacher encouraged the class to think critically about the impact of technology on society.",
-    "During recess, the students engaged in a spirited game that fostered teamwork and sportsmanship.",
-    "The inspiring lecture motivated the students to pursue their academic interests passionately.",
-    "After a long day of learning, the students reflected on their progress and set new goals.",
-    "The teacher used real-life examples to make abstract concepts more accessible.",
-    "During the class discussion, every student contributed thoughtful ideas and opinions.",
-    "The creative writing assignment allowed the students to express themselves through imaginative storytelling.",
-    "In the music class, the students practiced their instruments with determination and precision.",
-    "The teacher organized a field trip that enriched the students' understanding of history and culture.",
-    "After a challenging day, the class celebrated their accomplishments with a fun educational activity.",
-    "The rigorous academic schedule prepared the students for the challenges of upcoming examinations.",
-    "With dedication and hard work, the students steadily improved their academic performance.",
-    "The teacher provided valuable feedback that helped the students refine their skills and knowledge.",
-    "During group work, the students learned the importance of communication and collaboration.",
-    "The classroom buzzed with energy as the students engaged in a lively discussion about current events.",
-    "By the end of the lesson, the students felt inspired to further explore the topic on their own.",
-    "The dedicated student looked forward to the future with optimism and a thirst for knowledge."
+    "After finishing his homework the student went to the library to study more in depth.",
+    "Although it was raining heavily the children played outside happily during recess.",
+    "The teacher known for her kindness explained the lesson in remarkable detail.",
+    "Despite the heavy traffic she arrived at school on time and greeted everyone warmly.",
+    "When the bell rang the students hurried to their classrooms with eager anticipation.",
+    "Since the exam was extremely challenging the teacher reviewed the material thoroughly afterward.",
+    "Even though it was late the boy continued reading his favorite book with great enthusiasm.",
+    "While the sun was setting the family enjoyed a delightful picnic in the park.",
+    "If you study hard every day you will achieve excellent results in your exams.",
+    "After the game ended the players celebrated their victory with cheers and applause.",
+    "Although the movie was quite long the audience remained engaged until the very end.",
+    "Because the weather was unexpectedly cool the picnic lasted longer than anticipated.",
+    "Since the library was exceptionally quiet the students concentrated deeply on their research.",
+    "When the storm passed the children went outside to play joyfully despite the damp ground.",
+    "After receiving his award the student thanked his parents for their unwavering support.",
+    "Although she was extremely tired the teacher continued to prepare engaging lessons for the class.",
+    "If you practice regularly your skills will improve significantly over time with dedication.",
+    "While the bell was ringing the students gathered in the hall to listen attentively to the announcement.",
+    "Because the assignment was particularly difficult the students worked in groups to complete it.",
+    "After the concert ended the crowd applauded enthusiastically as the performers took a bow.",
+    "Anya writes a story about her travels.",
+    "Mateo builds a model of a rocket.",
+    "Sofia learns about her family history.",
+    "Jamil shares a recipe from his culture.",
   ];
 
-  // Game variables
-  const sessionLength = 5;
+  // Game state variables
+  const sessionLength = 10;
   let puzzles = [];
   let currentPuzzleIndex = 0;
   let score = 0;
-  let currentLevel = localStorage.getItem('currentLevel') || 'p3';
-  let xp = parseInt(localStorage.getItem('xp')) || 0;
-  let streak = parseInt(localStorage.getItem('streak')) || 0;
-  let badges = JSON.parse(localStorage.getItem('badges')) || [];
+  let currentLevel = localStorage.getItem("currentLevel") || "p3";
+  let xp = parseInt(localStorage.getItem("xp")) || 0;
+  let streak = parseInt(localStorage.getItem("streak")) || 0;
+  let badges = JSON.parse(localStorage.getItem("badges")) || [];
   let timeLeft = 30, timerId = null;
   let hintCount = 0;
   let currentDropZone = null;
-  let lastPlayDate = localStorage.getItem('lastPlayDate');
+  let puzzleAttempts = 0;
+  let correctCount = 0;
   const today = new Date().toDateString();
-  if (lastPlayDate && lastPlayDate !== today) {
+  if (
+    localStorage.getItem("lastPlayDate") &&
+    localStorage.getItem("lastPlayDate") !== today
+  ) {
     const yesterday = new Date();
     yesterday.setDate(yesterday.getDate() - 1);
-    if (lastPlayDate !== yesterday.toDateString()) streak = 0;
+    if (localStorage.getItem("lastPlayDate") !== yesterday.toDateString())
+      streak = 0;
   }
 
-  // Utilities
-  const shuffle = array => array.sort(() => Math.random() - 0.5);
-  const debounce = (func, wait) => {
-    let timeout;
-    return (...args) => {
-      clearTimeout(timeout);
-      timeout = setTimeout(() => func(...args), wait);
-    };
-  };
+  // Utility function to shuffle an array
+  const shuffle = (array) => array.sort(() => Math.random() - 0.5);
 
-  const getSentencesForLevel = level => ({
-    p1: sentencesP1, p2: sentencesP2, p3: sentencesP3,
-    p4: sentencesP4, p5: sentencesP5, p6: sentencesP6
-  }[level] || sentencesP3);
+  // Get sentences for the current level
+  const getSentencesForLevel = (level) =>
+    ({
+      p1: sentencesP1,
+      p2: sentencesP2,
+      p3: sentencesP3,
+      p4: sentencesP4,
+      p5: sentencesP5,
+      p6: sentencesP6,
+    }[level] || sentencesP3);
 
-  // Puzzle Generation
+  // Generate puzzles for the current session
   const generatePuzzles = () => {
     const sentencePool = getSentencesForLevel(currentLevel);
     const selectedSentences = shuffle([...sentencePool]).slice(0, sessionLength);
-    puzzles = selectedSentences.map(sentence => ({
+    puzzles = selectedSentences.map((sentence) => ({
       correct: sentence.split(" "),
       submitted: false,
       userAnswer: [],
-      attempts: 0
+      attempts: 0,
     }));
     currentPuzzleIndex = 0;
     score = 0;
+    puzzleAttempts = 0;
+    correctCount = 0;
     hintCount = 0;
     updateGamificationPanel();
   };
 
-  // Check Completion
+  // Check if the drop zone has all words to enable submission
   const checkCompletion = () => {
     if (!currentDropZone) return;
     const totalWords = puzzles[currentPuzzleIndex].correct.length;
     const droppedWords = currentDropZone.children.length;
     elements.submitBtn.disabled = droppedWords !== totalWords;
-    elements.submitBtn.style.opacity = elements.submitBtn.disabled ? "0.5" : "1";
-    console.log(`Check Completion - Dropped: ${droppedWords}, Total: ${totalWords}, Button Enabled: ${!elements.submitBtn.disabled}`);
+    elements.submitBtn.style.backgroundColor = elements.submitBtn.disabled
+      ? "#cccccc"
+      : "#4CAF50";
   };
 
-  // Display Puzzle
+  // Determine the role of a word in a sentence
+  const getWordRole = (word, index, correctSentence) => {
+    if (index === 0 && /^[A-Z]/.test(word)) return "subject";
+    if (
+      word.match(
+        /^(is|was|were|are|runs|eats|sings|sleeps|reads|writes|explained|listened|chased|had|play|draws|decided|enjoyed|prepared|helped|finished|stopped|jumps|builds|climbs|solves|shares|flies|falls|barks|purrs|rides|skips|claps|fetch|wags|does|do|did|will|shall|can|might|should|would)/i
+      )
+    )
+      return "verb";
+    if (
+      index > 1 &&
+      index < correctSentence.length - 1 &&
+      !word.match(/[.!?]$/) &&
+      !word.match(
+        /^(is|was|were|are|runs|eats|sings|sleeps|reads|writes|explained|listened|chased|had|play|draws|decided|enjoyed|prepared|helped|finished|stopped|jumps|builds|climbs|solves|shares|flies|falls|barks|purrs|rides|skips|claps|fetch|wags|does|do|did|will|shall|can|might|should|would)/i
+      ) &&
+      word.match(/^[a-zA-Z\s]+$/)
+    )
+      return "object";
+    if (word.match(/[.!?]$/)) return "end";
+    return "other";
+  };
+
+  // Display the current puzzle on the screen
   const displayCurrentPuzzle = () => {
+    if (!elements.puzzleContainer) return;
     elements.puzzleContainer.innerHTML = "";
     elements.hint.textContent = "";
     elements.successMessage.textContent = "";
     stopTimer();
     elements.submitBtn.style.display = "inline-block";
     elements.tryAgainBtn.style.display = "none";
+    elements.prevBtn.style.display = "inline-block";
+    elements.nextBtn.style.display = "inline-block";
+    elements.hintBtn.style.display = "inline-block";
+    elements.clearBtn.style.display = "inline-block";
+    elements.learnBtn.style.display = "inline-block";
 
     if (currentPuzzleIndex >= puzzles.length) {
-      elements.puzzleContainer.innerHTML = "<p>Well done! Session complete!</p>";
-      speak("Well done! You finished the session!");
+      if (puzzleAttempts >= sessionLength && correctCount / puzzleAttempts >= 0.8) {
+        elements.puzzleContainer.innerHTML =
+          "<p>Well done! You’ve mastered this level! Ready for a review?</p>";
+        speak("Well done! You’ve mastered this level! Ready for a review?");
+        startReviewSession();
+      } else {
+        elements.puzzleContainer.innerHTML =
+          "<p>Keep practicing! You need more tries to master this level.</p>";
+        speak("Keep practicing! You need more tries to master this level.");
+        generatePuzzles();
+      }
+      updateLocalStorage();
       return;
     }
 
@@ -454,7 +371,14 @@
     container.appendChild(wordBank);
     container.appendChild(currentDropZone);
 
-    [wordBank, currentDropZone].forEach(zone => {
+    wordBank.style.display = "grid";
+    wordBank.style.gridTemplateColumns = "repeat(auto-fit, minmax(120px, 1fr))";
+    wordBank.style.gap = "20px";
+    currentDropZone.style.display = "grid";
+    currentDropZone.style.gridTemplateColumns = "repeat(auto-fit, minmax(120px, 1fr))";
+    currentDropZone.style.gap = "20px";
+
+    [wordBank, currentDropZone].forEach((zone) => {
       zone.addEventListener("dragover", handleDragOver);
       zone.addEventListener("dragleave", handleDragLeave);
       zone.addEventListener("drop", handleDrop);
@@ -462,44 +386,45 @@
 
     if (!puzzle.submitted) {
       const wordsShuffled = shuffle([...puzzle.correct]);
-      wordsShuffled.forEach(word => {
+      wordsShuffled.forEach((word) => {
         const wordDiv = document.createElement("div");
         wordDiv.className = "word";
         wordDiv.setAttribute("role", "listitem");
         wordDiv.tabIndex = 0;
         wordDiv.textContent = word;
-        if (window.PointerEvent) {
-          wordDiv.addEventListener("pointerdown", handlePointerDown);
-          wordDiv.draggable = false;
-        } else {
-          wordDiv.draggable = true;
-          wordDiv.addEventListener("dragstart", handleDragStart);
-          wordDiv.addEventListener("dragend", handleDragEnd);
-        }
+        wordDiv.draggable = true;
+        const role = getWordRole(word, puzzle.correct.indexOf(word), puzzle.correct);
+        wordDiv.dataset.role = role;
+        wordDiv.classList.add(role);
+        wordDiv.addEventListener("dragstart", handleDragStart);
+        wordDiv.addEventListener("dragend", handleDragEnd);
+        wordDiv.addEventListener("mouseover", showTooltip);
+        wordDiv.addEventListener("mouseout", hideTooltip);
+        wordDiv.addEventListener("touchstart", showTouchTooltip, { passive: true });
         wordDiv.addEventListener("keydown", (e) => {
-          if (e.key === "Enter" || e.key === " ") {
-            e.preventDefault();
-            currentDropZone.appendChild(wordDiv);
-            checkCompletion();
-            wordDiv.focus();
-          }
+          if (e.key === "Enter" && wordDiv.parentElement.classList.contains("drop-zone"))
+            removeWord(e);
         });
         wordBank.appendChild(wordDiv);
       });
+      if (!currentDropZone.children.length) {
+        const placeholder = document.createElement("div");
+        placeholder.className = "drop-placeholder";
+        placeholder.textContent = "Drag words here to build your sentence!";
+        currentDropZone.appendChild(placeholder);
+      }
     } else {
       puzzle.userAnswer.forEach((word, index) => {
         const wordDiv = document.createElement("div");
         wordDiv.className = "word";
         wordDiv.textContent = word;
-        wordDiv.classList.add(word === puzzle.correct[index] ? "correct" : "incorrect");
-        if (word !== puzzle.correct[index]) {
-          wordDiv.setAttribute("data-tooltip", getWordRole(puzzle.correct[index]));
-          wordDiv.addEventListener("click", () => handleWordClick(wordDiv, index));
-          wordDiv.draggable = true; // Allow re-dragging within drop zone
-          wordDiv.addEventListener("dragstart", handleDragStart);
-          wordDiv.addEventListener("dragend", handleDragEnd);
+        const isCorrect = word === puzzle.correct[index];
+        wordDiv.classList.add(isCorrect ? "correct" : "incorrect");
+        wordDiv.dataset.correctWord = puzzle.correct[index];
+        if (!isCorrect) {
+          wordDiv.style.cursor = "pointer";
+          wordDiv.addEventListener("click", correctWord);
         }
-        wordDiv.tabIndex = 0;
         currentDropZone.appendChild(wordDiv);
       });
       elements.submitBtn.style.display = "none";
@@ -510,228 +435,438 @@
     timeLeft = 30;
     startTimer();
     checkCompletion();
-    elements.progress.textContent = `Puzzle ${currentPuzzleIndex + 1} of ${sessionLength}${document.getElementById("timer-mode").checked ? ` - Time: ${timeLeft}s` : ""}`;
+    elements.progress.textContent = `Puzzle ${currentPuzzleIndex + 1} of ${sessionLength}${
+      document.getElementById("timer-mode").checked ? ` - Time: ${timeLeft}s` : ""
+    }`;
     elements.score.textContent = `Score: ${score}`;
     elements.progressBar.style.width = `${((currentPuzzleIndex + 1) / sessionLength) * 100}%`;
+    elements.progressIndicator.textContent = `Mastery Progress: ${
+      puzzleAttempts > 0 ? Math.round((correctCount / puzzleAttempts) * 100) : 0
+    }% (80% to advance)`;
+    elements.progressLabel.innerHTML = `<img src="images/star.png" alt="Star" class="progress-icon"> Puzzle ${
+      currentPuzzleIndex + 1
+    }/${sessionLength}`;
   };
 
-  // Helper to determine word role for tooltip
-  const getWordRole = (word) => {
-    if (/^[A-Z]/.test(word)) return "This is the subject.";
-    if (word.match(/^(is|was|are|runs|jumps|eats)/)) return "This is the verb.";
-    if (word.match(/\.$/)) return "This ends the sentence.";
-    return "This is part of the sentence.";
-  };
-
-  // Handle clicking incorrect words
-  const handleWordClick = (wordDiv, currentIndex) => {
-    const puzzle = puzzles[currentPuzzleIndex];
-    const correctIndex = puzzle.correct.indexOf(wordDiv.textContent);
-    if (correctIndex !== -1 && correctIndex !== currentIndex) {
-      const targetWord = currentDropZone.children[correctIndex];
-      currentDropZone.insertBefore(wordDiv, targetWord);
-      checkCompletion();
-    }
-  };
-
-  // Drag-and-Drop Handlers
+  // Drag-and-drop event handlers
   let draggedItem = null;
   const handleDragStart = (e) => {
     draggedItem = e.target;
     e.target.style.opacity = "0.5";
     e.dataTransfer.setData("text/plain", e.target.textContent);
   };
+
   const handleDragEnd = (e) => {
     e.target.style.opacity = "1";
+    draggedItem = null;
   };
+
   const handleDragOver = (e) => {
     e.preventDefault();
-    if (e.currentTarget.classList.contains("drop-zone")) {
-      e.currentTarget.classList.add("active");
-    }
+    e.currentTarget.classList.add("active");
   };
+
   const handleDragLeave = (e) => {
-    if (e.currentTarget.classList.contains("drop-zone")) {
-      e.currentTarget.classList.remove("active");
-    }
+    e.currentTarget.classList.remove("active");
   };
+
   const handleDrop = (e) => {
     e.preventDefault();
-    e.stopPropagation();
-    if (e.currentTarget.classList.contains("drop-zone") && draggedItem) {
+    if (
+      (e.currentTarget.classList.contains("drop-zone") ||
+        e.currentTarget.classList.contains("word-bank")) &&
+      draggedItem
+    ) {
       e.currentTarget.classList.remove("active");
-      const dropIndex = Array.from(e.currentTarget.children).indexOf(draggedItem);
-      if (dropIndex === -1) {
-        e.currentTarget.appendChild(draggedItem);
+      const placeholder = e.currentTarget.querySelector(".drop-placeholder");
+      if (placeholder && e.currentTarget.classList.contains("drop-zone"))
+        placeholder.remove();
+      e.currentTarget.appendChild(draggedItem);
+      gsap.fromTo(
+        draggedItem,
+        { scale: 0.8, opacity: 0 },
+        { scale: 1, opacity: 1, duration: 0.3 }
+      );
+      checkCompletion();
+      if (
+        e.currentTarget.classList.contains("drop-zone") &&
+        e.currentTarget.children.length === 0
+      ) {
+        const newPlaceholder = document.createElement("div");
+        newPlaceholder.className = "drop-placeholder";
+        newPlaceholder.textContent = "Drag words here to build your sentence!";
+        e.currentTarget.appendChild(newPlaceholder);
       }
-      gsap.fromTo(draggedItem, { opacity: 0, scale: 0.8 }, { duration: 0.3, opacity: 1, scale: 1 });
-      checkCompletion();
     }
   };
 
-  let pointerDragItem = null, pointerOffsetX = 0, pointerOffsetY = 0;
-  const handlePointerDown = (e) => {
-    if (e.button && e.button !== 0) return;
-    pointerDragItem = e.currentTarget;
-    pointerDragItem.setPointerCapture(e.pointerId);
-    pointerDragItem.style.opacity = "0.7";
-    pointerDragItem.style.zIndex = "1000";
-    const rect = pointerDragItem.getBoundingClientRect();
-    pointerOffsetX = e.clientX - rect.left;
-    pointerOffsetY = e.clientY - rect.top;
-  };
-  const handlePointerMove = (e) => {
-    if (!pointerDragItem) return;
-    pointerDragItem.style.position = "absolute";
-    pointerDragItem.style.left = `${e.clientX - pointerOffsetX}px`;
-    pointerDragItem.style.top = `${e.clientY - pointerOffsetY}px`;
-    e.preventDefault();
-  };
-  const handlePointerUp = (e) => {
-    if (!pointerDragItem) return;
-    pointerDragItem.releasePointerCapture(e.pointerId);
-    pointerDragItem.style.opacity = "1";
-    const originalDisplay = pointerDragItem.style.display;
-    pointerDragItem.style.display = "none";
-    const dropTarget = document.elementFromPoint(e.clientX, e.clientY);
-    pointerDragItem.style.display = originalDisplay;
-    let validDropZone = dropTarget;
-    while (validDropZone && !validDropZone.classList.contains("drop-zone")) {
-      validDropZone = validDropZone.parentElement;
-    }
-    if (validDropZone) {
-      validDropZone.appendChild(pointerDragItem);
-      gsap.fromTo(pointerDragItem, { opacity: 0, scale: 0.8 }, { duration: 0.3, opacity: 1, scale: 1 });
-      currentDropZone = validDropZone;
-      checkCompletion();
-    }
-    pointerDragItem.style.position = "";
-    pointerDragItem.style.left = "";
-    pointerDragItem.style.top = "";
-    pointerDragItem.style.zIndex = "";
-    pointerDragItem = null;
-  };
-  if (window.PointerEvent) {
-    document.addEventListener("pointermove", debounce(handlePointerMove, 10));
-    document.addEventListener("pointerup", handlePointerUp);
-  }
-
-  // Timer Logic
+  // Timer for timed mode
   const startTimer = () => {
     if (!document.getElementById("timer-mode").checked) return;
+    stopTimer();
     timerId = setInterval(() => {
       timeLeft--;
       elements.progress.textContent = `Puzzle ${currentPuzzleIndex + 1} of ${sessionLength} - Time: ${timeLeft}s`;
       if (timeLeft <= 0) {
-        clearInterval(timerId);
+        stopTimer();
         submitAnswer();
         nextPuzzle();
       }
     }, 1000);
   };
-  const stopTimer = () => clearInterval(timerId);
 
-  // Gamification
+  const stopTimer = () => {
+    if (timerId) clearInterval(timerId);
+    timerId = null;
+  };
+
+  // Update gamification panel and save state to localStorage
   function updateGamificationPanel() {
     elements.xpDisplay.textContent = `XP: ${xp}`;
     elements.streakDisplay.textContent = `Streak: ${streak}`;
-    elements.badgesList.textContent = badges.join(', ');
-    localStorage.setItem('xp', xp);
-    localStorage.setItem('streak', streak);
-    localStorage.setItem('badges', JSON.stringify(badges));
-    localStorage.setItem('lastPlayDate', today);
-    localStorage.setItem('currentLevel', currentLevel);
+    elements.badgesList.innerHTML =
+      badges
+        .map(
+          (badge) =>
+            `<img src="images/${badge.toLowerCase().replace(" ", "-")}.png" alt="${badge}" class="badge-icon">`
+        )
+        .join(" ") || "None";
+    localStorage.setItem("xp", xp);
+    localStorage.setItem("streak", streak);
+    localStorage.setItem("badges", JSON.stringify(badges));
+    localStorage.setItem("lastPlayDate", today);
+    localStorage.setItem("currentLevel", currentLevel);
   }
 
-  function displayConfetti() {
-    const confettiContainer = document.createElement('div');
-    confettiContainer.className = 'confetti-container';
+  // Save current game state to localStorage
+  function updateLocalStorage() {
+    localStorage.setItem("xp", xp);
+    localStorage.setItem("streak", streak);
+    localStorage.setItem("badges", JSON.stringify(badges));
+    localStorage.setItem("currentLevel", currentLevel);
+  }
+
+  // Display confetti animation on success
+  function displayConfetti(count = 20) {
+    const confettiContainer = document.createElement("div");
+    confettiContainer.className = "confetti-container";
     document.body.appendChild(confettiContainer);
-    for (let i = 0; i < 50; i++) {
-      const confetti = document.createElement('div');
-      confetti.className = 'confetti';
-      confetti.style.left = Math.random() * 100 + 'vw';
-      confetti.style.animationDelay = Math.random() * 2 + 's';
-      confetti.style.backgroundColor = getRandomColor();
+    for (let i = 0; i < count; i++) {
+      const confetti = document.createElement("div");
+      confetti.className = "confetti";
+      confetti.style.left = Math.random() * 100 + "vw";
+      confetti.style.animationDelay = Math.random() * 2 + "s";
+      confetti.style.backgroundColor = [
+        "#ff6f61",
+        "#ff9f1c",
+        "#ffcc00",
+        "#98fb98",
+        "#40c4ff",
+      ][Math.floor(Math.random() * 5)];
       confettiContainer.appendChild(confetti);
     }
     setTimeout(() => confettiContainer.remove(), 5000);
   }
-  function getRandomColor() {
-    return ['#ff6f61', '#ff9f1c', '#ffcc00', '#98fb98', '#40c4ff'][Math.floor(Math.random() * 5)];
-  }
 
+  // Animate success message with GSAP
   function animateSuccessMessage() {
-    gsap.fromTo(elements.successMessage, { scale: 0, opacity: 0 }, { duration: 0.6, scale: 1, opacity: 1, ease: "bounce.out" });
+    gsap.fromTo(
+      elements.successMessage,
+      { scale: 0, opacity: 0 },
+      { scale: 1, opacity: 1, duration: 0.6, ease: "bounce.out" }
+    );
   }
 
-  // Hint & Submission
+  // Show tooltip on hover with word role
+  const showTooltip = (e) => {
+    const word = e.target.textContent;
+    const puzzle = puzzles[currentPuzzleIndex];
+    const index = puzzle.correct.indexOf(word);
+    const role = index !== -1 ? getWordRole(word, index, puzzle.correct) : "unknown";
+    let tip = "";
+    switch (role) {
+      case "subject":
+        tip = "Subject: Who does it?";
+        break;
+      case "verb":
+        tip = "Verb: What happens?";
+        break;
+      case "object":
+        tip = "Object: What’s it about?";
+        break;
+      case "end":
+        tip = "End: This ends the sentence.";
+        break;
+      default:
+        tip = "Other: Part of the sentence.";
+    }
+    const tooltip = document.createElement("div");
+    tooltip.textContent = tip;
+    tooltip.className = "word-tooltip";
+    tooltip.style.position = "absolute";
+    tooltip.style.background = "rgba(0, 0, 0, 0.8)";
+    tooltip.style.color = "white";
+    tooltip.style.padding = "8px 12px";
+    tooltip.style.borderRadius = "10px";
+    tooltip.style.fontSize = "1em";
+    tooltip.style.zIndex = "10";
+    const rect = e.target.getBoundingClientRect();
+    const scrollY = window.scrollY || document.documentElement.scrollTop;
+    tooltip.style.top = `${rect.bottom + scrollY + 5}px`;
+    tooltip.style.left = `${rect.left}px`;
+    const tooltipRect = tooltip.getBoundingClientRect();
+    if (tooltipRect.right > window.innerWidth)
+      tooltip.style.left = `${window.innerWidth - tooltipRect.width - 5}px`;
+    if (tooltipRect.bottom > window.innerHeight)
+      tooltip.style.top = `${rect.top + scrollY - tooltipRect.height - 5}px`;
+    document.body.appendChild(tooltip);
+    e.target.addEventListener("mouseout", () => tooltip.remove(), { once: true });
+  };
+
+  // Show tooltip on touch (long press)
+  const showTouchTooltip = (e) => {
+    let timer;
+    const touchMove = () => clearTimeout(timer);
+    const touchEnd = () => {
+      clearTimeout(timer);
+      document.removeEventListener("touchmove", touchMove);
+      document.removeEventListener("touchend", touchEnd);
+    };
+    timer = setTimeout(() => {
+      const word = e.target.textContent;
+      const puzzle = puzzles[currentPuzzleIndex];
+      const index = puzzle.correct.indexOf(word);
+      const role = index !== -1 ? getWordRole(word, index, puzzle.correct) : "unknown";
+      let tip = "";
+      switch (role) {
+        case "subject":
+          tip = "Subject: Who does it?";
+          break;
+        case "verb":
+          tip = "Verb: What happens?";
+          break;
+        case "object":
+          tip = "Object: What’s it about?";
+          break;
+        case "end":
+          tip = "End: This ends the sentence.";
+          break;
+        default:
+          tip = "Other: Part of the sentence.";
+      }
+      const tooltip = document.createElement("div");
+      tooltip.textContent = tip;
+      tooltip.className = "word-tooltip";
+      tooltip.style.position = "absolute";
+      tooltip.style.background = "rgba(0, 0, 0, 0.7)";
+      tooltip.style.color = "white";
+      tooltip.style.padding = "5px 10px";
+      tooltip.style.borderRadius = "4px";
+      tooltip.style.fontSize = "0.8em";
+      tooltip.style.zIndex = "10";
+      const rect = e.target.getBoundingClientRect();
+      const scrollY = window.scrollY || document.documentElement.scrollTop;
+      tooltip.style.top = `${rect.bottom + scrollY + 5}px`;
+      tooltip.style.left = `${rect.left}px`;
+      const tooltipRect = tooltip.getBoundingClientRect();
+      if (tooltipRect.right > window.innerWidth)
+        tooltip.style.left = `${window.innerWidth - tooltipRect.width - 5}px`;
+      if (tooltipRect.bottom > window.innerHeight)
+        tooltip.style.top = `${rect.top + scrollY - tooltipRect.height - 5}px`;
+      document.body.appendChild(tooltip);
+      e.target.addEventListener("touchend", () => tooltip.remove(), { once: true });
+    }, 500);
+    document.addEventListener("touchmove", touchMove);
+    document.addEventListener("touchend", touchEnd);
+  };
+
+  // Remove a word from the drop zone and return it to the word bank
+  const removeWord = (e) => {
+    const word = e.target;
+    const wordBank = document.querySelector(".word-bank");
+    if (!wordBank || !word.classList.contains("word")) return;
+    if (word.parentElement.classList.contains("drop-zone")) {
+      const newWord = word.cloneNode(true);
+      newWord.draggable = true;
+      newWord.addEventListener("dragstart", handleDragStart);
+      newWord.addEventListener("dragend", handleDragEnd);
+      newWord.addEventListener("mouseover", showTooltip);
+      newWord.addEventListener("mouseout", hideTooltip);
+      newWord.addEventListener("touchstart", showTouchTooltip, { passive: true });
+      newWord.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" && newWord.parentElement.classList.contains("drop-zone"))
+          removeWord(e);
+      });
+      wordBank.appendChild(newWord);
+      word.classList.add("removing");
+      setTimeout(() => word.remove(), 300);
+      speak("Word removed and returned to the word bank.");
+    }
+    checkCompletion();
+    if (currentDropZone && currentDropZone.children.length === 0) {
+      const placeholder = document.createElement("div");
+      placeholder.className = "drop-placeholder";
+      placeholder.textContent = "Drag words here to build your sentence!";
+      currentDropZone.appendChild(placeholder);
+    }
+  };
+
+  // Correct a wrong word on click (updated: no individual correction audio)
+  const correctWord = (e) => {
+    const wordDiv = e.target;
+    if (!wordDiv.classList.contains("incorrect")) return;
+    const correctWordText = wordDiv.dataset.correctWord;
+    wordDiv.textContent = correctWordText;
+    wordDiv.classList.remove("incorrect");
+    wordDiv.classList.add("correct");
+    wordDiv.style.cursor = "default";
+    wordDiv.removeEventListener("click", correctWord);
+    // Now, if the sentence becomes correct, read out the full correct sentence
+    const puzzle = puzzles[currentPuzzleIndex];
+    puzzle.userAnswer = Array.from(currentDropZone.children).map((word) => word.textContent);
+    const isNowCorrect = puzzle.userAnswer.join(" ") === puzzle.correct.join(" ");
+    if (isNowCorrect) {
+      score++;
+      correctCount++;
+      streak++;
+      xp += 5; // Partial credit for correction
+      document.getElementById("success-sound").play();
+      // Read out the complete correct sentence
+      speak(`Great job! The sentence is now correct: ${puzzle.correct.join(" ")}`);
+      elements.successMessage.textContent = "✓ Yay! You fixed it!";
+      animateSuccessMessage();
+      displayConfetti();
+      setTimeout(() => (elements.successMessage.textContent = ""), 3000);
+      updateGamificationPanel();
+    }
+  };
+
+  // Provide hints to help the player
   const showHint = () => {
     const puzzle = puzzles[currentPuzzleIndex];
     if (!puzzle.submitted) {
+      const wordBankWords = Array.from(document.querySelectorAll(".word-bank .word"));
       if (hintCount === 0) {
         hintCount++;
-        elements.hint.textContent = `Hint 1: Start with "${puzzle.correct[0]}"`;
-        speak(`Hint: Start with ${puzzle.correct[0]}`);
+        const subjectWord = puzzle.correct[0];
+        if (subjectWord) {
+          elements.hint.textContent = `Who does it? The subject is "${subjectWord}".`;
+          speak(`Who does it? The subject is ${subjectWord}.`);
+          wordBankWords.forEach((word) => {
+            if (word.textContent === subjectWord) {
+              word.classList.add("hint-subject");
+              setTimeout(() => word.classList.remove("hint-subject"), 3000);
+            }
+          });
+        }
       } else if (hintCount === 1) {
         hintCount++;
-        elements.hint.textContent = "Hint 2: Use Subject-Verb-Object order.";
-        speak("Hint: Use Subject-Verb-Object order.");
+        const verbIndex = puzzle.correct.findIndex(
+          (word) => getWordRole(word, puzzle.correct.indexOf(word), puzzle.correct) === "verb"
+        );
+        const verbWord = verbIndex !== -1 ? puzzle.correct[verbIndex] : null;
+        if (verbWord) {
+          elements.hint.textContent = `What happens? The action word is "${verbWord}".`;
+          speak(`What happens? The action word is ${verbWord}.`);
+          wordBankWords.forEach((word) => {
+            if (word.textContent === verbWord) {
+              word.classList.add("hint-verb");
+              setTimeout(() => word.classList.remove("hint-verb"), 3000);
+            }
+          });
+        }
+      } else if (hintCount === 2) {
+        hintCount++;
+        const objectIndex = puzzle.correct.findIndex(
+          (word, idx) => getWordRole(word, idx, puzzle.correct) === "object"
+        );
+        const objectWord = objectIndex !== -1 ? puzzle.correct[objectIndex] : null;
+        if (objectWord) {
+          elements.hint.textContent = `What’s it about? The object is "${objectWord}".`;
+          speak(`What’s it about? The object is ${objectWord}.`);
+          wordBankWords.forEach((word) => {
+            if (word.textContent === objectWord) {
+              word.classList.add("hint-object");
+              setTimeout(() => word.classList.remove("hint-object"), 3000);
+            }
+          });
+        }
       } else {
-        elements.hint.textContent = "No more hints!";
+        elements.hint.textContent = "No more hints! You can do it!";
+        speak("No more hints! You can do it!");
       }
       xp -= hintCount * 2;
       updateGamificationPanel();
     }
   };
 
+  // Submit and evaluate the player's answer
   const submitAnswer = () => {
-    console.log("Submit Answer clicked");
     const puzzle = puzzles[currentPuzzleIndex];
     puzzle.attempts++;
-    localStorage.setItem(`puzzle_${currentPuzzleIndex}_attempts`, puzzle.attempts);
-    if (!currentDropZone) return;
-    const userWords = Array.from(currentDropZone.children).map(word => word.textContent);
-    if (userWords.length !== puzzle.correct.length) return;
-
+    puzzleAttempts++;
+    const userWords = Array.from(currentDropZone.children).map((word) => word.textContent);
     puzzle.submitted = true;
-    const userWordsAdjusted = userWords.map((word, idx) => 
+    const userWordsAdjusted = userWords.map((word, idx) =>
       idx === 0 ? word.charAt(0).toUpperCase() + word.slice(1).toLowerCase() : word
     );
-    const needsPunctuation = !/[.!?]/.test(userWordsAdjusted[userWordsAdjusted.length - 1]);
+    const needsPunctuation = !/[.!?]$/.test(userWordsAdjusted[userWordsAdjusted.length - 1]);
     puzzle.userAnswer = userWordsAdjusted;
     const isCorrect = userWordsAdjusted.join(" ") === puzzle.correct.join(" ");
 
     Array.from(currentDropZone.children).forEach((wordElem, index) => {
       wordElem.classList.remove("correct", "incorrect");
-      wordElem.classList.add(wordElem.textContent === puzzle.correct[index] ? "correct" : "incorrect");
+      const isWordCorrect = wordElem.textContent === puzzle.correct[index];
+      wordElem.classList.add(isWordCorrect ? "correct" : "incorrect");
+      if (!isWordCorrect) {
+        wordElem.dataset.correctWord = puzzle.correct[index];
+        wordElem.style.cursor = "pointer";
+        wordElem.addEventListener("click", correctWord);
+      }
     });
 
     if (isCorrect && !needsPunctuation) {
       score++;
+      correctCount++;
       streak++;
       xp += 10 + (document.getElementById("timer-mode").checked ? Math.floor(timeLeft / 5) : 0);
       if (!badges.includes("First Win")) badges.push("First Win");
-      if (streak === 5 && !badges.includes("Perfect Streak 5")) badges.push("Perfect Streak 5");
-      if (score === sessionLength && !badges.includes("Level Master")) badges.push("Level Master");
+      if (streak === 5 && !badges.includes("Perfect Streak 5"))
+        badges.push("Perfect Streak 5");
+      if (score === sessionLength && !badges.includes("Level Master"))
+        badges.push("Level Master");
       document.getElementById("success-sound").play();
       speak(`Great job! The sentence is: ${puzzle.correct.join(" ")}`);
       elements.successMessage.textContent = "✓ Yay! You got it!";
       animateSuccessMessage();
       displayConfetti();
-      setTimeout(() => elements.successMessage.textContent = "", 3000);
+      setTimeout(() => (elements.successMessage.textContent = ""), 3000);
     } else {
       document.getElementById("error-sound").play();
       streak = 0;
-      let feedback = "Oops, not quite! Click the red words to fix them.";
-      if (needsPunctuation) feedback += " Add a period or question mark.";
-      speak(`${feedback} The correct sentence is: ${puzzle.correct.join(" ")}`);
+      let feedback = "Oops, not quite! Click incorrect words to fix them. ";
+      if (!isCorrect) feedback += "Check your word order. ";
+      if (needsPunctuation) feedback += "Add a period or question mark. ";
+      if (!isCorrect && userWordsAdjusted[0] !== puzzle.correct[0])
+        feedback += "Start with the subject! ";
+      if (
+        !isCorrect &&
+        userWordsAdjusted.findIndex((w) =>
+          getWordRole(w, userWordsAdjusted.indexOf(w), userWordsAdjusted) === "verb"
+        ) !==
+          puzzle.correct.findIndex((w) =>
+            getWordRole(w, puzzle.correct.indexOf(w), puzzle.correct) === "verb"
+          )
+      )
+        feedback += "The verb might be misplaced! ";
+      speak(feedback);
       elements.hint.textContent = feedback;
     }
     updateGamificationPanel();
     displayCurrentPuzzle();
   };
 
+  // Retry the current puzzle
   const tryAgain = () => {
     const puzzle = puzzles[currentPuzzleIndex];
     puzzle.submitted = false;
@@ -740,31 +875,32 @@
     displayCurrentPuzzle();
   };
 
-  // Navigation
+  // Move to the next puzzle or evaluate mastery
   const nextPuzzle = () => {
     if (currentPuzzleIndex < puzzles.length - 1) {
       currentPuzzleIndex++;
       hintCount = 0;
       displayCurrentPuzzle();
-    } else if (score === sessionLength) {
-      const levels = ['p1', 'p2', 'p3', 'p4', 'p5', 'p6'];
+    } else if (puzzleAttempts >= sessionLength && correctCount / puzzleAttempts >= 0.8) {
+      const levels = ["p1", "p2", "p3", "p4", "p5", "p6"];
       const nextLevelIndex = levels.indexOf(currentLevel) + 1;
       if (nextLevelIndex < levels.length) {
         currentLevel = levels[nextLevelIndex];
         document.getElementById("level-select").value = currentLevel;
         speak(`Wow! Moving up to ${currentLevel.toUpperCase()}!`);
         alert(`Great job! Moving up to ${currentLevel.toUpperCase()}!`);
-        resetQuiz();
+        generatePuzzles();
       } else {
         speak("Amazing! You’ve mastered all levels!");
         alert("Congratulations! You've mastered all levels!");
       }
     } else {
-      speak("Session complete! Good work!");
-      alert("Session complete! You finished 5 puzzles.");
+      generatePuzzles();
+      speak("Keep practicing to master this level!");
     }
   };
 
+  // Move to the previous puzzle
   const prevPuzzle = () => {
     if (currentPuzzleIndex > 0) {
       currentPuzzleIndex--;
@@ -776,33 +912,116 @@
     }
   };
 
+  // Start a review session with mixed-level puzzles
+  const startReviewSession = () => {
+    // If current level is p1, remain at p1; otherwise, use previous level for review
+    const prevLevel = currentLevel === "p1" ? "p1" : "p" + (parseInt(currentLevel.slice(1)) - 1);
+    const prevSentences = getSentencesForLevel(prevLevel);
+    const currentSentences = getSentencesForLevel(currentLevel);
+    const reviewSentences = shuffle([...prevSentences.slice(0, 3), ...currentSentences.slice(0, 7)]);
+    puzzles = reviewSentences.map((sentence) => ({
+      correct: sentence.split(" "),
+      submitted: false,
+      userAnswer: [],
+      attempts: 0,
+    }));
+    currentPuzzleIndex = 0;
+    score = 0;
+    puzzleAttempts = 0;
+    correctCount = 0;
+    displayCurrentPuzzle();
+    speak("Time for a review session with mixed puzzles!");
+  };
+
+  // Reset the quiz to start over
   const resetQuiz = () => {
     generatePuzzles();
-    const levelColors = { p1: '#ff6f61', p2: '#ff9f1c', p3: '#ffcc00', p4: '#98fb98', p5: '#40c4ff', p6: '#ff69b4' };
-    document.documentElement.style.setProperty('--primary-color', levelColors[currentLevel]);
+    const levelColors = {
+      p1: "#ff6f61",
+      p2: "#ff9f1c",
+      p3: "#ffcc00",
+      p4: "#98fb98",
+      p5: "#40c4ff",
+      p6: "#ff69b4",
+    };
+    document.documentElement.style.setProperty("--primary-color", levelColors[currentLevel]);
     displayCurrentPuzzle();
   };
 
+  // Clear the drop zone and return words to the word bank
+  const clearDropZone = () => {
+    if (!currentDropZone) return;
+    const wordBank = document.querySelector(".word-bank");
+    if (!wordBank) return;
+    Array.from(currentDropZone.children).forEach((word) => {
+      if (word.classList.contains("word")) {
+        const newWord = word.cloneNode(true);
+        newWord.draggable = true;
+        newWord.addEventListener("dragstart", handleDragStart);
+        newWord.addEventListener("dragend", handleDragEnd);
+        newWord.addEventListener("mouseover", showTooltip);
+        newWord.addEventListener("mouseout", hideTooltip);
+        newWord.addEventListener("touchstart", showTouchTooltip, { passive: true });
+        newWord.addEventListener("keydown", (e) => {
+          if (e.key === "Enter" && newWord.parentElement.classList.contains("drop-zone"))
+            removeWord(e);
+        });
+        wordBank.appendChild(newWord);
+        word.classList.add("removing");
+        setTimeout(() => word.remove(), 300);
+      }
+    });
+    const placeholder = document.createElement("div");
+    placeholder.className = "drop-placeholder";
+    placeholder.textContent = "Drag words here to build your sentence!";
+    currentDropZone.appendChild(placeholder);
+    checkCompletion();
+    speak("Drop zone cleared. Words returned to the word bank.");
+  };
+
+  // Toggle fullscreen mode
   const toggleFullScreen = () => {
-    if (!document.fullscreenElement) document.documentElement.requestFullscreen().catch(err => console.warn(err));
+    if (!document.fullscreenElement) document.documentElement.requestFullscreen();
     else document.exitFullscreen();
   };
 
-  // Event Listeners
-  document.getElementById("listen-instructions-btn").addEventListener("click", () => speak(document.querySelector("p.instructions").textContent));
-  document.getElementById("hint-btn").addEventListener("click", showHint);
+  // Event listeners for interactive elements
+  document.getElementById("listen-instructions-btn").addEventListener("click", () =>
+    speak(document.querySelector("p.instructions").textContent)
+  );
+  elements.hintBtn.addEventListener("click", showHint);
   elements.submitBtn.addEventListener("click", submitAnswer);
   elements.tryAgainBtn.addEventListener("click", tryAgain);
-  document.getElementById("next-btn").addEventListener("click", nextPuzzle);
-  document.getElementById("prev-btn").addEventListener("click", prevPuzzle);
+  elements.prevBtn.addEventListener("click", prevPuzzle);
+  elements.nextBtn.addEventListener("click", nextPuzzle);
+  elements.clearBtn.addEventListener("click", clearDropZone);
+  elements.learnBtn.addEventListener("click", () => {
+    elements.puzzleContainer.innerHTML =
+      "<h3>Learn Sentence Basics</h3><p>A sentence has a subject (who), a verb (what happens), and often an object (what’s affected). Example: 'The dog (subject) runs (verb) fast (object).'</p>";
+    speak("Learn Sentence Basics: A sentence has a subject, a verb, and often an object.");
+  });
   document.getElementById("reset-btn").addEventListener("click", resetQuiz);
   document.getElementById("level-select").addEventListener("change", (e) => {
     currentLevel = e.target.value;
     resetQuiz();
   });
   document.getElementById("fullscreen-btn").addEventListener("click", toggleFullScreen);
-  document.getElementById("theme-toggle").addEventListener("click", () => document.body.classList.toggle("light-theme"));
+  document.getElementById("theme-toggle").addEventListener("click", () => {
+    const body = document.body;
+    if (body.classList.contains("pastel-theme")) {
+      body.classList.remove("pastel-theme");
+      body.classList.add("rainbow-theme");
+      speak("Switched to Rainbow Fun theme!");
+    } else if (body.classList.contains("rainbow-theme")) {
+      body.classList.remove("rainbow-theme");
+      speak("Switched to Bright Playful theme!");
+    } else {
+      body.classList.add("pastel-theme");
+      speak("Switched to Pastel Calm theme!");
+    }
+  });
 
+  // Initialize the game on page load
   document.addEventListener("DOMContentLoaded", () => {
     generatePuzzles();
     displayCurrentPuzzle();
