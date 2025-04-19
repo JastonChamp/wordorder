@@ -1,3 +1,4 @@
+```javascript
 // script.js
 "use strict";
 
@@ -165,7 +166,7 @@ function playErrorSound() {
     "The teacher reads a fascinating story and the children listen attentively.",
     "The boy finished his homework before dinner so he went outside to play.",
     "The little girl happily skipped to school and her friends cheered her on.",
-    "The bright sun shines over the calm sea while a gentle breeze cools the air.",
+    "The bright sun shines over the calm sea while a gentle breeze cools the air.",  
     "The busy bees buzz around the blooming flowers as the children watch in wonder.",
     "The students study in the library and take notes carefully on every detail.",
     "The father cooks dinner and the children eagerly help set the table.",
@@ -215,24 +216,15 @@ function playErrorSound() {
   ];
 
   // ── UTILITIES ───────────────────────────────────────────────────────────────
-  const shuffle = arr => arr.sort(() => Math.random() - 0.5);
-
-  function getWordRole(word, idx, arr) {
-    if (idx === 0 && /^[A-Z]/.test(word)) return "subject";
-    if (/^(is|was|were|are|runs|eats|sings|sleeps|reads|writes|explained|listened|chased|had|play|draws|decided|enjoyed|prepared|helped|finished|stopped|jumps|builds|climbs|solves|shares|flies|falls|barks|purrs|rides|skips|claps|fetch|wags|does|do|did|will|shall|can|might|should|would)/i.test(word)) return "verb";
-    if (idx > 1 && idx < arr.length - 1 && !/[.!?]$/.test(word) && /^[A-Za-z]+$/.test(word)) return "object";
-    if (/[.!?]$/.test(word)) return "end";
-    return "other";
+  function shuffle(arr) {
+    return arr.sort(() => Math.random() - 0.5);
   }
 
-  // ── STATE ─────────────────────────────────────────────────────────────────
+  // ── STATE & CAMPAIGN ────────────────────────────────────────────────────────
   const sessionLength = 10;
   let puzzles = [], currentIndex = 0;
-  let score = 0, xp = parseInt(localStorage.getItem("xp")) || 0;
-  let streak = parseInt(localStorage.getItem("streak")) || 0;
-  let badges = JSON.parse(localStorage.getItem("badges")) || [];
-  let attempts = 0, correctCount = 0, hintCount = 0;
-  let timeLeft = 30, timerId = null;
+  let score = 0, xp = 0, streak = 0, attempts = 0, correctCount = 0, hintCount = 0;
+  let badges = [], timeLeft = 30, timerId = null;
   let currentLevel = localStorage.getItem("currentLevel") || "p3";
 
   function saveState() {
@@ -253,8 +245,8 @@ function playErrorSound() {
     saveState();
   }
 
-  function getPool(level) {
-    return { p1: sentencesP1, p2: sentencesP2, p3: sentencesP3, p4: sentencesP4, p5: sentencesP5, p6: sentencesP6 }[level];
+  function getPool(lvl) {
+    return { p1: sentencesP1, p2: sentencesP2, p3: sentencesP3, p4: sentencesP4, p5: sentencesP5, p6: sentencesP6 }[lvl];
   }
 
   function generatePuzzles() {
@@ -274,13 +266,13 @@ function playErrorSound() {
     if (timerId) clearInterval(timerId);
     timerId = null;
   }
-
   function startTimer() {
     if (!document.getElementById("timer-mode").checked) return;
     clearTimer();
     timeLeft = 30;
     timerId = setInterval(() => {
-      document.getElementById("progress").textContent = `Puzzle ${currentIndex+1}/${sessionLength} - Time: ${timeLeft}s`;
+      document.getElementById("progress").textContent =
+        `Puzzle ${currentIndex+1}/${sessionLength} - Time: ${timeLeft}s`;
       if (--timeLeft <= 0) {
         clearTimer();
         submitAnswer();
@@ -298,24 +290,24 @@ function playErrorSound() {
     document.getElementById("hint").textContent = "";
     document.getElementById("success-message").textContent = "";
 
-    // Card wrapper
+    // sentence card
     const card = document.createElement("div");
     card.className = "sentence-container";
-    const header = document.createElement("h3");
-    header.textContent = `Puzzle ${currentIndex+1} of ${sessionLength}`;
-    card.appendChild(header);
+    const h3 = document.createElement("h3");
+    h3.textContent = `Puzzle ${currentIndex+1} of ${sessionLength}`;
+    card.appendChild(h3);
 
-    // Word bank & drop zone
     const bank = document.createElement("div");
     bank.className = "word-bank";
     const drop = document.createElement("div");
     drop.className = "drop-zone";
 
-    [bank, drop].forEach(z => {
-      z.addEventListener("dragover", e => { e.preventDefault(); z.classList.add("active"); });
-      z.addEventListener("dragleave", e => z.classList.remove("active"));
-      z.addEventListener("drop", e => {
-        e.preventDefault(); z.classList.remove("active");
+    [bank, drop].forEach(zone => {
+      zone.addEventListener("dragover", e => { e.preventDefault(); zone.classList.add("active"); });
+      zone.addEventListener("dragleave", e => zone.classList.remove("active"));
+      zone.addEventListener("drop", e => {
+        e.preventDefault();
+        zone.classList.remove("active");
         if (window.draggedWord) {
           const ph = drop.querySelector(".drop-placeholder");
           if (ph) ph.remove();
@@ -331,7 +323,7 @@ function playErrorSound() {
         d.className = "word";
         d.textContent = w;
         d.draggable = true;
-        d.addEventListener("dragstart", () => { window.draggedWord = d; });
+        d.addEventListener("dragstart", () => window.draggedWord = d);
         bank.appendChild(d);
       });
       const ph = document.createElement("div");
@@ -344,9 +336,21 @@ function playErrorSound() {
     card.appendChild(drop);
     container.appendChild(card);
 
-    document.getElementById("submit-btn").disabled = p.submitted;
+    // reset buttons
+    const submitBtn = document.getElementById("submit-btn");
+    const tryAgainBtn = document.getElementById("try-again-btn");
+    submitBtn.style.display = "inline-block";
+    submitBtn.disabled = p.submitted;
+    tryAgainBtn.style.display = "none";
+
     updateProgress();
     startTimer();
+  }
+
+  function checkComplete() {
+    const drop = document.querySelector(".drop-zone");
+    const btn = document.getElementById("submit-btn");
+    btn.disabled = drop.children.length !== puzzles[currentIndex].correct.length;
   }
 
   function updateProgress() {
@@ -385,11 +389,11 @@ function playErrorSound() {
     const p = puzzles[currentIndex];
     const raw = Array.from(document.querySelectorAll(".drop-zone .word")).map(d => d.textContent);
 
-    // Normalize: capitalize first, ensure punctuation
+    // normalize first word + punctuation
     const normalized = raw.map((w,i) => {
       if (i === 0) {
-        const base = w.toLowerCase().replace(/[.!?]$/,"");
-        return base.charAt(0).toUpperCase()+base.slice(1);
+        const lw = w.toLowerCase().replace(/[.!?]$/,"");
+        return lw.charAt(0).toUpperCase() + lw.slice(1);
       }
       return w;
     });
@@ -399,10 +403,9 @@ function playErrorSound() {
     p.submitted = true;
     attempts++;
 
-    // Strict in-order check
-    const correct = p.correct;
-    const isCorrect = normalized.length === correct.length &&
-                      normalized.every((w,i) => w === correct[i]);
+    // strict comparison
+    const isCorrect = normalized.length === p.correct.length &&
+                      normalized.every((w,i) => w === p.correct[i]);
 
     if (isCorrect) {
       score++; correctCount++; streak++; xp += 10;
@@ -414,8 +417,9 @@ function playErrorSound() {
       document.getElementById("hint").textContent = "Oops, that order isn't quite right.";
       speak("Oops, that order isn't quite right.");
     }
-
     updateGamification();
+
+    // toggle buttons
     document.getElementById("submit-btn").style.display = "none";
     document.getElementById("try-again-btn").style.display = "inline-block";
   }
@@ -423,29 +427,23 @@ function playErrorSound() {
   // ── RETRY ───────────────────────────────────────────────────────────────────
   function tryAgain() {
     puzzles[currentIndex].submitted = false;
-    hintCount = 0;
+    hintCount = 0;  
     displayPuzzle();
   }
 
   // ── NAVIGATION ──────────────────────────────────────────────────────────────
   function nextPuzzle() {
     if (currentIndex < sessionLength - 1) {
-      currentIndex++;
-      hintCount = 0;
-      displayPuzzle();
+      currentIndex++; hintCount = 0; displayPuzzle();
     }
   }
   function prevPuzzle() {
     if (currentIndex > 0) {
-      currentIndex--;
-      hintCount = 0;
-      displayPuzzle();
+      currentIndex--; hintCount = 0; displayPuzzle();
     }
   }
   function clearDropZone() {
-    puzzles[currentIndex].submitted = false;
-    hintCount = 0;
-    displayPuzzle();
+    puzzles[currentIndex].submitted = false; hintCount = 0; displayPuzzle();
   }
 
   // ── LEARN BASICS ────────────────────────────────────────────────────────────
@@ -468,10 +466,9 @@ function playErrorSound() {
     else document.exitFullscreen();
   }
 
-  // ── WIRE UP EVENTS ─────────────────────────────────────────────────────────
+  // ── BIND EVENTS ─────────────────────────────────────────────────────────────
   window.addEventListener("DOMContentLoaded", () => {
     console.log("✅ DOMContentLoaded – attaching handlers");
-
     document.getElementById("hint-btn").addEventListener("click", showHint);
     document.getElementById("submit-btn").addEventListener("click", submitAnswer);
     document.getElementById("try-again-btn").addEventListener("click", tryAgain);
@@ -479,25 +476,23 @@ function playErrorSound() {
     document.getElementById("prev-btn").addEventListener("click", prevPuzzle);
     document.getElementById("clear-btn").addEventListener("click", clearDropZone);
     document.getElementById("learn-btn").addEventListener("click", learnBasics);
-
     document.getElementById("listen-instructions-btn").addEventListener("click", () => {
-      const text = document.querySelector("p.instructions").textContent;
-      speak(text);
+      speak(document.querySelector("p.instructions").textContent);
     });
     document.getElementById("fullscreen-btn").addEventListener("click", toggleFullScreen);
     document.getElementById("theme-toggle").addEventListener("click", toggleTheme);
-    document.getElementById("level-select").addEventListener("change", () => {
-      currentLevel = document.getElementById("level-select").value;
+    document.getElementById("level-select").addEventListener("change", (e) => {
+      currentLevel = e.target.value;
       generatePuzzles();
     });
     document.getElementById("reset-btn").addEventListener("click", generatePuzzles);
 
-    generatePuzzles();  // start!
+    generatePuzzles();
   });
 
-  // ── Register Service Worker ─────────────────────────────────────────────────
+  // ── SERVICE WORKER ──────────────────────────────────────────────────────────
   if ("serviceWorker" in navigator) {
-    navigator.serviceWorker.register("service-worker.js").catch(() => { /* fail silently */ });
+    navigator.serviceWorker.register("service-worker.js").catch(() => {});
   }
 
-})();  // end IIFE
+})();
