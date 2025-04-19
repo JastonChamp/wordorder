@@ -1,12 +1,3 @@
-Below is the **complete** `script.js`. It fixes:
-
-1. **Adds** `elements.hint` so `elements.hint.textContent` is defined.  
-2. Uses **relative paths** for images (e.g. `"images/star.png"`) so you don’t get 404s.  
-3. **Suppresses** service‑worker registration errors (no more SW 404s).  
-
-> **Make sure** you overwrite your existing `script.js` with this, clear your cache, and reload.
-
-```js
 // script.js
 "use strict";
 
