@@ -1,3 +1,4 @@
+<!-- index.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -14,14 +15,14 @@
   <!-- PWA manifest (relative) -->
   <link rel="manifest" href="manifest.json" />
 
-  <!-- Favicon (relative) -->
+  <!-- Favicon -->
   <link rel="icon" href="favicon.ico" />
 
   <!-- Main stylesheet -->
-  <link rel="stylesheet" href="styles.css?v=13" />
+  <link rel="stylesheet" href="styles.css?v=14" />
 </head>
 <body>
-  <!-- Tutorial Overlay (first‑time only) -->
+  <!-- Tutorial Overlay -->
   <div id="tutorial-overlay" class="hidden">
     <div id="tutorial-content">
       <h2>Welcome to Word Order Adventure!</h2>
@@ -57,12 +58,10 @@
         <option value="p5">Primary 5</option>
         <option value="p6">Primary 6</option>
       </select>
-
       <label>
         <input type="checkbox" id="timer-mode" />
         Timer Mode (30s)
       </label>
-
       <button id="listen-instructions-btn" class="instruction-btn">
         Hear Instructions
       </button>
@@ -75,11 +74,10 @@
     </div>
   </header>
 
-  <main class="game-container" id="game-container">
+  <main class="game-container">
     <section
       id="puzzle-container"
       role="region"
-      aria-label="Current Puzzle"
       aria-live="polite"
     ></section>
 
@@ -91,7 +89,7 @@
             alt="Star"
             class="progress-icon"
           />
-          Puzzle 1 / 10
+          Puzzle 1/10
         </span>
       </div>
     </section>
@@ -112,7 +110,7 @@
       <button id="prev-btn">Back</button>
       <button id="hint-btn">Get a Hint</button>
       <button id="submit-btn" disabled>Check Answer</button>
-      <button id="try-again-btn" style="display:none;">Try Again</button>
+      <button id="try-again-btn" style="display:none">Try Again</button>
       <button id="next-btn">Next</button>
       <button id="clear-btn">Clear</button>
       <button id="learn-btn">Learn</button>
@@ -128,25 +126,18 @@
     <button id="reset-btn">Start Over</button>
   </main>
 
-  <!-- Audio files (relative) -->
-  <audio id="success-sound" src="sounds/success.mp3" preload="auto"></audio>
-  <audio id="error-sound"   src="sounds/error.mp3"   preload="auto"></audio>
-
-  <!-- Main game script -->
   <script src="script.js" defer></script>
   <script>
     document.addEventListener("DOMContentLoaded", () => {
-      // Load GSAP for animations
+      // Load GSAP
       const s = document.createElement("script");
       s.src =
         "https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js";
       document.body.appendChild(s);
 
-      // Register service worker (fail silently if missing)
+      // Register SW silently
       if ("serviceWorker" in navigator) {
-        navigator.serviceWorker
-          .register("service-worker.js")
-          .catch(() => {});
+        navigator.serviceWorker.register("service-worker.js").catch(() => {});
       }
     });
   </script>
