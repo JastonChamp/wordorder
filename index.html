@@ -8,11 +8,13 @@
     href="https://fonts.googleapis.com/css2?family=Comic+Neue:wght@400;700&display=swap"
     rel="stylesheet"
   />
-  <link rel="manifest" href="/manifest.json" />
+  <!-- Manifest must be relative -->
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" href="favicon.ico" />
   <link rel="stylesheet" href="styles.css?v=13" />
 </head>
 <body>
-  <!-- Tutorial Overlay (first‑time users only) -->
+  <!-- Tutorial Overlay -->
   <div id="tutorial-overlay" class="hidden">
     <div id="tutorial-content">
       <h2>Welcome to Word Order Adventure!</h2>
@@ -31,7 +33,9 @@
     <p class="instructions">
       Drag the words below to make a sentence or question!<br />
       Start with a capital letter and end with a full stop or question mark.<br />
-      <span style="font-size: 0.8em; color: var(--accent-color);">(Tap and hold on phones)</span>
+      <span style="font-size: 0.8em; color: var(--accent-color);">
+        (Tap and hold on phones)
+      </span>
     </p>
     <div class="mascot-container">
       <img src="images/mascot.png" alt="Friendly Flower Mascot" id="mascot" />
@@ -46,19 +50,22 @@
         <option value="p5">Primary 5</option>
         <option value="p6">Primary 6</option>
       </select>
-      <label><input type="checkbox" id="timer-mode" /> Timer Mode (30s)</label>
-      <button id="listen-instructions-btn" class="instruction-btn" aria-label="Hear Instructions">Hear Instructions</button>
-      <button id="fullscreen-btn" class="instruction-btn" aria-label="Toggle Fullscreen">Fullscreen</button>
-      <button id="theme-toggle" class="instruction-btn" aria-label="Toggle Theme">Change Theme</button>
+      <label>
+        <input type="checkbox" id="timer-mode" /> Timer Mode (30s)
+      </label>
+      <button id="listen-instructions-btn" class="instruction-btn">Hear Instructions</button>
+      <button id="fullscreen-btn" class="instruction-btn">Fullscreen</button>
+      <button id="theme-toggle" class="instruction-btn">Change Theme</button>
     </div>
   </header>
 
   <main class="game-container" id="game-container">
-    <section id="puzzle-container" role="region" aria-label="Current Puzzle" aria-live="polite"></section>
+    <section id="puzzle-container" role="region" aria-live="polite"></section>
     <section id="progress-bar-container">
       <div id="progress-bar">
         <span id="progress-label">
-          <img src="images/star.png" alt="Star" class="progress-icon" /> Puzzle 1/10
+          <img src="images/star.png" alt="Star" class="progress-icon" />
+          Puzzle 1/10
         </span>
       </div>
     </section>
@@ -66,16 +73,18 @@
     <section id="gamification-panel">
       <p id="xp-display">XP: 0</p>
       <p id="streak-display">Streak: 0</p>
-      <div id="badges-container">Badges: <span id="badges-list"></span></div>
+      <div id="badges-container">
+        Badges: <span id="badges-list"></span>
+      </div>
     </section>
     <nav class="nav-buttons">
-      <button id="prev-btn" aria-label="Previous Puzzle">Back</button>
-      <button id="hint-btn" aria-label="Get a Hint">Get a Hint</button>
-      <button id="submit-btn" disabled aria-label="Check Answer">Check Answer</button>
-      <button id="try-again-btn" style="display: none;" aria-label="Try Again">Try Again</button>
-      <button id="next-btn" aria-label="Next Puzzle">Next</button>
-      <button id="clear-btn" aria-label="Clear Drop Zone">Clear</button>
-      <button id="learn-btn" aria-label="Learn Sentence Basics">Learn</button>
+      <button id="prev-btn">Back</button>
+      <button id="hint-btn">Get a Hint</button>
+      <button id="submit-btn" disabled>Check Answer</button>
+      <button id="try-again-btn" style="display:none">Try Again</button>
+      <button id="next-btn">Next</button>
+      <button id="clear-btn">Clear</button>
+      <button id="learn-btn">Learn</button>
     </nav>
     <div class="feedback">
       <p id="progress"></p>
@@ -83,28 +92,26 @@
       <p id="hint"></p>
       <p id="success-message" aria-live="polite"></p>
     </div>
-    <button id="reset-btn" aria-label="Start Over">Start Over</button>
+    <button id="reset-btn">Start Over</button>
   </main>
 
-  <audio id="success-sound" src="/sounds/success.mp3" preload="auto"></audio>
-  <audio id="error-sound" src="/sounds/error.mp3" preload="auto"></audio>
+  <!-- Audio (relative paths) -->
+  <audio id="success-sound" src="sounds/success.mp3" preload="auto"></audio>
+  <audio id="error-sound"   src="sounds/error.mp3"   preload="auto"></audio>
 
   <script src="script.js" defer></script>
   <script>
     document.addEventListener("DOMContentLoaded", () => {
-      const script = document.createElement("script");
-      script.src = "https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js";
-      script.onload = () => {
-        const mascot = document.getElementById("mascot");
-        if (mascot) {
-          gsap.to(mascot, { duration: 2, rotation: 360, ease: "power1.inOut", repeat: -1 });
-        }
-      };
-      document.body.appendChild(script);
+      // Load GSAP for animations
+      const s = document.createElement("script");
+      s.src = "https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js";
+      document.body.appendChild(s);
+
+      // Register service worker (will fail silently if missing)
       if ("serviceWorker" in navigator) {
-        navigator.serviceWorker.register("/service-worker.js")
-          .then(() => console.log("Service Worker registered"))
-          .catch(err => console.error("Service Worker registration failed:", err));
+        navigator.serviceWorker
+          .register("service-worker.js")
+          .catch(() => {});
       }
     });
   </script>
