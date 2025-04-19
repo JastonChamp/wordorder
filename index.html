@@ -9,9 +9,23 @@
     rel="stylesheet"
   />
   <link rel="manifest" href="/manifest.json" />
-  <link rel="stylesheet" href="styles.css?v=12" />
+  <link rel="stylesheet" href="styles.css?v=13" />
 </head>
 <body>
+  <!-- Tutorial Overlay (first‑time users only) -->
+  <div id="tutorial-overlay" class="hidden">
+    <div id="tutorial-content">
+      <h2>Welcome to Word Order Adventure!</h2>
+      <ol>
+        <li>Drag words from the bank into the drop zone.</li>
+        <li>Tap “Check Answer” to see if you got it right.</li>
+        <li>Use one free hint per puzzle from the Hint button.</li>
+        <li>Earn XP, badges and level up as you master sentences!</li>
+      </ol>
+      <button id="tutorial-next">Got it!</button>
+    </div>
+  </div>
+
   <header>
     <h1>Word Order Adventure</h1>
     <p class="instructions">
@@ -74,13 +88,13 @@
 
   <audio id="success-sound" src="/sounds/success.mp3" preload="auto"></audio>
   <audio id="error-sound" src="/sounds/error.mp3" preload="auto"></audio>
+
   <script src="script.js" defer></script>
   <script>
     document.addEventListener("DOMContentLoaded", () => {
       const script = document.createElement("script");
       script.src = "https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js";
       script.onload = () => {
-        console.log("GSAP loaded");
         const mascot = document.getElementById("mascot");
         if (mascot) {
           gsap.to(mascot, { duration: 2, rotation: 360, ease: "power1.inOut", repeat: -1 });
