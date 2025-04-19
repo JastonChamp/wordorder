@@ -1,7 +1,7 @@
 // script.js
 "use strict";
 
-// ── Sanity check ─────────────────────────────────────────────────────────────
+// ── Sanity check ────────────────────────────────────────────────────────────
 console.log("✅ script.js loaded");
 
 // ── WebAudio “beep” for success ─────────────────────────────────────────────
@@ -20,7 +20,7 @@ function playSuccessSound() {
   osc.stop(ctx.currentTime + 0.3);
 }
 
-// ── WebAudio “buzz” for error ────────────────────────────────────────────────
+// ── WebAudio “buzz” for error ───────────────────────────────────────────────
 function playErrorSound() {
   const ctx = new (window.AudioContext || window.webkitAudioContext)();
   const osc = ctx.createOscillator();
@@ -45,9 +45,9 @@ function playErrorSound() {
     const loadVoices = () => {
       const v = window.speechSynthesis.getVoices();
       u.voice =
-        v.find(x => x.lang==="en-GB" && x.name.includes("Female")) ||
-        v.find(x => x.lang==="en-US" && (x.name.includes("Samantha")||x.name.includes("Victoria"))) ||
-        v.find(x => x.lang==="en-AU" && x.name.includes("Karen")) ||
+        v.find(x => x.lang === "en-GB" && x.name.includes("Female")) ||
+        v.find(x => x.lang === "en-US" && (x.name.includes("Samantha") || x.name.includes("Victoria"))) ||
+        v.find(x => x.lang === "en-AU" && x.name.includes("Karen")) ||
         v[0];
       u.rate = 0.9;
       u.pitch = 1.1;
@@ -219,7 +219,7 @@ function playErrorSound() {
     "Jamil shares a recipe from his culture."
   ];
 
-  // ==== Utilities ====
+  // ==== Utilities ====  
   const shuffle = arr => arr.sort(() => Math.random() - 0.5);
 
   function getWordRole(word, idx, arr) {
@@ -230,14 +230,14 @@ function playErrorSound() {
     return "other";
   }
 
-  // ==== State ====
+  // ==== State ====  
   const sessionLength = 10;
   let puzzles = [], currentIndex = 0;
   let score = 0, xp = parseInt(localStorage.getItem("xp")) || 0;
   let streak = parseInt(localStorage.getItem("streak")) || 0;
   let badges = JSON.parse(localStorage.getItem("badges")) || [];
   let hintCount = 0, timeLeft = 30, timerId = null;
-  let attempts = 0, correctCount = 0;
+  let attemptsCount = 0, correctCount = 0;
   const today = new Date().toDateString();
   let currentLevel = localStorage.getItem("currentLevel") || "p3";
 
@@ -246,12 +246,12 @@ function playErrorSound() {
     if (localStorage.getItem("lastPlayDate") !== y.toDateString()) streak = 0;
   }
 
-  function updateGamification() {
+  function updateGamificationPanel() {
     document.getElementById("xp-display").textContent     = `XP: ${xp}`;
     document.getElementById("streak-display").textContent = `Streak: ${streak}`;
     const bl = document.getElementById("badges-list");
     bl.innerHTML = badges.length
-      ? badges.map(b=>`<img src="images/${b.toLowerCase().replace(/ /g,"-")}.png" alt="${b}" class="badge-icon">`).join("")
+      ? badges.map(b => `<img src="images/${b.toLowerCase().replace(/ /g,"-")}.png" alt="${b}" class="badge-icon">`).join("")
       : "None";
     localStorage.setItem("xp", xp);
     localStorage.setItem("streak", streak);
@@ -260,23 +260,26 @@ function playErrorSound() {
     localStorage.setItem("currentLevel", currentLevel);
   }
 
-  function getSentences(level) {
-    return {p1:sentencesP1,p2:sentencesP2,p3:sentencesP3,p4:sentencesP4,p5:sentencesP5,p6:sentencesP6}[level];
+  function getSentencesForLevel(lvl) {
+    return { p1: sentencesP1, p2: sentencesP2, p3: sentencesP3, p4: sentencesP4, p5: sentencesP5, p6: sentencesP6 }[lvl];
   }
 
   function generatePuzzles() {
-    const pool = getSentences(currentLevel);
+    const pool = getSentencesForLevel(currentLevel);
     puzzles = shuffle(pool.slice()).slice(0, sessionLength).map(s => ({
       correct: s.split(" "),
       submitted: false,
-      user: [],
-      tries: 0
+      userAnswer: [],
+      attempts: 0
     }));
-    currentIndex = 0; score = 0; attempts = 0; correctCount = 0; hintCount = 0;
-    updateGamification();
+    currentIndex = 0; score = 0; attemptsCount = 0; correctCount = 0; hintCount = 0;
+    updateGamificationPanel();
   }
 
-  function clearTimer() { if (timerId) clearInterval(timerId); timerId = null; }
+  function clearTimer() {
+    if (timerId) clearInterval(timerId);
+    timerId = null;
+  }
   function startTimer() {
     if (!document.getElementById("timer-mode").checked) return;
     clearTimer(); timeLeft = 30;
@@ -288,183 +291,230 @@ function playErrorSound() {
         submitAnswer();
         nextPuzzle();
       }
-    },1000);
+    }, 1000);
   }
 
-  // ==== Rendering & Interaction ====
-  function displayPuzzle() {
+  // ==== Display Puzzle ====
+  function displayCurrentPuzzle() {
     const container = document.getElementById("puzzle-container");
     container.innerHTML = "";
     clearTimer();
 
     if (currentIndex >= puzzles.length) {
-      const rate = correctCount/attempts;
-      if (attempts>=sessionLength && rate>=0.8) {
-        container.innerHTML = "<p>Well done! You've mastered this level! Review?</p>";
-        startReview();
+      const ratio = correctCount / attemptsCount;
+      if (attemptsCount >= sessionLength && ratio >= 0.8) {
+        container.innerHTML = "<p>Well done! You've mastered this level! Ready for review?</p>";
+        startReviewSession();
       } else {
-        container.innerHTML = "<p>Keep practicing to master this level!</p>";
-        generatePuzzles(); displayPuzzle();
+        container.innerHTML = "<p>Keep practicing to master this level.</p>";
+        generatePuzzles(); displayCurrentPuzzle();
       }
       return;
     }
 
     const p = puzzles[currentIndex];
-    const wrapper = document.createElement("div"); wrapper.className="sentence-container";
+    p.attempts++;
+
+    // Create containers
+    const card = document.createElement("div"); card.className = "sentence-container";
     const header = document.createElement("h3");
     header.textContent = `Puzzle ${currentIndex+1} of ${sessionLength}`;
-    wrapper.appendChild(header);
+    card.appendChild(header);
 
-    const bank = document.createElement("div"); bank.className="word-bank";
-    const drop = document.createElement("div"); drop.className="drop-zone";
+    const bank = document.createElement("div"); bank.className = "word-bank";
+    const drop = document.createElement("div"); drop.className = "drop-zone";
 
-    [bank,drop].forEach(z => {
-      z.addEventListener("dragover",e=>{e.preventDefault();z.classList.add("active");});
-      z.addEventListener("dragleave",e=>z.classList.remove("active"));
-      z.addEventListener("drop",e=>{
-        e.preventDefault(); z.classList.remove("active");
-        if (!window.dragged) return;
-        const ph = drop.querySelector(".drop-placeholder"); if (ph) ph.remove();
-        drop.appendChild(window.dragged);
-        checkCompletion();
+    [bank, drop].forEach(zone => {
+      zone.addEventListener("dragover", e => { e.preventDefault(); zone.classList.add("active"); });
+      zone.addEventListener("dragleave", e => { zone.classList.remove("active"); });
+      zone.addEventListener("drop", e => {
+        e.preventDefault(); zone.classList.remove("active");
+        if (window.draggedWord) {
+          if (drop.querySelector(".drop-placeholder")) drop.querySelector(".drop-placeholder").remove();
+          drop.appendChild(window.draggedWord);
+          checkCompletion();
+        }
       });
     });
 
     if (!p.submitted) {
       shuffle(p.correct).forEach(w => {
-        const d = document.createElement("div"); d.className="word"; d.textContent=w;
-        d.draggable = true;
-        d.addEventListener("dragstart",e=>{window.dragged=e.target;});
-        d.addEventListener("dragend",e=>{window.dragged=null;});
-        bank.appendChild(d);
+        const tile = document.createElement("div"); tile.className = "word"; tile.textContent = w;
+        tile.draggable = true;
+        tile.addEventListener("dragstart", e => { window.draggedWord = tile; });
+        tile.addEventListener("dragend", e => { window.draggedWord = null; });
+        bank.appendChild(tile);
       });
-      const ph = document.createElement("div"); ph.className="drop-placeholder";
-      ph.textContent = "Drag words here to build your sentence!";
-      drop.appendChild(ph);
+      const placeholder = document.createElement("div"); placeholder.className = "drop-placeholder";
+      placeholder.textContent = "Drag words here to build your sentence!";
+      drop.appendChild(placeholder);
     } else {
-      p.user.forEach((w,i) => {
-        const d = document.createElement("div"); d.className="word";
-        d.textContent = w;
-        if (w===p.correct[i]) d.classList.add("correct");
+      p.userAnswer.forEach((w, i) => {
+        const tile = document.createElement("div"); tile.className = "word"; tile.textContent = w;
+        const correctW = p.correct[i];
+        if (w === correctW) tile.classList.add("correct");
         else {
-          d.classList.add("incorrect");
-          d.dataset.correct = p.correct[i];
-          d.addEventListener("click",fixWord);
+          tile.classList.add("incorrect");
+          tile.dataset.correctWord = correctW;
+          tile.addEventListener("click", correctWordHandler);
         }
-        drop.appendChild(d);
+        drop.appendChild(tile);
       });
     }
 
-    wrapper.appendChild(bank);
-    wrapper.appendChild(drop);
-    container.appendChild(wrapper);
+    card.appendChild(bank);
+    card.appendChild(drop);
+    container.appendChild(card);
 
-    document.getElementById("submit-btn").disabled = !drop.children.length || p.submitted;
+    // Update UI        
+    document.getElementById("submit-btn").disabled = p.submitted;
+    updateProgressUI();
+
     startTimer();
-    updateProgress();
   }
 
-  function updateProgress() {
+  function checkCompletion() {
+    const drop = document.querySelector(".drop-zone");
+    const btn = document.getElementById("submit-btn");
+    if (!drop || drop.children.length === 0) return;
+    btn.disabled = drop.children.length !== puzzles[currentIndex].correct.length;
+  }
+
+  function updateProgressUI() {
     document.getElementById("progress-bar").style.width =
       `${((currentIndex+1)/sessionLength)*100}%`;
     document.getElementById("progress-label").innerHTML =
-      `<img src="images/star.png" class="progress-icon" alt="Star"> Puzzle ${currentIndex+1}/${sessionLength}`;
+      `<img src=\"images/star.png\" class=\"progress-icon\" alt=\"Star\"> Puzzle ${currentIndex+1}/${sessionLength}`;
     document.getElementById("progress-indicator").textContent =
-      `Mastery Progress: ${attempts>0?Math.round((correctCount/attempts)*100):0}% (80% to advance)`;
+      `Mastery Progress: ${attemptsCount>0 ? Math.round((correctCount/attemptsCount)*100) : 0}% (80% to advance)`;
     document.getElementById("score").textContent = `Score: ${score}`;
   }
 
+  // ==== Hint ====
   function showHint() {
     const p = puzzles[currentIndex];
-    const words = Array.from(document.querySelectorAll(".word-bank .word"));
-    if (hintCount===0) {
-      hintCount++; const sub=p.correct[0];
-      document.getElementById("hint").textContent = `Subject: ${sub}`;
-      words.filter(w=>w.textContent===sub).forEach(w=>w.classList.add("hint"));
-    } else if (hintCount===1) {
-      hintCount++; const vi=p.correct.findIndex((w,i)=>getWordRole(w,i,p.correct)==="verb");
-      const v=p.correct[vi];
-      document.getElementById("hint").textContent = `Verb: ${v}`;
-      words.filter(w=>w.textContent===v).forEach(w=>w.classList.add("hint"));
+    const bankTiles = Array.from(document.querySelectorAll(".word-bank .word"));
+    if (hintCount === 0) {
+      hintCount++;
+      const subj = p.correct[0];
+      document.getElementById("hint").textContent = `Subject: ${subj}`;
+      bankTiles.filter(t => t.textContent === subj).forEach(t => t.classList.add("hint"));
+    } else if (hintCount === 1) {
+      hintCount++;
+      const vi = p.correct.findIndex((w, i) => getWordRole(w, i, p.correct) === "verb");
+      const verb = p.correct[vi];
+      document.getElementById("hint").textContent = `Verb: ${verb}`;
+      bankTiles.filter(t => t.textContent === verb).forEach(t => t.classList.add("hint"));
     } else {
       document.getElementById("hint").textContent = "No more hints!";
     }
-    xp -= hintCount*2; updateGamification();
+    xp = Math.max(0, xp - hintCount*2);
+    updateGamificationPanel();
   }
 
+  // ==== Submit Answer (normalized) ====
   function submitAnswer() {
-    const p = puzzles[currentIndex], drop=document.querySelector(".drop-zone");
-    const userAns = Array.from(drop.children).map(w=>w.textContent);
-    p.submitted=true; p.user = userAns;
-    attempts++;
-    const punct = /[.!?]$/.test(userAns.at(-1));
-    const correct = userAns.join(" ")===p.correct.join(" ");
-    if (correct && punct) {
-      score++; correctCount++; streak++; xp+=10;
+    const p = puzzles[currentIndex];
+    const drop = document.querySelector(".drop-zone");
+    // raw student words
+    const raw = Array.from(drop.children).map(w => w.textContent);
+    // normalize
+    const normalized = raw.map((w, i) => {
+      if (i === 0) {
+        const lw = w.toLowerCase().replace(/[.!?]$/, "");
+        return lw.charAt(0).toUpperCase() + lw.slice(1);
+      }
+      return w;
+    });
+    // ensure punctuation
+    const li = normalized.length - 1;
+    if (!/[.!?]$/.test(normalized[li])) normalized[li] += ".";
+
+    p.submitted = true;
+    p.userAnswer = normalized;
+    attemptsCount++;
+
+    const correct = normalized.join(" ") === p.correct.join(" ");
+
+    // color words
+    Array.from(drop.children).forEach((tile, i) => {
+      const cw = p.correct[i];
+      if (normalized[i] === cw) {
+        tile.classList.add("correct");
+        correctCount++;
+      } else {
+        tile.classList.add("incorrect");
+        tile.dataset.correctWord = cw;
+        tile.addEventListener("click", correctWordHandler);
+      }
+    });
+
+    // feedback
+    if (correct) {
+      score++; streak++; xp += 10;
       playSuccessSound();
-      document.getElementById("success-message").textContent="✓ Correct!";
+      document.getElementById("success-message").textContent = "✓ You got it!";
     } else {
-      streak=0; xp-=5;
+      streak = 0;
       playErrorSound();
-      document.getElementById("hint").textContent="Try again!";
+      document.getElementById("hint").textContent = "Oops, check again!";
     }
-    updateGamification();
-    setTimeout(displayPuzzle,500);
+    updateGamificationPanel();
+    // toggle buttons
+    document.getElementById("submit-btn").style.display = "none";
+    document.getElementById("try-again-btn").style.display = "inline-block";
   }
 
-  function fixWord(e) {
-    const el=e.target;
-    el.textContent=el.dataset.correct;
-    el.classList.replace("incorrect","correct");
+  function correctWordHandler(e) {
+    const tile = e.target;
+    const correctText = tile.dataset.correctWord;
+    tile.textContent = correctText;
+    tile.classList.replace("incorrect", "correct");
   }
 
-  function nextPuzzle() {
-    currentIndex++; hintCount=0; displayPuzzle();
+  // ==== Navigation ====
+  function nextPuzzle() { currentIndex++; displayCurrentPuzzle(); }
+  function prevPuzzle() { if (currentIndex>0) currentIndex--; displayCurrentPuzzle(); }
+  function clearDropZone() {
+    const dz = document.querySelector(".drop-zone");
+    dz.innerHTML = "<div class=\"drop-placeholder\">Drag words here to build your sentence!</div>";
+    displayCurrentPuzzle();
   }
-  function prevPuzzle() {
-    if(currentIndex>0) currentIndex--; displayPuzzle();
-  }
-  function clearZone() {
-    document.querySelector(".drop-zone").innerHTML="";
-    displayPuzzle();
-  }
+  function resetQuiz() { generatePuzzles(); displayCurrentPuzzle(); }
 
-  function resetQuiz() {
-    generatePuzzles(); displayPuzzle();
-  }
-
-  function startReview() {
-    // mix previous and current level
-    displayPuzzle();
+  function startReviewSession() {
+    // implement if needed
+    generatePuzzles(); displayCurrentPuzzle();
   }
 
   function toggleTheme() {
-    document.body.classList.toggle("dark-theme");
+    document.body.classList.toggle("rainbow-theme");
   }
   function toggleFullScreen() {
-    if(!document.fullscreenElement) document.documentElement.requestFullscreen();
+    if (!document.fullscreenElement) document.documentElement.requestFullscreen();
     else document.exitFullscreen();
   }
 
   // ── Wire up once DOM is ready ──────────────────────────────────────────────
   window.addEventListener("DOMContentLoaded", () => {
     console.log("✅ DOMContentLoaded – attaching handlers");
-    document.getElementById("hint-btn")        .addEventListener("click", showHint);
-    document.getElementById("submit-btn")      .addEventListener("click", submitAnswer);
-    document.getElementById("next-btn")        .addEventListener("click", nextPuzzle);
-    document.getElementById("prev-btn")        .addEventListener("click", prevPuzzle);
-    document.getElementById("clear-btn")       .addEventListener("click", clearZone);
-    document.getElementById("reset-btn")       .addEventListener("click", resetQuiz);
-    document.getElementById("theme-toggle")    .addEventListener("click", toggleTheme);
-    document.getElementById("fullscreen-btn")  .addEventListener("click", toggleFullScreen);
-    document.getElementById("level-select")    .addEventListener("change", resetQuiz);
+    document.getElementById("hint-btn").addEventListener("click", showHint);
+    document.getElementById("submit-btn").addEventListener("click", () => submitAnswer());
+    document.getElementById("try-again-btn").addEventListener("click", () => displayCurrentPuzzle());
+    document.getElementById("next-btn").addEventListener("click", nextPuzzle);
+    document.getElementById("prev-btn").addEventListener("click", prevPuzzle);
+    document.getElementById("clear-btn").addEventListener("click", clearDropZone);
+    document.getElementById("reset-btn").addEventListener("click", resetQuiz);
+    document.getElementById("level-select").addEventListener("change", resetQuiz);
+    document.getElementById("theme-toggle").addEventListener("click", toggleTheme);
+    document.getElementById("fullscreen-btn").addEventListener("click", toggleFullScreen);
+
     generatePuzzles();
-    displayPuzzle();
+    displayCurrentPuzzle();
   });
 
-  // ── Register Service Worker ───────────────────────────────────────────────
+  // ── Register Service Worker ──────────────────────────────────────────────
   if ("serviceWorker" in navigator) {
-    navigator.serviceWorker.register("service-worker.js").catch(()=>{});
+    navigator.serviceWorker.register("service-worker.js").catch(() => {});
   }
-
-})();  // end IIFE
+})();
