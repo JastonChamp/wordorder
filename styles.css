@@ -1,3 +1,4 @@
+/* styles.css */
 :root {
   --primary-color: #ff6f61;
   --secondary-color: #ff9f1c;
@@ -484,17 +485,4 @@ h1 {
 @keyframes confetti-fall {
   0% { transform: translateY(0) rotate(0deg); opacity: 1; }
   100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
-}
-
-/* 3) Mobile: horizontal scroll word bank (redundant but safe) */
-@media (max-width: 600px) {
-  .word-bank {
-    display: flex !important;
-    overflow-x: auto;
-    padding-bottom: 10px;
-  }
-  .word-bank .word {
-    flex: 0 0 auto;
-    margin-right: 15px;
-  }
 }
