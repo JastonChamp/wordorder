@@ -1,16 +1,15 @@
-```javascript
 // script.js
 "use strict";
 
-// ── WebAudio “beep” for success ─────────────────────────────────────────────
+/* ────────────────────────────────────────────────────────────────────────── */
+/*  WebAudio “beep” and “buzz” so you never need external .mp3 files       */
+/* ────────────────────────────────────────────────────────────────────────── */
 function playSuccessSound() {
   const ctx = new (window.AudioContext || window.webkitAudioContext)();
-  const osc = ctx.createOscillator();
-  const gain = ctx.createGain();
-  osc.connect(gain);
-  gain.connect(ctx.destination);
+  const osc = ctx.createOscillator(), gain = ctx.createGain();
+  osc.connect(gain); gain.connect(ctx.destination);
   osc.type = "sine";
-  osc.frequency.setValueAtTime(880, ctx.currentTime);
+  osc.frequency.value = 880;
   gain.gain.setValueAtTime(0, ctx.currentTime);
   gain.gain.linearRampToValueAtTime(0.2, ctx.currentTime + 0.01);
   gain.gain.linearRampToValueAtTime(0, ctx.currentTime + 0.3);
@@ -18,15 +17,12 @@ function playSuccessSound() {
   osc.stop(ctx.currentTime + 0.3);
 }
 
-// ── WebAudio “buzz” for error ────────────────────────────────────────────────
 function playErrorSound() {
   const ctx = new (window.AudioContext || window.webkitAudioContext)();
-  const osc = ctx.createOscillator();
-  const gain = ctx.createGain();
-  osc.connect(gain);
-  gain.connect(ctx.destination);
+  const osc = ctx.createOscillator(), gain = ctx.createGain();
+  osc.connect(gain); gain.connect(ctx.destination);
   osc.type = "square";
-  osc.frequency.setValueAtTime(220, ctx.currentTime);
+  osc.frequency.value = 220;
   gain.gain.setValueAtTime(0, ctx.currentTime);
   gain.gain.linearRampToValueAtTime(0.2, ctx.currentTime + 0.01);
   gain.gain.linearRampToValueAtTime(0, ctx.currentTime + 0.3);
@@ -34,29 +30,33 @@ function playErrorSound() {
   osc.stop(ctx.currentTime + 0.3);
 }
 
-// ── Speech Synthesis ────────────────────────────────────────────────────────
+/* ────────────────────────────────────────────────────────────────────────── */
+/*  Speech Synthesis for instructions & hints                                */
+/* ────────────────────────────────────────────────────────────────────────── */
 function speak(text) {
-  if (!("speechSynthesis" in window)) return;
+  if (!window.speechSynthesis) return;
   const u = new SpeechSynthesisUtterance(text);
-  const load = () => {
-    const v = speechSynthesis.getVoices();
+  const pickVoice = () => {
+    const voices = speechSynthesis.getVoices();
     u.voice =
-      v.find(x => x.lang === "en-GB" && x.name.includes("Female")) ||
-      v.find(x => x.lang === "en-US" && /Samantha|Victoria/i.test(x.name)) ||
-      v.find(x => x.lang === "en-AU" && x.name.includes("Karen")) ||
-      v[0];
+      voices.find(v => v.lang === "en-GB" && /Female/.test(v.name)) ||
+      voices.find(v => v.lang === "en-US" && /Samantha|Victoria/.test(v.name)) ||
+      voices.find(v => v.lang === "en-AU" && /Karen/.test(v.name)) ||
+      voices[0];
     u.rate = 0.9;
     u.pitch = 1.1;
     speechSynthesis.speak(u);
   };
   if (!speechSynthesis.getVoices().length) {
-    speechSynthesis.onvoiceschanged = load;
+    speechSynthesis.onvoiceschanged = pickVoice;
   } else {
-    load();
+    pickVoice();
   }
 }
 
-// ── Sentence Pools ─────────────────────────────────────────────────────────
+/* ────────────────────────────────────────────────────────────────────────── */
+/*  Sentence pools for Primary 1–6 (24 each = 144 total)                     */
+/* ────────────────────────────────────────────────────────────────────────── */
 const sentencesP1 = [
   "Doreen had a huge birthday party.",
   "We can go out to play.",
@@ -214,64 +214,67 @@ const sentencesP6 = [
   "Jamil shares a recipe from his culture."
 ];
 
-// ── Utility ──────────────────────────────────────────────────────────────────
+/* ────────────────────────────────────────────────────────────────────────── */
+/*  Utility to shuffle an array (Fisher–Yates)                              */
+/* ────────────────────────────────────────────────────────────────────────── */
 function shuffle(arr) {
-  return arr.sort(() => Math.random() - 0.5);
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
 }
 
-// ── State ───────────────────────────────────────────────────────────────────
+/* ────────────────────────────────────────────────────────────────────────── */
+/*  Game state & persistence                                                */
+/* ────────────────────────────────────────────────────────────────────────── */
 const sessionLength = 10;
-let puzzles = [],
-    currentIndex = 0,
-    score = 0,
-    xp = 0,
-    streak = 0,
-    attempts = 0,
-    correctCount = 0,
-    hintCount = 0,
-    timerId = null,
-    timeLeft = 30,
-    currentLevel = localStorage.getItem("currentLevel") || "p3";
+let puzzles = [], currentIndex = 0;
+let score = 0, xp = parseInt(localStorage.getItem("xp")) || 0;
+let streak = parseInt(localStorage.getItem("streak")) || 0;
+let attempts = 0, correctCount = 0, hintCount = 0;
+let badges = JSON.parse(localStorage.getItem("badges")) || [];
+let timerId = null, timeLeft = 30;
+let currentLevel = localStorage.getItem("currentLevel") || "p3";
 
-// Save and update gamification
 function saveState() {
   localStorage.setItem("xp", xp);
   localStorage.setItem("streak", streak);
+  localStorage.setItem("badges", JSON.stringify(badges));
   localStorage.setItem("currentLevel", currentLevel);
 }
+
 function updateGamification() {
   document.getElementById("xp-display").textContent = `XP: ${xp}`;
   document.getElementById("streak-display").textContent = `Streak: ${streak}`;
   document.getElementById("score").textContent = `Score: ${score}`;
+  const bl = document.getElementById("badges-list");
+  bl.innerHTML = badges.length
+    ? badges.map(b => `<img src="images/${b.toLowerCase().replace(/ /g,"-")}.png" class="badge-icon" alt="${b}">`).join("")
+    : "None";
   saveState();
 }
 
-// Fetch pool by level
-function getPool(lvl) {
-  return {
-    p1: sentencesP1,
-    p2: sentencesP2,
-    p3: sentencesP3,
-    p4: sentencesP4,
-    p5: sentencesP5,
-    p6: sentencesP6
-  }[lvl];
-}
-
-// Generate puzzles
+/* ────────────────────────────────────────────────────────────────────────── */
+/*  Build a fresh list of puzzles for the session                           */
+/* ────────────────────────────────────────────────────────────────────────── */
 function generatePuzzles() {
-  const pool = getPool(currentLevel);
+  const pool = ({p1: sentencesP1, p2: sentencesP2, p3: sentencesP3,
+                 p4: sentencesP4, p5: sentencesP5, p6: sentencesP6})[currentLevel];
   puzzles = shuffle(pool.slice()).slice(0, sessionLength).map(s => ({
     correct: s.split(" "),
     submitted: false
   }));
   currentIndex = 0;
-  score = xp = streak = attempts = correctCount = hintCount = 0;
+  score = attempts = correctCount = hintCount = 0;
+  streak = badges = 0;
   updateGamification();
   displayPuzzle();
 }
 
-// Timer control
+/* ────────────────────────────────────────────────────────────────────────── */
+/*  Timer for timed mode                                                     */
+/* ────────────────────────────────────────────────────────────────────────── */
 function clearTimer() {
   if (timerId) clearInterval(timerId);
   timerId = null;
@@ -291,26 +294,28 @@ function startTimer() {
   }, 1000);
 }
 
-// Display puzzle
+/* ────────────────────────────────────────────────────────────────────────── */
+/*  Render current puzzle                                                    */
+/* ────────────────────────────────────────────────────────────────────────── */
 function displayPuzzle() {
   clearTimer();
   const p = puzzles[currentIndex];
-  const container = document.getElementById("puzzle-container");
-  container.innerHTML = "";
+  const cont = document.getElementById("puzzle-container");
+  cont.innerHTML = "";
   document.getElementById("hint").textContent = "";
   document.getElementById("success-message").textContent = "";
 
+  // card
   const card = document.createElement("div");
   card.className = "sentence-container";
-  const h3 = document.createElement("h3");
-  h3.textContent = `Puzzle ${currentIndex+1} of ${sessionLength}`;
-  card.appendChild(h3);
+  card.innerHTML = `<h3>Puzzle ${currentIndex+1} of ${sessionLength}</h3>`;
 
   const bank = document.createElement("div");
   bank.className = "word-bank";
   const drop = document.createElement("div");
   drop.className = "drop-zone";
 
+  // drag/drop handlers
   [bank, drop].forEach(zone => {
     zone.addEventListener("dragover", e => { e.preventDefault(); zone.classList.add("active"); });
     zone.addEventListener("dragleave", e => zone.classList.remove("active"));
@@ -318,8 +323,7 @@ function displayPuzzle() {
       e.preventDefault();
       zone.classList.remove("active");
       if (window.draggedWord) {
-        const ph = drop.querySelector(".drop-placeholder");
-        if (ph) ph.remove();
+        drop.querySelector(".drop-placeholder")?.remove();
         drop.appendChild(window.draggedWord);
         checkComplete();
       }
@@ -327,14 +331,16 @@ function displayPuzzle() {
   });
 
   if (!p.submitted) {
+    // populate bank
     shuffle(p.correct).forEach(w => {
       const d = document.createElement("div");
       d.className = "word";
       d.textContent = w;
       d.draggable = true;
-      d.addEventListener("dragstart", () => { window.draggedWord = d; });
+      d.addEventListener("dragstart", () => (window.draggedWord = d));
       bank.appendChild(d);
     });
+    // placeholder
     const ph = document.createElement("div");
     ph.className = "drop-placeholder";
     ph.textContent = "Drag words here to build your sentence!";
@@ -343,29 +349,30 @@ function displayPuzzle() {
 
   card.appendChild(bank);
   card.appendChild(drop);
-  container.appendChild(card);
+  cont.appendChild(card);
 
-  // Buttons reset
-  const submitBtn = document.getElementById("submit-btn");
-  const tryAgainBtn = document.getElementById("try-again-btn");
-  submitBtn.style.display = "inline-block";
-  submitBtn.disabled = p.submitted;
-  tryAgainBtn.style.display = "none";
+  // reset buttons
+  const subBtn = document.getElementById("submit-btn");
+  const tryBtn = document.getElementById("try-again-btn");
+  subBtn.style.display = "inline-block";
+  subBtn.disabled = p.submitted;
+  tryBtn.style.display = "none";
 
   updateProgress();
   startTimer();
 }
 
-// Check complete
 function checkComplete() {
   const drop = document.querySelector(".drop-zone");
   document.getElementById("submit-btn").disabled =
     drop.children.length !== puzzles[currentIndex].correct.length;
 }
 
-// Update progress bar
+/* ────────────────────────────────────────────────────────────────────────── */
+/*  Update progress bar & mastery                                              */
+/* ────────────────────────────────────────────────────────────────────────── */
 function updateProgress() {
-  const pct = ((currentIndex+1)/sessionLength)*100;
+  const pct = Math.round(((currentIndex+1)/sessionLength)*100);
   document.getElementById("progress-bar").style.width = `${pct}%`;
   document.getElementById("progress-label").innerHTML =
     `<img src="images/star.png" class="progress-icon" alt="Star"> Puzzle ${currentIndex+1}/${sessionLength}`;
@@ -373,51 +380,61 @@ function updateProgress() {
     `Mastery Progress: ${attempts>0?Math.round((correctCount/attempts)*100):0}% (80% to advance)`;
 }
 
-// Show hint
+/* ────────────────────────────────────────────────────────────────────────── */
+/*  Provide one hint (subject only)                                             */
+/* ────────────────────────────────────────────────────────────────────────── */
 function showHint() {
   const p = puzzles[currentIndex];
-  const bankWords = Array.from(document.querySelectorAll(".word-bank .word"));
   if (hintCount === 0) {
     hintCount++;
-    const subj = p.correct[0];
-    document.getElementById("hint").textContent = `Subject: "${subj}"`;
-    speak(`Subject: ${subj}`);
-    bankWords.filter(w => w.textContent === subj).forEach(w => {
-      w.classList.add("hint-subject");
-      setTimeout(() => w.classList.remove("hint-subject"), 3000);
-    });
+    const sub = p.correct[0];
+    document.getElementById("hint").textContent = `Subject: "${sub}"`;
+    speak(`Subject: ${sub}`);
+    document.querySelectorAll(".word-bank .word")
+      .forEach(w => {
+        if (w.textContent === sub) {
+          w.classList.add("hint-subject");
+          setTimeout(() => w.classList.remove("hint-subject"), 3000);
+        }
+      });
+    xp = Math.max(0, xp - 2);
+    updateGamification();
   } else {
     document.getElementById("hint").textContent = "No more hints!";
     speak("No more hints!");
   }
-  xp = Math.max(0, xp - hintCount*2);
-  updateGamification();
 }
 
-// Submit answer
+/* ────────────────────────────────────────────────────────────────────────── */
+/*  Check answer                                                              */
+/* ────────────────────────────────────────────────────────────────────────── */
 function submitAnswer() {
   clearTimer();
   const p = puzzles[currentIndex];
   const raw = Array.from(document.querySelectorAll(".drop-zone .word"))
                    .map(d => d.textContent);
 
-  // Normalize
-  const normalized = raw.map((w,i) => {
-    if (i === 0) {
+  // normalize first + punctuation
+  const norm = raw.map((w,i) => {
+    if (i===0) {
       const lw = w.toLowerCase().replace(/[.!?]$/,"");
-      return lw.charAt(0).toUpperCase() + lw.slice(1);
+      return lw.charAt(0).toUpperCase()+lw.slice(1);
     }
     return w;
   });
-  const last = normalized.length - 1;
-  if (!/[.!?]$/.test(normalized[last])) normalized[last] += ".";
+  const last = norm.length-1;
+  if (!/[.!?]$/.test(norm[last])) norm[last]+=".";
 
   p.submitted = true;
   attempts++;
 
-  const correct = p.correct;
-  const isCorrect = normalized.length === correct.length &&
-                    normalized.every((w,i) => w === correct[i]);
+  const correct = p.correct.join(" ");
+  const attempt = norm.join(" ");
+  const isCorrect = attempt === correct;
+
+  // clear old classes
+  document.querySelectorAll(".drop-zone .word")
+    .forEach(w => w.classList.remove("correct","wrong"));
 
   if (isCorrect) {
     score++; correctCount++; streak++; xp += 10;
@@ -426,8 +443,12 @@ function submitAnswer() {
   } else {
     streak = 0; xp = Math.max(0, xp - 5);
     playErrorSound();
-    document.getElementById("hint").textContent = "Oops, that order isn't right.";
+    document.getElementById("hint").textContent = "Oops, that order isn't quite right.";
     speak("Oops, that order isn't quite right.");
+    
+    // mark wrong tiles
+    Array.from(document.querySelectorAll(".drop-zone .word"))
+      .forEach(w => w.classList.add("wrong"));
   }
 
   updateGamification();
@@ -435,22 +456,30 @@ function submitAnswer() {
   document.getElementById("try-again-btn").style.display = "inline-block";
 }
 
-// Try again
+/* ────────────────────────────────────────────────────────────────────────── */
+/*  Try again                                                                */
+/* ────────────────────────────────────────────────────────────────────────── */
 function tryAgain() {
   puzzles[currentIndex].submitted = false;
   hintCount = 0;
   displayPuzzle();
 }
 
-// Navigation
+/* ────────────────────────────────────────────────────────────────────────── */
+/*  Navigation: next / prev / clear                                          */
+/* ────────────────────────────────────────────────────────────────────────── */
 function nextPuzzle() {
   if (currentIndex < sessionLength - 1) {
-    currentIndex++; hintCount = 0; displayPuzzle();
+    currentIndex++;
+    hintCount = 0;
+    displayPuzzle();
   }
 }
 function prevPuzzle() {
   if (currentIndex > 0) {
-    currentIndex--; hintCount = 0; displayPuzzle();
+    currentIndex--;
+    hintCount = 0;
+    displayPuzzle();
   }
 }
 function clearDropZone() {
@@ -459,17 +488,21 @@ function clearDropZone() {
   displayPuzzle();
 }
 
-// Learn basics
+/* ────────────────────────────────────────────────────────────────────────── */
+/*  Learn basics                                                             */
+/* ────────────────────────────────────────────────────────────────────────── */
 function learnBasics() {
-  const cont = document.getElementById("puzzle-container");
-  cont.innerHTML = `
+  const c = document.getElementById("puzzle-container");
+  c.innerHTML = `
     <h3>Learn Sentence Basics</h3>
     <p>A sentence has a subject (who/what), a verb (action), and often an object (receiver).<br>
     Example: "The dog (subject) runs (verb) fast (object)."</p>`;
   speak("A sentence has a subject, a verb, and often an object.");
 }
 
-// Theme & fullscreen
+/* ────────────────────────────────────────────────────────────────────────── */
+/*  Theme toggle & fullscreen                                                */
+/* ────────────────────────────────────────────────────────────────────────── */
 function toggleTheme() {
   document.body.classList.toggle("rainbow-theme");
   speak("Theme changed.");
@@ -479,8 +512,11 @@ function toggleFullScreen() {
   else document.exitFullscreen();
 }
 
-// Bind events & init
+/* ────────────────────────────────────────────────────────────────────────── */
+/*  Bind all buttons & start                                                  */
+/* ────────────────────────────────────────────────────────────────────────── */
 window.addEventListener("DOMContentLoaded", () => {
+  // controls
   document.getElementById("hint-btn").addEventListener("click", showHint);
   document.getElementById("submit-btn").addEventListener("click", submitAnswer);
   document.getElementById("try-again-btn").addEventListener("click", tryAgain);
@@ -488,11 +524,13 @@ window.addEventListener("DOMContentLoaded", () => {
   document.getElementById("prev-btn").addEventListener("click", prevPuzzle);
   document.getElementById("clear-btn").addEventListener("click", clearDropZone);
   document.getElementById("learn-btn").addEventListener("click", learnBasics);
+
   document.getElementById("listen-instructions-btn").addEventListener("click", () => {
     speak(document.querySelector("p.instructions").textContent);
   });
   document.getElementById("fullscreen-btn").addEventListener("click", toggleFullScreen);
   document.getElementById("theme-toggle").addEventListener("click", toggleTheme);
+
   document.getElementById("level-select").addEventListener("change", e => {
     currentLevel = e.target.value;
     generatePuzzles();
@@ -502,7 +540,9 @@ window.addEventListener("DOMContentLoaded", () => {
   generatePuzzles();
 });
 
-// Service worker
+/* ────────────────────────────────────────────────────────────────────────── */
+/*  Register service worker (optional)                                        */
+/* ────────────────────────────────────────────────────────────────────────── */
 if ("serviceWorker" in navigator) {
-  navigator.serviceWorker.register("service-worker.js").catch(() => {});
+  navigator.serviceWorker.register("service-worker.js").catch(()=>{});
 }
