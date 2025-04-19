@@ -33,6 +33,50 @@ body.light-theme {
   --progress-bar-bg: linear-gradient(to right, #0288d1, #40c4ff);
 }
 
+/* 1) Tutorial overlay */
+#tutorial-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+}
+#tutorial-overlay.hidden { display: none; }
+#tutorial-content {
+  background: #ffffff;
+  padding: 30px;
+  border-radius: 12px;
+  max-width: 90%;
+  text-align: left;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+}
+#tutorial-content h2 {
+  margin-bottom: 1em;
+  color: #333;
+}
+#tutorial-content ol {
+  margin-left: 1em;
+}
+#tutorial-content button {
+  margin-top: 1.5em;
+  padding: 0.8em 1.2em;
+  font-size: 1em;
+  background: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+/* 2) Higher‑contrast instructions */
+.instructions {
+  background-color: rgba(255,255,255,0.95);
+  color: #222;
+  border: 3px solid var(--accent-color);
+}
+
 * {
   box-sizing: border-box;
   margin: 0;
@@ -72,7 +116,6 @@ h1 {
   padding: 15px;
   font-weight: 700;
   background-color: rgba(255, 255, 255, 0.8);
-  border: 3px solid var(--accent-color);
   border-radius: 15px;
   margin: 0 auto 15px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
@@ -82,7 +125,6 @@ h1 {
 .mascot-container {
   margin: 10px 0;
 }
-
 .mascot-container img {
   width: 80px;
   height: auto;
@@ -99,14 +141,12 @@ h1 {
   padding: 10px;
   border-radius: 20px;
 }
-
 .controls label,
 .controls select,
 .controls input {
   font-size: 1.2em;
   margin-right: 10px;
 }
-
 .instruction-btn {
   padding: 10px 20px;
   font-size: 1.2em;
@@ -119,16 +159,13 @@ h1 {
   transition: transform 0.2s, background-color 0.3s;
   box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
 }
-
 .instruction-btn:hover {
   background-color: var(--secondary-color);
   transform: scale(1.05);
 }
-
 .instruction-btn:active {
   transform: scale(0.95);
 }
-
 .instruction-btn:focus {
   outline: 2px solid var(--secondary-color);
 }
@@ -153,7 +190,6 @@ h1 {
   border: 2px solid var(--accent-color);
   position: relative;
 }
-
 #progress-bar {
   width: 0%;
   height: var(--progress-bar-height);
@@ -161,7 +197,6 @@ h1 {
   transition: width 0.5s ease;
   position: relative;
 }
-
 #progress-label {
   position: absolute;
   top: 50%;
@@ -172,7 +207,6 @@ h1 {
   font-size: 1.2em;
   text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
 }
-
 .progress-icon {
   width: 20px;
   height: 20px;
@@ -190,7 +224,6 @@ h1 {
   font-size: 1.2em;
   border: 2px dashed var(--primary-color);
 }
-
 .badge-icon {
   width: 30px;
   height: 30px;
@@ -201,7 +234,6 @@ h1 {
 #puzzle-container {
   margin-bottom: 20px;
 }
-
 .sentence-container {
   margin: 0 auto 20px;
   padding: 20px;
@@ -211,7 +243,6 @@ h1 {
   max-width: 700px;
   box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
 }
-
 .sentence-container h3 {
   margin-bottom: 15px;
   color: var(--secondary-color);
@@ -219,6 +250,7 @@ h1 {
   font-weight: 700;
 }
 
+/* Word bank & drop zone */
 .word-bank,
 .drop-zone {
   min-height: 120px;
@@ -231,6 +263,19 @@ h1 {
   grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
   gap: 20px;
   transition: background-color 0.3s, border-color 0.3s;
+}
+
+/* 3) Mobile: horizontal scroll word bank */
+@media (max-width: 600px) {
+  .word-bank {
+    display: flex !important;
+    overflow-x: auto;
+    padding-bottom: 10px;
+  }
+  .word-bank .word {
+    flex: 0 0 auto;
+    margin-right: 15px;
+  }
 }
 
 .drop-zone.active {
@@ -259,31 +304,25 @@ h1 {
   text-align: center;
   position: relative;
 }
-
 .subject {
   background-color: #98fb98;
   border-color: #32cd32;
 }
-
 .verb {
   background-color: #ff9f1c;
   border-color: #e65100;
 }
-
 .object {
   background-color: #40c4ff;
   border-color: #0288d1;
 }
-
 .end {
   background-color: #9c27b0;
   border-color: #7b1fa2;
 }
-
 .word:hover {
   transform: scale(1.05);
 }
-
 .word:focus {
   outline: 3px solid var(--accent-color);
   outline-offset: 2px;
@@ -294,29 +333,28 @@ h1 {
   border-color: #32cd32;
   animation: pulse 1s infinite;
 }
-
 .hint-verb {
   background-color: var(--hint-verb-bg);
   border-color: #e65100;
   animation: pulse 1s infinite;
 }
-
 .hint-object {
   background-color: var(--hint-object-bg);
   border-color: #0288d1;
   animation: pulse 1s infinite;
 }
 
+/* 4) Incorrect wiggle only once */
+.incorrect {
+  background-color: var(--incorrect-bg);
+  border-color: var(--incorrect-border);
+  animation: wiggle 0.5s ease-out;
+}
+
 .correct {
   background-color: var(--correct-bg);
   border-color: var(--correct-border);
   animation: bounce 0.6s ease-out;
-}
-
-.incorrect {
-  background-color: var(--incorrect-bg);
-  border-color: var(--incorrect-border);
-  animation: wiggle 0.5s infinite;
 }
 
 .nav-buttons {
@@ -326,7 +364,6 @@ h1 {
   flex-wrap: wrap;
   margin-bottom: 15px;
 }
-
 .nav-buttons button {
   padding: 12px 25px;
   font-size: 1.3em;
@@ -339,17 +376,14 @@ h1 {
   transition: background-color 0.3s, transform 0.2s, box-shadow 0.2s;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
-
 .nav-buttons button:hover {
   background-color: var(--secondary-color);
   transform: scale(1.05);
   box-shadow: 0 6px 12px rgba(0, 0, 0, 0.25);
 }
-
 .nav-buttons button:active {
   transform: scale(0.95);
 }
-
 .nav-buttons button:focus {
   outline: 3px solid var(--secondary-color);
   outline-offset: 2px;
@@ -366,11 +400,9 @@ h1 {
   margin-top: 10px;
   font-weight: 700;
 }
-
 #hint {
   color: #4682b4;
 }
-
 #success-message {
   color: var(--correct-border);
 }
@@ -388,12 +420,10 @@ h1 {
   transition: background-color 0.3s, transform 0.2s;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
-
 #reset-btn:hover {
   background-color: var(--secondary-color);
   transform: scale(1.05);
 }
-
 #reset-btn:focus {
   outline: 3px solid var(--secondary-color);
   outline-offset: 2px;
@@ -408,7 +438,6 @@ h1 {
   pointer-events: none;
   z-index: 9999;
 }
-
 .confetti {
   position: absolute;
   width: 12px;
@@ -422,126 +451,50 @@ h1 {
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
-/* Animation for word removal */
-@keyframes bounceOut {
-  0% {
-    transform: scale(1);
-  }
-  50% {
-    transform: scale(0.8);
-    opacity: 0.5;
-  }
-  100% {
-    transform: scale(0);
-    opacity: 0;
-  }
-}
-
-.word.removing {
-  animation: bounceOut 0.3s ease-out forwards;
-}
-
-@keyframes confetti-fall {
-  0% {
-    transform: translateY(0) rotate(0deg);
-    opacity: 1;
-  }
-  100% {
-    transform: translateY(100vh) rotate(720deg);
-    opacity: 0;
-  }
-}
-
-@keyframes bounceIn {
-  0% {
-    transform: scale(0.5);
-    opacity: 0;
-  }
-  60% {
-    transform: scale(1.2);
-    opacity: 1;
-  }
-  100% {
-    transform: scale(1);
-  }
-}
-
-@keyframes bounce {
-  0% {
-    transform: scale(1);
-  }
-  30% {
-    transform: scale(1.3);
-  }
-  50% {
-    transform: scale(0.9);
-  }
-  70% {
-    transform: scale(1.15);
-  }
-  100% {
-    transform: scale(1);
-  }
-}
-
+/* Animations */
 @keyframes wiggle {
-  0% {
-    transform: translateX(0);
-  }
-  25% {
-    transform: translateX(-5px);
-  }
-  50% {
-    transform: translateX(5px);
-  }
-  75% {
-    transform: translateX(-5px);
-  }
-  100% {
-    transform: translateX(0);
-  }
+  0% { transform: translateX(0); }
+  25% { transform: translateX(-5px); }
+  50% { transform: translateX(5px); }
+  75% { transform: translateX(-5px); }
+  100% { transform: translateX(0); }
 }
-
+@keyframes bounce {
+  0% { transform: scale(1); }
+  30% { transform: scale(1.3); }
+  50% { transform: scale(0.9); }
+  70% { transform: scale(1.15); }
+  100% { transform: scale(1); }
+}
 @keyframes pulse {
-  0% {
-    transform: scale(1);
-  }
-  50% {
-    transform: scale(1.1);
-  }
-  100% {
-    transform: scale(1);
-  }
+  0% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+  100% { transform: scale(1); }
 }
-
+@keyframes bounceIn {
+  0% { transform: scale(0.5); opacity: 0; }
+  60% { transform: scale(1.2); opacity: 1; }
+  100% { transform: scale(1); }
+}
 @keyframes sway {
-  0% {
-    transform: rotate(0deg);
-  }
-  50% {
-    transform: rotate(10deg);
-  }
-  100% {
-    transform: rotate(0deg);
-  }
+  0% { transform: rotate(0deg); }
+  50% { transform: rotate(10deg); }
+  100% { transform: rotate(0deg); }
+}
+@keyframes confetti-fall {
+  0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+  100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
 }
 
+/* 3) Mobile: horizontal scroll word bank (redundant but safe) */
 @media (max-width: 600px) {
-  h1 {
-    font-size: 2.5em;
+  .word-bank {
+    display: flex !important;
+    overflow-x: auto;
+    padding-bottom: 10px;
   }
-  .word {
-    font-size: 1.2em;
-    padding: 15px;
-  }
-  .nav-buttons {
-    flex-direction: column;
-  }
-  .sentence-container {
-    padding: 15px;
-    max-width: 100%;
-  }
-  .controls {
-    gap: 10px;
+  .word-bank .word {
+    flex: 0 0 auto;
+    margin-right: 15px;
   }
 }
