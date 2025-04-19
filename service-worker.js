@@ -1,7 +1,7 @@
 // service-worker.js
 const CACHE_NAME = "word-order-v2";
 const urlsToCache = [
-  "./",
+  "./",            // cache the root, which usually serves index.html
   "index.html",
   "styles.css",
   "script.js",
@@ -18,8 +18,7 @@ const urlsToCache = [
 
 self.addEventListener("install", (event) => {
   event.waitUntil(
-    caches
-      .open(CACHE_NAME)
+    caches.open(CACHE_NAME)
       .then((cache) => cache.addAll(urlsToCache))
       .catch((err) => console.warn("Cache install failed:", err))
   );
@@ -27,21 +26,29 @@ self.addEventListener("install", (event) => {
 
 self.addEventListener("fetch", (event) => {
   event.respondWith(
-    caches
-      .match(event.request)
-      .then((resp) =>
-        resp || fetch(event.request).catch(() => caches.match("index.html"))
-      )
+    caches.match(event.request).then((cachedResponse) => {
+      // 1) Return from cache if we have it
+      if (cachedResponse) {
+        return cachedResponse;
+      }
+      // 2) Otherwise try network
+      return fetch(event.request).catch((networkError) => {
+        console.warn("Fetch failed; returning offline page instead.", networkError);
+        // 3) If both cache & network fail, return the cached index.html
+        return caches.match("index.html").then((fallbackResponse) => {
+          // If even the fallback is missing, throw; browser will show an error page
+          return fallbackResponse || Promise.reject("no-fallback-found");
+        });
+      });
+    })
   );
 });
 
 self.addEventListener("activate", (event) => {
   event.waitUntil(
-    caches.keys().then((keys) =>
+    caches.keys().then((keyList) =>
       Promise.all(
-        keys.map((key) =>
-          key !== CACHE_NAME ? caches.delete(key) : Promise.resolve()
-        )
+        keyList.map((key) => key !== CACHE_NAME ? caches.delete(key) : Promise.resolve())
       )
     )
   );
