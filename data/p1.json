@@ -1,0 +1,31 @@
+diff --git a//dev/null b/data/p1.json
+index 0000000000000000000000000000000000000000..f7cfbc8718e797bd952111f95cdc17abd698d16c 100644
+--- a//dev/null
++++ b/data/p1.json
+@@ -0,0 +1,26 @@
++[
++  "Doreen had a huge birthday party.",
++  "We can go out to play.",
++  "The boy was chased by a dog.",
++  "Would you like to have lunch now?",
++  "The house was empty and quiet.",
++  "I have a small red ball.",
++  "My cat sleeps on the warm mat.",
++  "The teacher reads a fun story.",
++  "The dog runs fast in the park.",
++  "I love to draw colorful pictures.",
++  "The sun is shining brightly.",
++  "My friend is kind and gentle.",
++  "We play games during recess.",
++  "The bird sings a sweet song.",
++  "I like to eat ice cream.",
++  "The tree is tall and green.",
++  "The girl wears a blue dress.",
++  "The boy rides a small bicycle.",
++  "My mom cooks tasty food.",
++  "The puppy barks at the mailman.",
++  "Ali plays soccer with his friends.",
++  "Maria dances at the festival.",
++  "Juan paints a bright mural.",
++  "Aisha shares her books with classmates."
++]
