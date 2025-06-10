@@ -1,0 +1,31 @@
+diff --git a//dev/null b/data/p4.json
+index 0000000000000000000000000000000000000000..89932a98715a897cac84cc3e2f51a16924c54992 100644
+--- a//dev/null
++++ b/data/p4.json
+@@ -0,0 +1,26 @@
++[
++  "The cheerful girl sings beautifully during the assembly.",
++  "The boy quickly runs to school eager to learn.",
++  "The teacher patiently explains the lesson to her attentive students.",
++  "The children happily play together in the spacious park.",
++  "The shiny red car moves fast along the busy road.",
++  "The little boy smiles brightly when he sees his friend at school.",
++  "The elderly man walks slowly with a calm and steady pace.",
++  "The smart student solves difficult problems with ease.",
++  "The busy mother prepares a delicious breakfast every single morning.",
++  "The gentle wind blows softly rustling the vibrant green leaves.",
++  "The excited child jumps high in joyful celebration during recess.",
++  "The kind teacher helps every student after class with care.",
++  "The little girl reads a colorful book under a large shady tree.",
++  "The brave boy climbs the tall tree with determination and skill.",
++  "The attentive class listens carefully to the teacher’s detailed instructions.",
++  "The calm lake reflects the clear blue sky perfectly on a sunny day.",
++  "The fast train zooms past the station with remarkable speed.",
++  "The playful puppy chases its tail with endless energy.",
++  "The thoughtful boy generously shares his toys with his friends.",
++  "The pretty garden blooms vibrantly in early spring showcasing many colors.",
++  "Nia plays a drum from her culture.",
++  "Santiago flies a kite with his brother.",
++  "Amina draws a picture of her family.",
++  "Chen learns to cook dumplings with grandma."
++]
