@@ -66,167 +66,18 @@
   };
 
   // **Sentence Pools for Each Level**
-  const sentencesP1 = [
-    "Doreen had a huge birthday party.",
-    "We can go out to play.",
-    "The boy was chased by a dog.",
-    "Would you like to have lunch now?",
-    "The house was empty and quiet.",
-    "I have a small red ball.",
-    "My cat sleeps on the warm mat.",
-    "The teacher reads a fun story.",
-    "The dog runs fast in the park.",
-    "I love to draw colorful pictures.",
-    "The sun is shining brightly.",
-    "My friend is kind and gentle.",
-    "We play games during recess.",
-    "The bird sings a sweet song.",
-    "I like to eat ice cream.",
-    "The tree is tall and green.",
-    "The girl wears a blue dress.",
-    "The boy rides a small bicycle.",
-    "My mom cooks tasty food.",
-    "The puppy barks at the mailman.",
-    "Ali plays soccer with his friends.",
-    "Maria dances at the festival.",
-    "Juan paints a bright mural.",
-    "Aisha shares her books with classmates.",
-  ];
+  const sentenceCache = {};
 
-  const sentencesP2 = [
-    "It was raining very heavily this morning.",
-    "All students should obey the school rules.",
-    "It was so cold that I could not stop shivering.",
-    "Which of these activities do you enjoy doing?",
-    "The teacher explained the lesson clearly and patiently.",
-    "My friend always helps me with my homework.",
-    "The cat quietly slept on the soft cushion.",
-    "We often play games during our lunch break.",
-    "The dog eagerly fetched the ball in the yard.",
-    "The students listened carefully to the principal's announcement.",
-    "My mother prepared a delicious meal for dinner.",
-    "The library was quiet and full of interesting books.",
-    "I carefully completed all my assignments on time.",
-    "The children enjoyed a fun and educational field trip.",
-    "The weather was so warm that we decided to have a picnic.",
-    "The boy happily rode his bicycle to school.",
-    "The girl carefully painted a beautiful picture.",
-    "The teacher asked a challenging question during the lesson.",
-    "Our class worked together to solve a difficult problem.",
-    "I felt excited as I opened my new book.",
-    "Hiro reads a story about Japan.",
-    "Fatima shares dates with her class.",
-    "Luka sings a song from Croatia.",
-    "Priya learns a dance from India.",
-  ];
+  const loadSentencesForLevel = async (level) => {
+    if (sentenceCache[level]) return sentenceCache[level];
+    const response = await fetch(`data/${level}.json`);
+    if (!response.ok) throw new Error("Failed to load sentences");
+    const data = await response.json();
+    sentenceCache[level] = data;
+    return data;
+  };
 
-  const sentencesP3 = [
-    "The boy eats an apple during recess.",
-    "The girl plays with a shiny toy in class.",
-    "The dog chases the ball across the field.",
-    "The teacher reads an interesting story to the students.",
-    "The cat drinks milk from a small bowl.",
-    "The boy kicks the ball with great enthusiasm.",
-    "The girl draws a colorful picture on the board.",
-    "The dog barks at the stranger outside.",
-    "The student writes a letter to his best friend.",
-    "The mother cooks dinner for the family.",
-    "The father drives a car on busy roads.",
-    "The boy catches a slippery frog near the pond.",
-    "The girl rides her bicycle along the busy street.",
-    "The dog fetches a stick in the backyard.",
-    "The teacher explains the lesson clearly to the class.",
-    "The child opens the door to let in the sunshine.",
-    "The boy climbs a tall tree in the park.",
-    "The girl sings a sweet song during assembly.",
-    "The cat chases a little mouse in the garden.",
-    "The student solves a challenging puzzle.",
-    "Kofi builds a sandcastle at the beach.",
-    "Mei paints a dragon for the festival.",
-    "Omar kicks a ball in the park.",
-    "Sana writes a poem for her teacher.",
-  ];
-
-  const sentencesP4 = [
-    "The cheerful girl sings beautifully during the assembly.",
-    "The boy quickly runs to school eager to learn.",
-    "The teacher patiently explains the lesson to her attentive students.",
-    "The children happily play together in the spacious park.",
-    "The shiny red car moves fast along the busy road.",
-    "The little boy smiles brightly when he sees his friend at school.",
-    "The elderly man walks slowly with a calm and steady pace.",
-    "The smart student solves difficult problems with ease.",
-    "The busy mother prepares a delicious breakfast every single morning.",
-    "The gentle wind blows softly rustling the vibrant green leaves.",
-    "The excited child jumps high in joyful celebration during recess.",
-    "The kind teacher helps every student after class with care.",
-    "The little girl reads a colorful book under a large shady tree.",
-    "The brave boy climbs the tall tree with determination and skill.",
-    "The attentive class listens carefully to the teacher’s detailed instructions.",
-    "The calm lake reflects the clear blue sky perfectly on a sunny day.",
-    "The fast train zooms past the station with remarkable speed.",
-    "The playful puppy chases its tail with endless energy.",
-    "The thoughtful boy generously shares his toys with his friends.",
-    "The pretty garden blooms vibrantly in early spring showcasing many colors.",
-    "Nia plays a drum from her culture.",
-    "Santiago flies a kite with his brother.",
-    "Amina draws a picture of her family.",
-    "Chen learns to cook dumplings with grandma.",
-  ];
-
-  const sentencesP5 = [
-    "The teacher reads a fascinating story and the children listen attentively.",
-    "The boy finished his homework before dinner so he went outside to play.",
-    "The little girl happily skipped to school and her friends cheered her on.",
-    "The bright sun shines over the calm sea while a gentle breeze cools the air.",
-    "The busy bees buzz around the blooming flowers as the children watch in wonder.",
-    "The students study in the library and take notes carefully on every detail.",
-    "The father cooks dinner and the children eagerly help set the table.",
-    "The dog barks loudly but the cat remains calm and sleeps peacefully.",
-    "The rain poured outside yet the class continued their lesson indoors with focus.",
-    "The bird sings in the morning and the flowers open gracefully to welcome the day.",
-    "The boy plays soccer while his friend rides a bicycle around the field.",
-    "The teacher writes on the board and the students copy the notes precisely.",
-    "The car stops at the red light and the driver patiently waits for the signal.",
-    "The children laugh during recess full of energy and joy.",
-    "The sun sets in the west and the sky turns a beautiful shade of orange.",
-    "The little girl draws a creative picture and her mother praises her artistic skills.",
-    "The student answers the question correctly and the teacher smiles with pride.",
-    "The dog runs in the park and the kids cheer excitedly during playtime.",
-    "The wind blows gently making the leaves rustle softly in the cool breeze.",
-    "The book is open on the desk and the student reads silently with concentration.",
-    "Zara sings a song from her homeland.",
-    "Diego helps his dad with the garden.",
-    "Leila paints a picture of her cat.",
-    "Ravi plays cricket with his cousins.",
-  ];
-
-  const sentencesP6 = [
-    "After finishing his homework the student went to the library to study more in depth.",
-    "Although it was raining heavily the children played outside happily during recess.",
-    "The teacher known for her kindness explained the lesson in remarkable detail.",
-    "Despite the heavy traffic she arrived at school on time and greeted everyone warmly.",
-    "When the bell rang the students hurried to their classrooms with eager anticipation.",
-    "Since the exam was extremely challenging the teacher reviewed the material thoroughly afterward.",
-    "Even though it was late the boy continued reading his favorite book with great enthusiasm.",
-    "While the sun was setting the family enjoyed a delightful picnic in the park.",
-    "If you study hard every day you will achieve excellent results in your exams.",
-    "After the game ended the players celebrated their victory with cheers and applause.",
-    "Although the movie was quite long the audience remained engaged until the very end.",
-    "Because the weather was unexpectedly cool the picnic lasted longer than anticipated.",
-    "Since the library was exceptionally quiet the students concentrated deeply on their research.",
-    "When the storm passed the children went outside to play joyfully despite the damp ground.",
-    "After receiving his award the student thanked his parents for their unwavering support.",
-    "Although she was extremely tired the teacher continued to prepare engaging lessons for the class.",
-    "If you practice regularly your skills will improve significantly over time with dedication.",
-    "While the bell was ringing the students gathered in the hall to listen attentively to the announcement.",
-    "Because the assignment was particularly difficult the students worked in groups to complete it.",
-    "After the concert ended the crowd applauded enthusiastically as the performers took a bow.",
-    "Anya writes a story about her travels.",
-    "Mateo builds a model of a rocket.",
-    "Sofia learns about her family history.",
-    "Jamil shares a recipe from his culture.",
-  ];
+  const getSentencesForLevel = (level) => sentenceCache[level] || [];
 
   // **Game State Variables**
   const sessionLength = 10;
@@ -256,20 +107,9 @@
   // **Utility Function to Shuffle an Array**
   const shuffle = (array) => array.sort(() => Math.random() - 0.5);
 
-  // **Get Sentences for the Current Level**
-  const getSentencesForLevel = (level) =>
-    ({
-      p1: sentencesP1,
-      p2: sentencesP2,
-      p3: sentencesP3,
-      p4: sentencesP4,
-      p5: sentencesP5,
-      p6: sentencesP6,
-    }[level] || sentencesP3);
-
   // **Generate Puzzles for the Current Session**
-  const generatePuzzles = () => {
-    const sentencePool = getSentencesForLevel(currentLevel);
+  const generatePuzzles = async () => {
+    const sentencePool = await loadSentencesForLevel(currentLevel);
     const selectedSentences = shuffle([...sentencePool]).slice(0, sessionLength);
     puzzles = selectedSentences.map((sentence) => ({
       correct: sentence.split(" "),
@@ -344,7 +184,7 @@
         elements.puzzleContainer.innerHTML =
           "<p>Keep practicing! You need more tries to master this level.</p>";
         speak("Keep practicing! You need more tries to master this level.");
-        generatePuzzles();
+        generatePuzzles().then(() => displayCurrentPuzzle());
       }
       updateLocalStorage();
       return;
@@ -375,7 +215,7 @@
     wordBank.style.gridTemplateColumns = "repeat(auto-fit, minmax(120px, 1fr))";
     wordBank.style.gap = "20px";
     currentDropZone.style.display = "grid";
-    currentDropZone.style.gridTemplateColumns = "repeat(auto-fit, minmax(120px, 1fr))";
+    currentDropZone.style.gridTemplateColumns = "repeat(auto-fit, minmax(120px,1fr))";
     currentDropZone.style.gap = "20px";
 
     [wordBank, currentDropZone].forEach((zone) => {
@@ -854,11 +694,11 @@
         feedback += "Start with the subject! ";
       if (
         !isCorrect &&
-        userWordsAdjusted.findIndex((w) =>
-          getWordRole(w, userWordsAdjusted.indexOf(w), userWordsAdjusted) === "verb"
+        userWordsAdjusted.findIndex(
+          (w) => getWordRole(w, userWordsAdjusted.indexOf(w), userWordsAdjusted) === "verb"
         ) !==
-          puzzle.correct.findIndex((w) =>
-            getWordRole(w, puzzle.correct.indexOf(w), puzzle.correct) === "verb"
+          puzzle.correct.findIndex(
+            (w) => getWordRole(w, puzzle.correct.indexOf(w), puzzle.correct) === "verb"
           )
       )
         feedback += "The verb might be misplaced! ";
@@ -879,7 +719,7 @@
   };
 
   // **Move to Next Puzzle**
-  const nextPuzzle = () => {
+  const nextPuzzle = async () => {
     if (currentPuzzleIndex < puzzles.length - 1) {
       currentPuzzleIndex++;
       hintCount = 0;
@@ -892,13 +732,13 @@
         document.getElementById("level-select").value = currentLevel;
         speak(`Wow! Moving up to ${currentLevel.toUpperCase()}!`);
         alert(`Great job! Moving up to ${currentLevel.toUpperCase()}!`);
-        generatePuzzles();
+        await generatePuzzles();
       } else {
         speak("Amazing! You’ve mastered all levels!");
         alert("Congratulations! You've mastered all levels!");
       }
     } else {
-      generatePuzzles();
+      await generatePuzzles();
       speak("Keep practicing to master this level!");
     }
   };
@@ -916,10 +756,12 @@
   };
 
   // **Start Review Session**
-  const startReviewSession = () => {
+  const startReviewSession = async () => {
     const prevLevel = currentLevel === "p1" ? "p1" : "p" + (parseInt(currentLevel.slice(1)) - 1);
-    const prevSentences = getSentencesForLevel(prevLevel);
-    const currentSentences = getSentencesForLevel(currentLevel);
+    const [prevSentences, currentSentences] = await Promise.all([
+      loadSentencesForLevel(prevLevel),
+      loadSentencesForLevel(currentLevel),
+    ]);
     const reviewSentences = shuffle([...prevSentences.slice(0, 3), ...currentSentences.slice(0, 7)]);
     puzzles = reviewSentences.map((sentence) => ({
       correct: sentence.split(" "),
@@ -936,8 +778,8 @@
   };
 
   // **Reset Quiz**
-  const resetQuiz = () => {
-    generatePuzzles();
+  const resetQuiz = async () => {
+    await generatePuzzles();
     const levelColors = {
       p1: "#ff6f61",
       p2: "#ff9f1c",
@@ -1001,9 +843,9 @@
     speak("Learn Sentence Basics: A sentence has a subject, a verb, and often an object.");
   });
   document.getElementById("reset-btn").addEventListener("click", resetQuiz);
-  document.getElementById("level-select").addEventListener("change", (e) => {
+  document.getElementById("level-select").addEventListener("change", async (e) => {
     currentLevel = e.target.value;
-    resetQuiz();
+    await resetQuiz();
   });
   document.getElementById("fullscreen-btn").addEventListener("click", toggleFullScreen);
   document.getElementById("theme-toggle").addEventListener("click", () => {
@@ -1022,8 +864,8 @@
   });
 
   // **Initialize Game on Page Load**
-  document.addEventListener("DOMContentLoaded", () => {
-    generatePuzzles();
+  document.addEventListener("DOMContentLoaded", async () => {
+    await generatePuzzles();
     displayCurrentPuzzle();
   });
 })();
