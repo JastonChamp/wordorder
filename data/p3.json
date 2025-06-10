@@ -1,0 +1,31 @@
+diff --git a//dev/null b/data/p3.json
+index 0000000000000000000000000000000000000000..917f930d7c3afb4f3401eaacd4281853a227474f 100644
+--- a//dev/null
++++ b/data/p3.json
+@@ -0,0 +1,26 @@
++[
++  "The boy eats an apple during recess.",
++  "The girl plays with a shiny toy in class.",
++  "The dog chases the ball across the field.",
++  "The teacher reads an interesting story to the students.",
++  "The cat drinks milk from a small bowl.",
++  "The boy kicks the ball with great enthusiasm.",
++  "The girl draws a colorful picture on the board.",
++  "The dog barks at the stranger outside.",
++  "The student writes a letter to his best friend.",
++  "The mother cooks dinner for the family.",
++  "The father drives a car on busy roads.",
++  "The boy catches a slippery frog near the pond.",
++  "The girl rides her bicycle along the busy street.",
++  "The dog fetches a stick in the backyard.",
++  "The teacher explains the lesson clearly to the class.",
++  "The child opens the door to let in the sunshine.",
++  "The boy climbs a tall tree in the park.",
++  "The girl sings a sweet song during assembly.",
++  "The cat chases a little mouse in the garden.",
++  "The student solves a challenging puzzle.",
++  "Kofi builds a sandcastle at the beach.",
++  "Mei paints a dragon for the festival.",
++  "Omar kicks a ball in the park.",
++  "Sana writes a poem for her teacher."
++]
