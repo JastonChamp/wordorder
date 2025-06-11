@@ -152,153 +152,153 @@ import { getWordClass } from "./wordClasses.js";
   const handleDragStart = (e) => {
     draggedItem = e.target;
 @@ -400,122 +358,124 @@
-        "#ff6f61",
-        "#ff9f1c",
-        "#ffcc00",
-        "#98fb98",
-        "#40c4ff",
-      ][Math.floor(Math.random() * 5)];
-      confettiContainer.appendChild(confetti);
-    }
-    setTimeout(() => confettiContainer.remove(), 5000);
-  }
+         "#ff6f61",
+         "#ff9f1c",
+         "#ffcc00",
+         "#98fb98",
+         "#40c4ff",
+       ][Math.floor(Math.random() * 5)];
+       confettiContainer.appendChild(confetti);
+     }
+     setTimeout(() => confettiContainer.remove(), 5000);
+   }
 
-  // **Animate Success Message with GSAP**
-  function animateSuccessMessage() {
-    gsap.fromTo(
-      elements.successMessage,
-      { scale: 0, opacity: 0 },
-      { scale: 1, opacity: 1, duration: 0.6, ease: "bounce.out" }
-    );
-  }
+   // **Animate Success Message with GSAP**
+   function animateSuccessMessage() {
+     gsap.fromTo(
+       elements.successMessage,
+       { scale: 0, opacity: 0 },
+       { scale: 1, opacity: 1, duration: 0.6, ease: "bounce.out" }
+     );
+   }
 
-  // **Show Tooltip on Hover**
-  const showTooltip = (e) => {
-    const word = e.target.textContent;
-    const puzzle = puzzles[currentPuzzleIndex];
-    const index = puzzle.correct.indexOf(word);
-    const role = index !== -1 ? getWordRole(word, index, puzzle.correct) : "unknown";
-    const cls = getWordClass(word);
-    let tip = cls !== "other" ? `${cls.charAt(0).toUpperCase() + cls.slice(1)}. ` : "";
-    switch (role) {
-      case "subject":
-        tip += "Subject: Who does it?";
-        break;
-      case "verb":
-        tip += "Verb: What happens?";
-        break;
-      case "object":
-        tip += "Object: What’s it about?";
-        break;
-      case "end":
-        tip += "End: This ends the sentence.";
-        break;
-      default:
-        tip += "Other: Part of the sentence.";
-    }
-    const tooltip = document.createElement("div");
-    tooltip.textContent = tip;
-    tooltip.className = "word-tooltip";
-    tooltip.style.position = "absolute";
-    tooltip.style.background = "rgba(0, 0, 0, 0.8)";
-    tooltip.style.color = "white";
-    tooltip.style.padding = "8px 12px";
-    tooltip.style.borderRadius = "10px";
-    tooltip.style.fontSize = "1em";
-    tooltip.style.zIndex = "10";
-    const rect = e.target.getBoundingClientRect();
-    const scrollY = window.scrollY || document.documentElement.scrollTop;
-    tooltip.style.top = `${rect.bottom + scrollY + 5}px`;
-    tooltip.style.left = `${rect.left}px`;
-    const tooltipRect = tooltip.getBoundingClientRect();
-    if (tooltipRect.right > window.innerWidth)
-      tooltip.style.left = `${window.innerWidth - tooltipRect.width - 5}px`;
-    if (tooltipRect.bottom > window.innerHeight)
-      tooltip.style.top = `${rect.top + scrollY - tooltipRect.height - 5}px`;
-    document.body.appendChild(tooltip);
-    e.target.addEventListener("mouseout", () => tooltip.remove(), { once: true });
-  };
+   // **Show Tooltip on Hover**
+   const showTooltip = (e) => {
+     const word = e.target.textContent;
+     const puzzle = puzzles[currentPuzzleIndex];
+     const index = puzzle.correct.indexOf(word);
+     const role = index !== -1 ? getWordRole(word, index, puzzle.correct) : "unknown";
+     const cls = getWordClass(word);
+     let tip = cls !== "other" ? `${cls.charAt(0).toUpperCase() + cls.slice(1)}. ` : "";
+     switch (role) {
+       case "subject":
+         tip += "Subject: Who does it?";
+         break;
+       case "verb":
+         tip += "Verb: What happens?";
+         break;
+       case "object":
+         tip += "Object: What’s it about?";
+         break;
+       case "end":
+         tip += "End: This ends the sentence.";
+         break;
+       default:
+         tip += "Other: Part of the sentence.";
+     }
+     const tooltip = document.createElement("div");
+     tooltip.textContent = tip;
+     tooltip.className = "word-tooltip";
+     tooltip.style.position = "absolute";
+     tooltip.style.background = "rgba(0, 0, 0, 0.8)";
+     tooltip.style.color = "white";
+     tooltip.style.padding = "8px 12px";
+     tooltip.style.borderRadius = "10px";
+     tooltip.style.fontSize = "1em";
+     tooltip.style.zIndex = "10";
+     const rect = e.target.getBoundingClientRect();
+     const scrollY = window.scrollY || document.documentElement.scrollTop;
+     tooltip.style.top = `${rect.bottom + scrollY + 5}px`;
+     tooltip.style.left = `${rect.left}px`;
+     const tooltipRect = tooltip.getBoundingClientRect();
+     if (tooltipRect.right > window.innerWidth)
+       tooltip.style.left = `${window.innerWidth - tooltipRect.width - 5}px`;
+     if (tooltipRect.bottom > window.innerHeight)
+       tooltip.style.top = `${rect.top + scrollY - tooltipRect.height - 5}px`;
+     document.body.appendChild(tooltip);
+     e.target.addEventListener("mouseout", () => tooltip.remove(), { once: true });
+   };
 
-  // **Show Tooltip on Touch (Long Press)**
-  const showTouchTooltip = (e) => {
-    let timer;
-    const touchMove = () => clearTimeout(timer);
-    const touchEnd = () => {
-      clearTimeout(timer);
-      document.removeEventListener("touchmove", touchMove);
-      document.removeEventListener("touchend", touchEnd);
-    };
-    timer = setTimeout(() => {
-      const word = e.target.textContent;
-      const puzzle = puzzles[currentPuzzleIndex];
-      const index = puzzle.correct.indexOf(word);
-      const role = index !== -1 ? getWordRole(word, index, puzzle.correct) : "unknown";
-      const cls = getWordClass(word);
-      let tip = cls !== "other" ? `${cls.charAt(0).toUpperCase() + cls.slice(1)}. ` : "";
-      switch (role) {
-        case "subject":
-          tip += "Subject: Who does it?";
-          break;
-        case "verb":
-          tip += "Verb: What happens?";
-          break;
-        case "object":
-          tip += "Object: What’s it about?";
-          break;
-        case "end":
-          tip += "End: This ends the sentence.";
-          break;
-        default:
-          tip += "Other: Part of the sentence.";
-      }
-      const tooltip = document.createElement("div");
-      tooltip.textContent = tip;
-      tooltip.className = "word-tooltip";
-      tooltip.style.position = "absolute";
-      tooltip.style.background = "rgba(0, 0, 0, 0.7)";
-      tooltip.style.color = "white";
-      tooltip.style.padding = "5px 10px";
-      tooltip.style.borderRadius = "4px";
-      tooltip.style.fontSize = "0.8em";
-      tooltip.style.zIndex = "10";
-      const rect = e.target.getBoundingClientRect();
-      const scrollY = window.scrollY || document.documentElement.scrollTop;
-      tooltip.style.top = `${rect.bottom + scrollY + 5}px`;
-      tooltip.style.left = `${rect.left}px`;
-      const tooltipRect = tooltip.getBoundingClientRect();
-      if (tooltipRect.right > window.innerWidth)
-        tooltip.style.left = `${window.innerWidth - tooltipRect.width - 5}px`;
-      if (tooltipRect.bottom > window.innerHeight)
-        tooltip.style.top = `${rect.top + scrollY - tooltipRect.height - 5}px`;
-      document.body.appendChild(tooltip);
-      e.target.addEventListener("touchend", () => tooltip.remove(), { once: true });
-    }, 500);
-    document.addEventListener("touchmove", touchMove);
-    document.addEventListener("touchend", touchEnd);
-  };
+   // **Show Tooltip on Touch (Long Press)**
+   const showTouchTooltip = (e) => {
+     let timer;
+     const touchMove = () => clearTimeout(timer);
+     const touchEnd = () => {
+       clearTimeout(timer);
+       document.removeEventListener("touchmove", touchMove);
+       document.removeEventListener("touchend", touchEnd);
+     };
+     timer = setTimeout(() => {
+       const word = e.target.textContent;
+       const puzzle = puzzles[currentPuzzleIndex];
+       const index = puzzle.correct.indexOf(word);
+       const role = index !== -1 ? getWordRole(word, index, puzzle.correct) : "unknown";
+       const cls = getWordClass(word);
+       let tip = cls !== "other" ? `${cls.charAt(0).toUpperCase() + cls.slice(1)}. ` : "";
+       switch (role) {
+         case "subject":
+           tip += "Subject: Who does it?";
+           break;
+         case "verb":
+           tip += "Verb: What happens?";
+           break;
+         case "object":
+           tip += "Object: What’s it about?";
+           break;
+         case "end":
+           tip += "End: This ends the sentence.";
+           break;
+         default:
+           tip += "Other: Part of the sentence.";
+       }
+       const tooltip = document.createElement("div");
+       tooltip.textContent = tip;
+       tooltip.className = "word-tooltip";
+       tooltip.style.position = "absolute";
+       tooltip.style.background = "rgba(0, 0, 0, 0.7)";
+       tooltip.style.color = "white";
+       tooltip.style.padding = "5px 10px";
+       tooltip.style.borderRadius = "4px";
+       tooltip.style.fontSize = "0.8em";
+       tooltip.style.zIndex = "10";
+       const rect = e.target.getBoundingClientRect();
+       const scrollY = window.scrollY || document.documentElement.scrollTop;
+       tooltip.style.top = `${rect.bottom + scrollY + 5}px`;
+       tooltip.style.left = `${rect.left}px`;
+       const tooltipRect = tooltip.getBoundingClientRect();
+       if (tooltipRect.right > window.innerWidth)
+         tooltip.style.left = `${window.innerWidth - tooltipRect.width - 5}px`;
+       if (tooltipRect.bottom > window.innerHeight)
+         tooltip.style.top = `${rect.top + scrollY - tooltipRect.height - 5}px`;
+       document.body.appendChild(tooltip);
+       e.target.addEventListener("touchend", () => tooltip.remove(), { once: true });
+     }, 500);
+     document.addEventListener("touchmove", touchMove);
+     document.addEventListener("touchend", touchEnd);
+   };
 @@ -846,26 +806,25 @@
-  document.getElementById("level-select").addEventListener("change", async (e) => {
-    currentLevel = e.target.value;
-    await resetQuiz();
-  });
-  document.getElementById("fullscreen-btn").addEventListener("click", toggleFullScreen);
-  document.getElementById("theme-toggle").addEventListener("click", () => {
-    const body = document.body;
-    if (body.classList.contains("pastel-theme")) {
-      body.classList.remove("pastel-theme");
-      body.classList.add("rainbow-theme");
-      speak("Switched to Rainbow Fun theme!");
-    } else if (body.classList.contains("rainbow-theme")) {
-      body.classList.remove("rainbow-theme");
-      speak("Switched to Bright Playful theme!");
-    } else {
-      body.classList.add("pastel-theme");
-      speak("Switched to Pastel Calm theme!");
-    }
-  });
+   document.getElementById("level-select").addEventListener("change", async (e) => {
+     currentLevel = e.target.value;
+     await resetQuiz();
+   });
+   document.getElementById("fullscreen-btn").addEventListener("click", toggleFullScreen);
+   document.getElementById("theme-toggle").addEventListener("click", () => {
+     const body = document.body;
+     if (body.classList.contains("pastel-theme")) {
+       body.classList.remove("pastel-theme");
+       body.classList.add("rainbow-theme");
+       speak("Switched to Rainbow Fun theme!");
+     } else if (body.classList.contains("rainbow-theme")) {
+       body.classList.remove("rainbow-theme");
+       speak("Switched to Bright Playful theme!");
+     } else {
+       body.classList.add("pastel-theme");
+       speak("Switched to Pastel Calm theme!");
+     }
+   });
 
-  // **Initialize Game on Page Load**
-  document.addEventListener("DOMContentLoaded", async () => {
-    await generatePuzzles();
-    displayCurrentPuzzle();
-  });
+   // **Initialize Game on Page Load**
+   document.addEventListener("DOMContentLoaded", async () => {
+     await generatePuzzles();
+     displayCurrentPuzzle();
+   });
