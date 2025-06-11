@@ -1,47 +1,150 @@
-diff --git a/index.html b/index.html
-index b6066972b2666fb1de7d01973c81cdd8d166e1a2..8960d1505971f68b1704314413492e9a26e19fd8 100644
---- a/index.html
-+++ b/index.html
-@@ -103,42 +103,42 @@
-       <div id="badges-container">
-         Badges: <span id="badges-list"></span>
-       </div>
-     </section>
- 
-     <nav class="nav-buttons">
-       <button id="prev-btn">Back</button>
-       <button id="hint-btn">Get a Hint</button>
-       <button id="submit-btn" disabled>Check Answer</button>
-       <button id="try-again-btn" style="display:none">Try Again</button>
-       <button id="next-btn">Next</button>
-       <button id="clear-btn">Clear</button>
-       <button id="learn-btn">Learn</button>
-     </nav>
- 
-     <div class="feedback">
-       <p id="progress"></p>
-       <p id="score"></p>
-       <p id="hint"></p>
-       <p id="success-message" aria-live="polite"></p>
-     </div>
- 
-     <button id="reset-btn">Start Over</button>
-   </main>
- 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Word Order Adventure</title>
+
+  <!-- Google Font -->
+  <link
+    href="https://fonts.googleapis.com/css2?family=Comic+Neue:wght@400;700&display=swap"
+    rel="stylesheet"
+  />
+
+  <!-- PWA manifest (relative) -->
+  <link rel="manifest" href="manifest.json" />
+
+  <!-- Favicon -->
+  <link rel="icon" href="favicon.ico" />
+
+  <!-- Main stylesheet -->
+  <link rel="stylesheet" href="styles.css?v=14" />
+</head>
+<body>
+  <!-- Tutorial Overlay -->
+  <div id="tutorial-overlay" class="hidden">
+    <div id="tutorial-content">
+      <h2>Welcome to Word Order Adventure!</h2>
+      <ol>
+        <li>Drag words from the bank into the drop zone.</li>
+        <li>Tap “Check Answer” to see if you got it right.</li>
+        <li>Use one free hint per puzzle from the Hint button.</li>
+        <li>Earn XP, badges and level up as you master sentences!</li>
+      </ol>
+      <button id="tutorial-next">Got it!</button>
+    </div>
+  </div>
+
+  <header>
+    <h1>Word Order Adventure</h1>
+    <p class="instructions">
+      Drag the words below to make a sentence or question!<br />
+      Start with a capital letter and end with a full stop or question mark.<br />
+      <span style="font-size:0.8em;color:var(--accent-color);">
+        (Tap and hold on phones)
+      </span>
+    </p>
+    <div class="mascot-container">
+      <img src="images/mascot.png" alt="Friendly Flower Mascot" id="mascot" />
+    </div>
+    <div class="controls">
+      <label for="level-select">Pick Your Level:</label>
+      <select id="level-select">
+        <option value="p1">Primary 1</option>
+        <option value="p2">Primary 2</option>
+        <option value="p3" selected>Primary 3</option>
+        <option value="p4">Primary 4</option>
+        <option value="p5">Primary 5</option>
+        <option value="p6">Primary 6</option>
+      </select>
+      <label>
+        <input type="checkbox" id="timer-mode" />
+        Timer Mode (30s)
+      </label>
+      <button id="listen-instructions-btn" class="instruction-btn">
+        Hear Instructions
+      </button>
+      <button id="fullscreen-btn" class="instruction-btn">
+        Fullscreen
+      </button>
+      <button id="theme-toggle" class="instruction-btn">
+        Change Theme
+      </button>
+    </div>
+  </header>
+
+  <main class="game-container">
+    <section
+      id="puzzle-container"
+      role="region"
+      aria-live="polite"
+    ></section>
+
+    <section id="progress-bar-container">
+      <div id="progress-bar">
+        <span id="progress-label">
+          <img
+            src="images/star.png"
+            alt="Star"
+            class="progress-icon"
+          />
+          Puzzle 1/10
+        </span>
+      </div>
+    </section>
+
+    <section id="progress-indicator">
+      Mastery Progress: 0% (80% to advance)
+    </section>
+
+    <section id="gamification-panel">
+      <p id="xp-display">XP: 0</p>
+      <p id="streak-display">Streak: 0</p>
+      <div id="badges-container">
+        Badges: <span id="badges-list"></span>
+      </div>
+    </section>
+    <section id="word-class-legend">
+      <span class="legend-item noun">Noun</span>
+      <span class="legend-item verb">Verb</span>
+      <span class="legend-item adjective">Adjective</span>
+      <span class="legend-item adverb">Adverb</span>
+    </section>
+
+    <nav class="nav-buttons">
+      <button id="prev-btn">Back</button>
+      <button id="hint-btn">Get a Hint</button>
+      <button id="submit-btn" disabled>Check Answer</button>
+      <button id="try-again-btn" style="display:none">Try Again</button>
+      <button id="next-btn">Next</button>
+      <button id="clear-btn">Clear</button>
+      <button id="learn-btn">Learn</button>
+    </nav>
+
+    <div class="feedback">
+      <p id="progress"></p>
+      <p id="score"></p>
+      <p id="hint"></p>
+      <p id="success-message" aria-live="polite"></p>
+    </div>
+
+    <button id="reset-btn">Start Over</button>
+  </main>
+
   <script type="module" src="game.js"></script>
-   <script>
-     document.addEventListener("DOMContentLoaded", () => {
-       // Load GSAP
-       const s = document.createElement("script");
-       s.src =
-         "https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js";
-       document.body.appendChild(s);
- 
-       // Register SW silently
-       if ("serviceWorker" in navigator) {
-         navigator.serviceWorker.register("service-worker.js").catch(() => {});
-       }
-     });
-   </script>
- </body>
- </html>
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      // Load GSAP
+      const s = document.createElement("script");
+      s.src =
+        "https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js";
+      document.body.appendChild(s);
+
+      // Register SW silently
+      if ("serviceWorker" in navigator) {
+        navigator.serviceWorker.register("service-worker.js").catch(() => {});
+      }
+    });
+  </script>
+</body>
+</html>
