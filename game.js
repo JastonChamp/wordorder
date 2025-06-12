@@ -9,7 +9,7 @@ const hideTooltip = () => {
   if (tt) tt.remove();
 };
 
-declare let gsap: any;
+
 
 // Sentence Cache
 const sentenceCache = {};
