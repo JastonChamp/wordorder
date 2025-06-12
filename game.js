@@ -40,13 +40,12 @@ elements.clearBtn.addEventListener('click', () => {
   elements.submitBtn.disabled = true;
 });
 elements.resetBtn.addEventListener('click', resetQuiz);
+
 // Hide Tooltip Helper
 const hideTooltip = () => {
   const tt = document.querySelector('.word-tooltip');
   if (tt) tt.remove();
 };
-
-
 
 // Sentence Cache
 const sentenceCache = {};
@@ -91,6 +90,7 @@ export const handleDrop = e => {
   e.currentTarget.appendChild(draggedItem);
   elements.submitBtn.disabled = false;
 };
+
 async function generatePuzzles() {
   const sentences = await loadSentencesForLevel(currentLevel);
   if (!sentences.length) {
@@ -155,7 +155,7 @@ function displayCurrentPuzzle() {
 }
 
 // Compare the dropped words with the correct answer
-function checkAnswer() {␊
+function checkAnswer() {
   const dropZone = elements.puzzleContainer.querySelector('.drop-zone');
   const attempt = Array.from(dropZone.children).map(ch => ch.textContent);
   const puzzle = puzzles[currentPuzzleIndex];
