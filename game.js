@@ -76,6 +76,7 @@ if (localStorage.getItem('lastPlayDate') !== new Date().toDateString()) {
   localStorage.setItem('lastPlayDate', new Date().toDateString());
 }
 
+let hintUsed = false;
 // Drag-and-Drop Handlers
 let draggedItem = null;
 export const handleDragStart = e => (draggedItem = e.target);
@@ -85,10 +86,11 @@ export const handleDragLeave = e => e.currentTarget.classList.remove('active');
 export const handleDrop = e => {
   e.preventDefault(); e.currentTarget.classList.remove('active');
   if (!draggedItem) return;
+  draggedItem.classList.remove('hint');
+  draggedItem.style.backgroundColor = '';
   e.currentTarget.appendChild(draggedItem);
   elements.submitBtn.disabled = false;
 };
-
 async function generatePuzzles() {
   const sentences = await loadSentencesForLevel(currentLevel);
   if (!sentences.length) {
@@ -109,6 +111,7 @@ async function generatePuzzles() {
 }
 
 function displayCurrentPuzzle() {
+  hintUsed = false;
   if (currentPuzzleIndex < 0) currentPuzzleIndex = 0;
   if (currentPuzzleIndex >= puzzles.length) currentPuzzleIndex = puzzles.length - 1;
   const puzzle = puzzles[currentPuzzleIndex];
@@ -152,7 +155,7 @@ function displayCurrentPuzzle() {
 }
 
 // Compare the dropped words with the correct answer
-function checkAnswer() {
+function checkAnswer() {␊
   const dropZone = elements.puzzleContainer.querySelector('.drop-zone');
   const attempt = Array.from(dropZone.children).map(ch => ch.textContent);
   const puzzle = puzzles[currentPuzzleIndex];
@@ -185,6 +188,38 @@ function checkAnswer() {
   elements.streakDisplay.textContent = `Streak: ${streak}`;
 }
 
+function showHint() {
+  if (hintUsed) return;
+  const puzzle = puzzles[currentPuzzleIndex];
+  const dropZone = elements.puzzleContainer.querySelector('.drop-zone');
+  const wordBank = elements.puzzleContainer.querySelector('.word-bank');
+  if (!puzzle || !dropZone || !wordBank) return;
+  const nextIndex = dropZone.children.length;
+  if (nextIndex >= puzzle.words.length) return;
+  const nextWord = puzzle.words[nextIndex];
+  const wordEl = Array.from(wordBank.children).find(w => w.textContent === nextWord);
+  if (wordEl) {
+    const role = getWordRole(nextWord, nextIndex, puzzle.words);
+    wordEl.classList.add('hint');
+    wordEl.style.backgroundColor = `var(--hint-${role}-bg)`;
+  }
+  elements.hint.textContent = nextWord;
+  hintUsed = true;
+}
+
+function clearPuzzle() {
+  const dropZone = elements.puzzleContainer.querySelector('.drop-zone');
+  const wordBank = elements.puzzleContainer.querySelector('.word-bank');
+  if (!dropZone || !wordBank) return;
+  Array.from(dropZone.children).forEach(ch => {
+    ch.classList.remove('correct', 'incorrect', 'hint');
+    ch.style.backgroundColor = '';
+    wordBank.appendChild(ch);
+  });
+  elements.submitBtn.disabled = true;
+  elements.successMessage.textContent = '';
+}
+
 // Reset game state and regenerate puzzles
 async function resetQuiz() {
   await generatePuzzles();
@@ -212,4 +247,6 @@ function animateSuccessMessage() {
 document.addEventListener('DOMContentLoaded', async () => {
   await generatePuzzles();
   displayCurrentPuzzle();
+  elements.hintBtn.addEventListener('click', showHint);
+  elements.clearBtn.addEventListener('click', clearPuzzle);
 });
