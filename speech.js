@@ -1,32 +1,15 @@
 export function speak(text) {
-  if (!('speechSynthesis' in window)) {
-    console.warn('Speech synthesis not supported on this device.');
-    return;
-  }
-  const utterance = new SpeechSynthesisUtterance(text);
+  if (!('speechSynthesis' in window)) return;
+  const u = new SpeechSynthesisUtterance(text);
   const loadVoices = () => {
-    const voices = window.speechSynthesis.getVoices();
-    let preferredVoice =
-      voices.find((v) => v.lang === 'en-GB' && v.name.includes('Female')) ||
-      voices.find(
-        (v) =>
-          v.lang === 'en-US' &&
-          (v.name.includes('Samantha') || v.name.includes('Victoria'))
-      ) ||
-      voices.find((v) => v.lang === 'en-AU' && v.name.includes('Karen')) ||
-      voices.find((v) => v.lang.includes('en'));
-    utterance.voice = preferredVoice || voices[0];
-    utterance.rate = 0.9;
-    utterance.pitch = 1.1;
-    utterance.volume = 1.0;
-    window.speechSynthesis.speak(utterance);
+    const v = window.speechSynthesis.getVoices();
+    u.voice = v.find(x => x.lang==='en-GB'&&x.name.includes('Female'))
+      || v.find(x => x.lang==='en-US'&&(/Samantha|Victoria/.test(x.name)))
+      || v.find(x => x.lang.includes('en'));
+    u.rate=0.9; u.pitch=1.1; u.volume=1.0;
+    window.speechSynthesis.speak(u);
   };
-  if (window.speechSynthesis.getVoices().length === 0) {
-    window.speechSynthesis.onvoiceschanged = () => {
-      loadVoices();
-      window.speechSynthesis.onvoiceschanged = null;
-    };
-  } else {
-    loadVoices();
-  }
+  if (!window.speechSynthesis.getVoices().length)
+    window.speechSynthesis.onvoiceschanged = loadVoices;
+  else loadVoices();
 }
