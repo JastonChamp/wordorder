@@ -71,8 +71,9 @@ async function generatePuzzles() {
   score = 0;
 }
 
-// Render the puzzle at the current index
 function displayCurrentPuzzle() {
+  if (currentPuzzleIndex < 0) currentPuzzleIndex = 0;
+  if (currentPuzzleIndex >= puzzles.length) currentPuzzleIndex = puzzles.length - 1;
   const puzzle = puzzles[currentPuzzleIndex];
   if (!puzzle) return;
 
