@@ -1,31 +1,27 @@
-diff --git a//dev/null b/data/p2.json
-index 0000000000000000000000000000000000000000..b01a68cf8f71bf75f451edd0d7896c77355896ae 100644
---- a//dev/null
-+++ b/data/p2.json
-@@ -0,0 +1,26 @@
-+[
-+  "It was raining very heavily this morning.",
-+  "All students should obey the school rules.",
-+  "It was so cold that I could not stop shivering.",
-+  "Which of these activities do you enjoy doing?",
-+  "The teacher explained the lesson clearly and patiently.",
-+  "My friend always helps me with my homework.",
-+  "The cat quietly slept on the soft cushion.",
-+  "We often play games during our lunch break.",
-+  "The dog eagerly fetched the ball in the yard.",
-+  "The students listened carefully to the principal's announcement.",
-+  "My mother prepared a delicious meal for dinner.",
-+  "The library was quiet and full of interesting books.",
-+  "I carefully completed all my assignments on time.",
-+  "The children enjoyed a fun and educational field trip.",
-+  "The weather was so warm that we decided to have a picnic.",
-+  "The boy happily rode his bicycle to school.",
-+  "The girl carefully painted a beautiful picture.",
-+  "The teacher asked a challenging question during the lesson.",
-+  "Our class worked together to solve a difficult problem.",
-+  "I felt excited as I opened my new book.",
-+  "Hiro reads a story about Japan.",
-+  "Fatima shares dates with her class.",
-+  "Luka sings a song from Croatia.",
-+  "Priya learns a dance from India."
-+]
+// data/p2.json
+[
+  "It was raining very heavily this morning.",
+  "All students should obey the school rules.",
+  "It was so cold that I could not stop shivering.",
+  "Which of these activities do you enjoy doing?",
+  "The teacher explained the lesson clearly and patiently.",
+  "My friend always helps me with my homework.",
+  "The cat quietly slept on the soft cushion.",
+  "We often play games during our lunch break.",
+  "The dog eagerly fetched the ball in the yard.",
+  "The students listened carefully to the principal's announcement.",
+  "My mother prepared a delicious meal for dinner.",
+  "The library was quiet and full of interesting books.",
+  "I carefully completed all my assignments on time.",
+  "The children enjoyed a fun and educational field trip.",
+  "The weather was so warm that we decided to have a picnic.",
+  "The boy happily rode his bicycle to school.",
+  "The girl carefully painted a beautiful picture.",
+  "The teacher asked a challenging question during the lesson.",
+  "Our class worked together to solve a difficult problem.",
+  "I felt excited as I opened my new book.",
+  "Hiro reads a story about Japan.",
+  "Fatima shares dates with her class.",
+  "Luka sings a song from Croatia.",
+  "Priya learns a dance from India."
+]
