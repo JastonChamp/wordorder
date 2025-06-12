@@ -1,31 +1,26 @@
-diff --git a//dev/null b/data/p6.json
-index 0000000000000000000000000000000000000000..d6bfc76c39b4cbdc049ead76b661305d0f324957 100644
---- a//dev/null
-+++ b/data/p6.json
-@@ -0,0 +1,26 @@
-+[
-+  "After finishing his homework the student went to the library to study more in depth.",
-+  "Although it was raining heavily the children played outside happily during recess.",
-+  "The teacher known for her kindness explained the lesson in remarkable detail.",
-+  "Despite the heavy traffic she arrived at school on time and greeted everyone warmly.",
-+  "When the bell rang the students hurried to their classrooms with eager anticipation.",
-+  "Since the exam was extremely challenging the teacher reviewed the material thoroughly afterward.",
-+  "Even though it was late the boy continued reading his favorite book with great enthusiasm.",
-+  "While the sun was setting the family enjoyed a delightful picnic in the park.",
-+  "If you study hard every day you will achieve excellent results in your exams.",
-+  "After the game ended the players celebrated their victory with cheers and applause.",
-+  "Although the movie was quite long the audience remained engaged until the very end.",
-+  "Because the weather was unexpectedly cool the picnic lasted longer than anticipated.",
-+  "Since the library was exceptionally quiet the students concentrated deeply on their research.",
-+  "When the storm passed the children went outside to play joyfully despite the damp ground.",
-+  "After receiving his award the student thanked his parents for their unwavering support.",
-+  "Although she was extremely tired the teacher continued to prepare engaging lessons for the class.",
-+  "If you practice regularly your skills will improve significantly over time with dedication.",
-+  "While the bell was ringing the students gathered in the hall to listen attentively to the announcement.",
-+  "Because the assignment was particularly difficult the students worked in groups to complete it.",
-+  "After the concert ended the crowd applauded enthusiastically as the performers took a bow.",
-+  "Anya writes a story about her travels.",
-+  "Mateo builds a model of a rocket.",
-+  "Sofia learns about her family history.",
-+  "Jamil shares a recipe from his culture."
-+]
+[
+  "After finishing his homework the student went to the library to study more in depth.",
+  "Although it was raining heavily the children played outside happily during recess.",
+  "The teacher known for her kindness explained the lesson in remarkable detail.",
+  "Despite the heavy traffic she arrived at school on time and greeted everyone warmly.",
+  "When the bell rang the students hurried to their classrooms with eager anticipation.",
+  "Since the exam was extremely challenging the teacher reviewed the material thoroughly afterward.",
+  "Even though it was late the boy continued reading his favorite book with great enthusiasm.",
+  "While the sun was setting the family enjoyed a delightful picnic in the park.",
+  "If you study hard every day you will achieve excellent results in your exams.",
+  "After the game ended the players celebrated their victory with cheers and applause.",
+  "Although the movie was quite long the audience remained engaged until the very end.",
+  "Because the weather was unexpectedly cool the picnic lasted longer than anticipated.",
+  "Since the library was exceptionally quiet the students concentrated deeply on their research.",
+  "When the storm passed the children went outside to play joyfully despite the damp ground.",
+  "After receiving his award the student thanked his parents for their unwavering support.",
+  "Although she was extremely tired the teacher continued to prepare engaging lessons for the class.",
+  "If you practice regularly your skills will improve significantly over time with dedication.",
+  "While the bell was ringing the students gathered in the hall to listen attentively to the announcement.",
+  "Because the assignment was particularly difficult the students worked in groups to complete it.",
+  "After the concert ended the crowd applauded enthusiastically as the performers took a bow.",
+  "Anya writes a story about her travels.",
+  "Mateo builds a model of a rocket.",
+  "Sofia learns about her family history.",
+  "Jamil shares a recipe from his culture."
+]
