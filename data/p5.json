@@ -1,31 +1,26 @@
-diff --git a//dev/null b/data/p5.json
-index 0000000000000000000000000000000000000000..d8996ab4e38a5ea5284f1de41679037ef825a11d 100644
---- a//dev/null
-+++ b/data/p5.json
-@@ -0,0 +1,26 @@
-+[
-+  "The teacher reads a fascinating story and the children listen attentively.",
-+  "The boy finished his homework before dinner so he went outside to play.",
-+  "The little girl happily skipped to school and her friends cheered her on.",
-+  "The bright sun shines over the calm sea while a gentle breeze cools the air.",
-+  "The busy bees buzz around the blooming flowers as the children watch in wonder.",
-+  "The students study in the library and take notes carefully on every detail.",
-+  "The father cooks dinner and the children eagerly help set the table.",
-+  "The dog barks loudly but the cat remains calm and sleeps peacefully.",
-+  "The rain poured outside yet the class continued their lesson indoors with focus.",
-+  "The bird sings in the morning and the flowers open gracefully to welcome the day.",
-+  "The boy plays soccer while his friend rides a bicycle around the field.",
-+  "The teacher writes on the board and the students copy the notes precisely.",
-+  "The car stops at the red light and the driver patiently waits for the signal.",
-+  "The children laugh during recess full of energy and joy.",
-+  "The sun sets in the west and the sky turns a beautiful shade of orange.",
-+  "The little girl draws a creative picture and her mother praises her artistic skills.",
-+  "The student answers the question correctly and the teacher smiles with pride.",
-+  "The dog runs in the park and the kids cheer excitedly during playtime.",
-+  "The wind blows gently making the leaves rustle softly in the cool breeze.",
-+  "The book is open on the desk and the student reads silently with concentration.",
-+  "Zara sings a song from her homeland.",
-+  "Diego helps his dad with the garden.",
-+  "Leila paints a picture of her cat.",
-+  "Ravi plays cricket with his cousins."
-+]
+[
+  "The teacher reads a fascinating story and the children listen attentively.",
+  "The boy finished his homework before dinner so he went outside to play.",
+  "The little girl happily skipped to school and her friends cheered her on.",
+  "The bright sun shines over the calm sea while a gentle breeze cools the air.",
+  "The busy bees buzz around the blooming flowers as the children watch in wonder.",
+  "The students study in the library and take notes carefully on every detail.",
+  "The father cooks dinner and the children eagerly help set the table.",
+  "The dog barks loudly but the cat remains calm and sleeps peacefully.",
+  "The rain poured outside yet the class continued their lesson indoors with focus.",
+  "The bird sings in the morning and the flowers open gracefully to welcome the day.",
+  "The boy plays soccer while his friend rides a bicycle around the field.",
+  "The teacher writes on the board and the students copy the notes precisely.",
+  "The car stops at the red light and the driver patiently waits for the signal.",
+  "The children laugh during recess full of energy and joy.",
+  "The sun sets in the west and the sky turns a beautiful shade of orange.",
+  "The little girl draws a creative picture and her mother praises her artistic skills.",
+  "The student answers the question correctly and the teacher smiles with pride.",
+  "The dog runs in the park and the kids cheer excitedly during playtime.",
+  "The wind blows gently making the leaves rustle softly in the cool breeze.",
+  "The book is open on the desk and the student reads silently with concentration.",
+  "Zara sings a song from her homeland.",
+  "Diego helps his dad with the garden.",
+  "Leila paints a picture of her cat.",
+  "Ravi plays cricket with his cousins."
+]
