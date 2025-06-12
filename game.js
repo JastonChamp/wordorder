@@ -3,6 +3,43 @@ import { elements } from './ui.js';
 import { speak } from './speech.js';
 import { getWordClass, getWordRole } from './wordClasses.js';
 
+// Button Event Listeners
+elements.submitBtn.addEventListener('click', checkAnswer);
+elements.nextBtn.addEventListener('click', () => {
+  if (currentPuzzleIndex < puzzles.length - 1) currentPuzzleIndex++;
+  displayCurrentPuzzle();
+});
+elements.prevBtn.addEventListener('click', () => {
+  if (currentPuzzleIndex > 0) currentPuzzleIndex--;
+  displayCurrentPuzzle();
+});
+elements.hintBtn.addEventListener('click', () => {
+  const puzzle = puzzles[currentPuzzleIndex];
+  if (!puzzle) return;
+  const dropZone = elements.puzzleContainer.querySelector('.drop-zone');
+  const nextIndex = dropZone ? dropZone.children.length : 0;
+  if (nextIndex < puzzle.words.length) {
+    const role = getWordRole(puzzle.words[nextIndex], nextIndex, puzzle.words);
+    elements.hint.textContent = `Next word role: ${role}`;
+  }
+});
+elements.tryAgainBtn.addEventListener('click', () => {
+  const dropZone = elements.puzzleContainer.querySelector('.drop-zone');
+  if (dropZone) {
+    dropZone.querySelectorAll('.word').forEach(w => w.classList.remove('incorrect'));
+  }
+  elements.submitBtn.disabled = false;
+  elements.tryAgainBtn.style.display = 'none';
+  elements.successMessage.textContent = '';
+});
+elements.clearBtn.addEventListener('click', () => {
+  const wordBank = elements.puzzleContainer.querySelector('.word-bank');
+  const dropZone = elements.puzzleContainer.querySelector('.drop-zone');
+  if (!wordBank || !dropZone) return;
+  Array.from(dropZone.children).forEach(ch => wordBank.appendChild(ch));
+  elements.submitBtn.disabled = true;
+});
+elements.resetBtn.addEventListener('click', resetQuiz);
 // Hide Tooltip Helper
 const hideTooltip = () => {
   const tt = document.querySelector('.word-tooltip');
