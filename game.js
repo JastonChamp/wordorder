@@ -54,7 +54,7 @@ import { getWordClass } from "./wordClasses.js";
     const yesterday = new Date();
     yesterday.setDate(yesterday.getDate() - 1);
     if (localStorage.getItem("lastPlayDate") !== yesterday.toDateString())
-@@ -204,91 +157,96 @@
+ -204,91 +157,96 
     wordBank.setAttribute("role", "list");
 
     currentDropZone = document.createElement("div");
@@ -151,7 +151,7 @@ import { getWordClass } from "./wordClasses.js";
   let draggedItem = null;
   const handleDragStart = (e) => {
     draggedItem = e.target;
-@@ -400,122 +358,124 @@
+ -400,122 +358,124 
          "#ff6f61",
          "#ff9f1c",
          "#ffcc00",
@@ -276,7 +276,7 @@ import { getWordClass } from "./wordClasses.js";
      document.addEventListener("touchmove", touchMove);
      document.addEventListener("touchend", touchEnd);
    };
-@@ -846,26 +806,25 @@
+ -846,26 +806,25 
    document.getElementById("level-select").addEventListener("change", async (e) => {
      currentLevel = e.target.value;
      await resetQuiz();
