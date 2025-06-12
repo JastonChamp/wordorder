@@ -6,19 +6,17 @@
   <title>Word Order Adventure</title>
 
   <!-- Google Font -->
-  <link
-    href="https://fonts.googleapis.com/css2?family=Comic+Neue:wght@400;700&display=swap"
-    rel="stylesheet"
-  />
+  <link href="https://fonts.googleapis.com/css2?family=Comic+Neue:wght@400;700&display=swap" rel="stylesheet" />
 
-  <!-- PWA manifest -->
+  <!-- Manifest -->
   <link rel="manifest" href="manifest.json" />
 
   <!-- Favicon -->
-  <link rel="icon" href="favicon.ico" />
+  <link rel="shortcut icon" href="./images/favicon.ico" type="image/x-icon" />
+  <link rel="icon" href="./images/favicon.ico" type="image/x-icon" />
 
   <!-- Main stylesheet -->
-  <link rel="stylesheet" href="styles.css?v=14" />
+  <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
   <!-- Tutorial Overlay -->
@@ -39,14 +37,9 @@
     <h1>Word Order Adventure</h1>
     <p class="instructions">
       Drag the words below to make a sentence or question!<br />
-      Start with a capital letter and end with a full stop or question mark.<br />
-      <span style="font-size:0.8em;color:var(--accent-color);">
-        (Tap and hold on phones)
-      </span>
+      Start with a capital letter and end with punctuation.<br />
+      <span style="font-size:0.8em;color:var(--accent-color);">(Tap and hold on phones)</span>
     </p>
-    <div class="mascot-container">
-      <img src="images/mascot.png" alt="Friendly Flower Mascot" id="mascot" />
-    </div>
     <div class="controls">
       <label for="level-select">Pick Your Level:</label>
       <select id="level-select">
@@ -57,19 +50,10 @@
         <option value="p5">Primary 5</option>
         <option value="p6">Primary 6</option>
       </select>
-      <label>
-        <input type="checkbox" id="timer-mode" />
-        Timer Mode (30s)
-      </label>
-      <button id="listen-instructions-btn" class="instruction-btn">
-        Hear Instructions
-      </button>
-      <button id="fullscreen-btn" class="instruction-btn">
-        Fullscreen
-      </button>
-      <button id="theme-toggle" class="instruction-btn">
-        Change Theme
-      </button>
+      <label><input type="checkbox" id="timer-mode" /> Timer Mode (30s)</label>
+      <button id="listen-instructions-btn" class="instruction-btn">Hear Instructions</button>
+      <button id="fullscreen-btn" class="instruction-btn">Fullscreen</button>
+      <button id="theme-toggle" class="instruction-btn">Change Theme</button>
     </div>
   </header>
 
@@ -77,25 +61,17 @@
     <section id="puzzle-container" role="region" aria-live="polite"></section>
 
     <section id="progress-bar-container">
-      <div id="progress-bar">
-        <span id="progress-label">
-          <img src="images/star.png" alt="Star" class="progress-icon" />
-          Puzzle 1/10
-        </span>
-      </div>
+      <div id="progress-bar"><span id="progress-label"></span></div>
     </section>
 
-    <section id="progress-indicator">
-      Mastery Progress: 0% (80% to advance)
-    </section>
+    <section id="progress-indicator">Mastery Progress: 0% (80% to advance)</section>
 
     <section id="gamification-panel">
       <p id="xp-display">XP: 0</p>
       <p id="streak-display">Streak: 0</p>
-      <div id="badges-container">
-        Badges: <span id="badges-list"></span>
-      </div>
+      <div id="badges-container">Badges: <span id="badges-list"></span></div>
     </section>
+
     <section id="word-class-legend">
       <span class="legend-item noun">Noun</span>
       <span class="legend-item verb">Verb</span>
@@ -110,12 +86,9 @@
       <button id="try-again-btn" style="display:none">Try Again</button>
       <button id="next-btn">Next</button>
       <button id="clear-btn">Clear</button>
-      <button id="learn-btn">Learn</button>
     </nav>
 
     <div class="feedback">
-      <p id="progress"></p>
-      <p id="score"></p>
       <p id="hint"></p>
       <p id="success-message" aria-live="polite"></p>
     </div>
@@ -129,8 +102,8 @@
       const s = document.createElement("script");
       s.src = "https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js";
       document.body.appendChild(s);
-      if ("serviceWorker" in navigator) {
-        navigator.serviceWorker.register("service-worker.js").catch(() => {});
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('service-worker.js');
       }
     });
   </script>
