@@ -89,12 +89,12 @@ export const getSentencesForLevel = (lvl) => sentenceCache[lvl] || [];
 
 export const handleDragStart = (e) => {
   draggedItem = e.target;
+  draggedItem.classList.add("dragging");
   hideTooltip();
 };
-export const handleDragEnd = () => (draggedItem = null);
-export const handleDragOver = (e) => {
-  e.preventDefault();
-  e.currentTarget.classList.add("active");
+export const handleDragEnd = () => {
+  if (draggedItem) draggedItem.classList.remove("dragging");
+  draggedItem = null;
 };
 export const handleDragLeave = (e) => e.currentTarget.classList.remove("active");
 export const handleDrop = (e) => {
