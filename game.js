@@ -315,10 +315,6 @@ async function resetQuiz() {
   displayCurrentPuzzle();
 }
 
-/* ------------------------------------------------------------------ */
-/* Event listeners                                                     */
-/* ------------------------------------------------------------------ */
-
 elements.submitBtn.addEventListener("click", checkAnswer);
 
 elements.nextBtn.addEventListener("click", () => {
@@ -379,12 +375,6 @@ function animateSuccessMessage() {
   if (window.gsap) {
     gsap.fromTo(
       elements.successMessage,
-      { scale: 0, opacity: 0 },
-      { scale: 1, opacity: 1, duration: 0.6, ease: "bounce.out" }
-    );
-  }
-}
-
 document.addEventListener("DOMContentLoaded", async () => {
   if ("speechSynthesis" in window) {
     // Preload voices so they are ready when speak() is called
