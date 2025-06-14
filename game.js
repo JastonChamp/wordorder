@@ -23,10 +23,6 @@ let hintUsed = false;
 let timer = null;
 let timerEnabled = JSON.parse(localStorage.getItem("timerMode") || "false");
 
-/* ------------------------------------------------------------------ */
-/* Utility functions                                                   */
-/* ------------------------------------------------------------------ */
-
 const hideTooltip = () => {
   const t = document.querySelector(".word-tooltip");
   if (t) t.remove();
@@ -43,7 +39,8 @@ const showTooltip = (e) => {
 
   const rect = e.currentTarget.getBoundingClientRect();
   tt.style.left = `${rect.left + rect.width / 2 + window.scrollX}px`;
-  tt.style.top = `${rect.top - 8 + window.scrollY}px`;
+  tt.style.top = `${rect.top + window.scrollY - 8}px`;
+  tt.style.transform = "translateX(-50%)";
 
   document.body.appendChild(tt);
 };
@@ -64,10 +61,6 @@ const startTimer = () => {
 
 const stopTimer = () => clearInterval(timer);
 
-/* ------------------------------------------------------------------ */
-/* Data loading                                                        */
-/* ------------------------------------------------------------------ */
-
 export async function loadSentencesForLevel(level) {
   if (sentenceCache[level]) return sentenceCache[level];
   try {
@@ -82,10 +75,6 @@ export async function loadSentencesForLevel(level) {
   }
 }
 export const getSentencesForLevel = (lvl) => sentenceCache[lvl] || [];
-
-/* ------------------------------------------------------------------ */
-/* Game logic                                                          */
-/* ------------------------------------------------------------------ */
 
 export const handleDragStart = (e) => {
   draggedItem = e.target;
@@ -147,14 +136,11 @@ function displayCurrentPuzzle() {
 
   const wordBank = document.createElement("div");
   wordBank.className = "word-bank";
-  puzzle.shuffled.forEach((w) => {
+  puzzle.shuffled.forEach((w, idx) => {
     const span = document.createElement("span");
     span.textContent = w;
-    span.dataset.role = getWordRole(
-      w,
-      puzzle.words.indexOf(w),
-      puzzle.words
-    );
+    span.dataset.index = idx;
+    span.dataset.role = getWordRole(w, puzzle.words.indexOf(w), puzzle.words);
     span.className = `word ${getWordClass(w)}`;
     span.draggable = true;
     span.addEventListener("dragstart", handleDragStart);
@@ -177,15 +163,9 @@ function displayCurrentPuzzle() {
   elements.prevBtn.disabled = currentPuzzleIndex === 0;
   elements.nextBtn.disabled = true;
 
-  elements.progressBar.style.width = `${
-    (currentPuzzleIndex / sessionLength) * 100
-  }%`;
-  elements.progressLabel.textContent = `Puzzle ${
-    currentPuzzleIndex + 1
-  }/${sessionLength}`;
-  elements.progressIndicator.textContent = `Mastery Progress: ${Math.round(
-    (score / sessionLength) * 100
-  )}% (80% to advance)`;
+  elements.progressBar.style.width = `${(currentPuzzleIndex / sessionLength) * 100}%`;
+  elements.progressLabel.textContent = `Puzzle ${currentPuzzleIndex + 1}/${sessionLength}`;
+  elements.progressIndicator.textContent = `Mastery Progress: ${Math.round((score / sessionLength) * 100)}% (80% to advance)`;
   elements.xpDisplay.textContent = `XP: ${xp}`;
   elements.streakDisplay.textContent = `Streak: ${streak}`;
   elements.badgesList.textContent = badges.join(", ");
@@ -245,9 +225,7 @@ function checkAnswer() {
     localStorage.setItem("streak", "0");
   }
 
-  elements.progressIndicator.textContent = `Mastery Progress: ${Math.round(
-    (score / sessionLength) * 100
-  )}% (80% to advance)`;
+  elements.progressIndicator.textContent = `Mastery Progress: ${Math.round((score / sessionLength) * 100)}% (80% to advance)`;
   elements.xpDisplay.textContent = `XP: ${xp}`;
   elements.streakDisplay.textContent = `Streak: ${streak}`;
 }
@@ -262,7 +240,7 @@ function showHint() {
   if (nextIndex >= puzzle.words.length) return;
   const nextWord = puzzle.words[nextIndex];
   const wordEl = Array.from(wordBank.children).find(
-    (w) => w.textContent === nextWord
+    (w) => w.textContent === nextWord && !w.classList.contains("hint")
   );
   if (wordEl) {
     const role = getWordRole(nextWord, nextIndex, puzzle.words);
@@ -287,10 +265,6 @@ function clearPuzzle() {
   hideTooltip();
 }
 
-/* ------------------------------------------------------------------ */
-/* Control handlers                                                    */
-/* ------------------------------------------------------------------ */
-
 function toggleFullscreen() {
   if (!document.fullscreenElement) {
     document.documentElement.requestFullscreen();
@@ -313,24 +287,18 @@ async function resetQuiz() {
 }
 
 elements.submitBtn.addEventListener("click", checkAnswer);
-
 elements.nextBtn.addEventListener("click", () => {
   if (currentPuzzleIndex < puzzles.length - 1) currentPuzzleIndex++;
   displayCurrentPuzzle();
 });
-
 elements.prevBtn.addEventListener("click", () => {
   if (currentPuzzleIndex > 0) currentPuzzleIndex--;
   displayCurrentPuzzle();
 });
-
 elements.hintBtn.addEventListener("click", showHint);
-
 elements.tryAgainBtn.addEventListener("click", revealAnswer);
-
 elements.clearBtn.addEventListener("click", clearPuzzle);
 elements.resetBtn.addEventListener("click", resetQuiz);
-
 elements.listenBtn.addEventListener("click", () => speak(INSTRUCTIONS));
 elements.fullscreenBtn.addEventListener("click", toggleFullscreen);
 elements.themeToggle.addEventListener("click", toggleTheme);
@@ -348,23 +316,16 @@ elements.tutorialNext.addEventListener("click", () => {
   localStorage.setItem("tutorialSeen", "yes");
 });
 
-/* ------------------------------------------------------------------ */
-/* Initialization                                                      */
-/* ------------------------------------------------------------------ */
-
 function loadSettings() {
   const storedTheme = localStorage.getItem("theme");
   if (storedTheme === "light") {
     elements.body.classList.add("light-theme");
   }
-
   timerEnabled = JSON.parse(localStorage.getItem("timerMode") || "false");
   elements.timerMode.checked = timerEnabled;
-
   if (!localStorage.getItem("tutorialSeen")) {
     elements.tutorialOverlay.classList.remove("hidden");
   }
-
   elements.levelSelect.value = currentLevel;
 }
 
@@ -372,9 +333,14 @@ function animateSuccessMessage() {
   if (window.gsap) {
     gsap.fromTo(
       elements.successMessage,
+      { opacity: 0, y: -10 },
+      { opacity: 1, y: 0, duration: 0.5 }
+    );
+  }
+}
+
 document.addEventListener("DOMContentLoaded", async () => {
   if ("speechSynthesis" in window) {
-    // Preload voices so they are ready when speak() is called
     window.speechSynthesis.getVoices();
   }
   loadSettings();
