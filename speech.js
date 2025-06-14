@@ -1,26 +1,27 @@
 export function speak(text) {
   if (!('speechSynthesis' in window)) return;
-  const u = new SpeechSynthesisUtterance(text);
 
-  const loadVoices = () => {
-    const v = window.speechSynthesis.getVoices();
-    u.voice =
-      v.find((x) => x.lang === 'en-GB' && x.name.includes('Female')) ||
-      v.find((x) => x.lang === 'en-US' && /Samantha|Victoria/.test(x.name)) ||
-      v.find((x) => x.lang.includes('en'));
-    u.rate = 0.9;
-    u.pitch = 1.1;
-    u.volume = 1.0;
-    window.speechSynthesis.speak(u);
+  const utterance = new SpeechSynthesisUtterance(text);
+
+  const handleVoices = () => {
+    const voices = window.speechSynthesis.getVoices();
+    utterance.voice =
+      voices.find((v) => v.lang === 'en-GB' && v.name.includes('Female')) ||
+      voices.find((v) => v.lang === 'en-US' && /Samantha|Victoria/.test(v.name)) ||
+      voices.find((v) => v.lang.includes('en'));
+    utterance.rate = 0.9;
+    utterance.pitch = 1.1;
+    utterance.volume = 1.0;
+    window.speechSynthesis.cancel();
+    window.speechSynthesis.speak(utterance);
   };
 
-  // Register the event listener before checking available voices
-  window.speechSynthesis.addEventListener('voiceschanged', loadVoices, {
+  const voices = window.speechSynthesis.getVoices();
+  window.speechSynthesis.addEventListener('voiceschanged', handleVoices, {
     once: true,
   });
 
-  const voices = window.speechSynthesis.getVoices();
   if (voices.length) {
-    loadVoices();
+    handleVoices();
   }
 }
