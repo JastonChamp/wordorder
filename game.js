@@ -92,6 +92,10 @@ export const handleDragStart = (e) => {
   draggedItem.classList.add("dragging");
   hideTooltip();
 };
+export const handleDragOver = (e) => {
+  e.preventDefault();
+  e.currentTarget.classList.add("active");
+};
 export const handleDragEnd = () => {
   if (draggedItem) draggedItem.classList.remove("dragging");
   draggedItem = null;
@@ -336,6 +340,11 @@ elements.themeToggle.addEventListener("click", toggleTheme);
 elements.timerMode.addEventListener("change", (e) => {
   timerEnabled = e.target.checked;
   localStorage.setItem("timerMode", timerEnabled);
+});
+elements.levelSelect.addEventListener("change", async (e) => {
+  currentLevel = e.target.value;
+  localStorage.setItem("currentLevel", currentLevel);
+  await resetQuiz();
 });
 elements.tutorialNext.addEventListener("click", () => {
   elements.tutorialOverlay.classList.add("hidden");
