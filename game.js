@@ -100,10 +100,7 @@ export const handleDragEnd = () => {
   if (draggedItem) draggedItem.classList.remove("dragging");
   draggedItem = null;
 };
-export const handleDragEnd = () => {
-  if (draggedItem) draggedItem.classList.remove("dragging");
-  draggedItem = null;
-};
+
 export const handleDragLeave = (e) => e.currentTarget.classList.remove("active");
 export const handleDrop = (e) => {
   e.preventDefault();
