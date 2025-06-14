@@ -382,6 +382,10 @@ function animateSuccessMessage() {
 }
 
 document.addEventListener("DOMContentLoaded", async () => {
+  if ("speechSynthesis" in window) {
+    // Preload voices so they are ready when speak() is called
+    window.speechSynthesis.getVoices();
+  }
   loadSettings();
   await generatePuzzles();
   displayCurrentPuzzle();
