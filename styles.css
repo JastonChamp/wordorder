@@ -168,6 +168,9 @@ h1 {
   gap:20px;
   transition:background-color 0.3s;
 }
+.drop-zone.active {
+  background:var(--dropzone-active-bg);
+}
 .word {
   padding:20px;
   background:var(--word-bg);
