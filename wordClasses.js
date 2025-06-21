@@ -4,7 +4,10 @@ const adjectives = new Set(['huge','small','red','blue','warm','quiet','empty','
 const adverbs = new Set(['quickly','slowly','happily','quietly','brightly','cheerfully','eagerly']);
 
 export function getWordClass(word) {
-  const clean = word.toLowerCase().replace(/[.!?]/g, '');
+  // Remove punctuation including straight and curly apostrophes
+  const clean = word
+    .toLowerCase()
+    .replace(/[.!?'\u2019]/g, '');
   if (adverbs.has(clean) || clean.endsWith('ly')) return 'adverb';
   if (verbs.has(clean)) return 'verb';
   if (adjectives.has(clean)) return 'adjective';
