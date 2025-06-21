@@ -109,6 +109,40 @@ export const handleDrop = (e) => {
   hideTooltip();
 };
 
+export const handleTouchStart = (e) => {
+  e.preventDefault();
+  handleDragStart(e);
+};
+
+export const handleTouchMove = (e) => {
+  e.preventDefault();
+  const touch = e.touches[0];
+  const target = document.elementFromPoint(touch.clientX, touch.clientY);
+  document
+    .querySelectorAll(".drop-zone.active")
+    .forEach((dz) => dz.classList.remove("active"));
+  const dropZone = target && target.closest(".drop-zone");
+  if (dropZone) {
+    dropZone.classList.add("active");
+  }
+};
+
+export const handleTouchEnd = (e) => {
+  e.preventDefault();
+  const touch = e.changedTouches[0];
+  const target = document.elementFromPoint(touch.clientX, touch.clientY);
+  const dropZone = target && target.closest(".drop-zone");
+  if (dropZone && draggedItem) {
+    dropZone.classList.remove("active");
+    draggedItem.classList.remove("hint");
+    draggedItem.style.backgroundColor = "";
+    dropZone.appendChild(draggedItem);
+    elements.submitBtn.disabled = false;
+    hideTooltip();
+  }
+  handleDragEnd();
+};
+
 async function generatePuzzles() {
   const sentences = await loadSentencesForLevel(currentLevel);
   if (!sentences.length) {
