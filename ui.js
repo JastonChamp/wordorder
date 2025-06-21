@@ -14,6 +14,7 @@ export const elements = {
   listenBtn: document.getElementById("listen-instructions-btn"),
   fullscreenBtn: document.getElementById("fullscreen-btn"),
   themeToggle: document.getElementById("theme-toggle"),
+  helpBtn: document.getElementById("help-btn"),
   timerMode: document.getElementById("timer-mode"),
    timerDisplay: document.getElementById("timer-display"),
   tutorialOverlay: document.getElementById("tutorial-overlay"),
