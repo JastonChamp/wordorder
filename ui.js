@@ -15,6 +15,7 @@ export const elements = {
   fullscreenBtn: document.getElementById("fullscreen-btn"),
   themeToggle: document.getElementById("theme-toggle"),
   timerMode: document.getElementById("timer-mode"),
+   timerDisplay: document.getElementById("timer-display"),
   tutorialOverlay: document.getElementById("tutorial-overlay"),
   tutorialNext: document.getElementById("tutorial-next"),
   levelSelect: document.getElementById("level-select"),
