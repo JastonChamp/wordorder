@@ -47,19 +47,26 @@ const showTooltip = (e) => {
 
 const startTimer = () => {
   clearInterval(timer);
+  elements.timerDisplay.textContent = "";
   if (!timerEnabled) return;
   let remaining = 30;
+  elements.timerDisplay.textContent = `${remaining}`;
   timer = setInterval(() => {
     remaining--;
+    elements.timerDisplay.textContent = `${remaining}`;
     if (remaining <= 0) {
       clearInterval(timer);
+      elements.timerDisplay.textContent = "";
       elements.submitBtn.disabled = true;
       elements.successMessage.textContent = "Time up!";
     }
   }, 1000);
 };
 
-const stopTimer = () => clearInterval(timer);
+const stopTimer = () => {
+  clearInterval(timer);
+  elements.timerDisplay.textContent = "";
+};
 
 export async function loadSentencesForLevel(level) {
   if (sentenceCache[level]) return sentenceCache[level];
