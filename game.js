@@ -184,8 +184,11 @@ function displayCurrentPuzzle() {
     span.dataset.role = getWordRole(w, puzzle.words.indexOf(w), puzzle.words);
     span.className = `word ${getWordClass(w)}`;
     span.draggable = true;
-    span.addEventListener("dragstart", handleDragStart);
+     span.addEventListener("dragstart", handleDragStart);
     span.addEventListener("dragend", handleDragEnd);
+    span.addEventListener("touchstart", handleTouchStart, { passive: false });
+    span.addEventListener("touchmove", handleTouchMove, { passive: false });
+    span.addEventListener("touchend", handleTouchEnd, { passive: false });
     span.addEventListener("mouseenter", showTooltip);
     span.addEventListener("mouseleave", hideTooltip);
     wordBank.appendChild(span);
@@ -196,6 +199,8 @@ function displayCurrentPuzzle() {
   dropZone.addEventListener("dragover", handleDragOver);
   dropZone.addEventListener("dragleave", handleDragLeave);
   dropZone.addEventListener("drop", handleDrop);
+  dropZone.addEventListener("touchmove", handleTouchMove, { passive: false });
+  dropZone.addEventListener("touchend", handleTouchEnd, { passive: false });
 
   elements.puzzleContainer.append(wordBank, dropZone);
 
