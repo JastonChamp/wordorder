@@ -309,6 +309,9 @@ elements.resetBtn.addEventListener("click", resetQuiz);
 elements.listenBtn.addEventListener("click", () => speak(INSTRUCTIONS));
 elements.fullscreenBtn.addEventListener("click", toggleFullscreen);
 elements.themeToggle.addEventListener("click", toggleTheme);
+elements.helpBtn.addEventListener("click", () => {
+  elements.tutorialOverlay.classList.remove("hidden");
+});
 elements.timerMode.addEventListener("change", (e) => {
   timerEnabled = e.target.checked;
   localStorage.setItem("timerMode", timerEnabled);
