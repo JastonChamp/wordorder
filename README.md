@@ -23,6 +23,17 @@ The game is a Progressive Web App. The service worker caches assets so you can p
 
 Pull requests are welcome. Please keep commits focused and follow the existing code style.
 
+## Sentence Data
+
+The game reads its sentences from the JSON files in the `data/` directory.
+Each file (`p1.json` to `p6.json`) represents a difficulty level and contains
+around 24 sentences. When creating or editing level files:
+
+- Keep sentences concise so they are easy to rearrange.
+- Use clear vocabulary and correct punctuation.
+- Aim for a mix of statements, questions, and the occasional exclamation.
+- Try to provide roughly 24 sentences per level.
+
 ## Testing
 
 Testing scripts will be added in future updates.
