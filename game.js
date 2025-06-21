@@ -170,7 +170,9 @@ function displayCurrentPuzzle() {
   elements.prevBtn.disabled = currentPuzzleIndex === 0;
   elements.nextBtn.disabled = true;
 
-  elements.progressBar.style.width = `${(currentPuzzleIndex / sessionLength) * 100}%`;
+ const progressPercent = (currentPuzzleIndex / sessionLength) * 100;
+  elements.progressBar.style.width = `${progressPercent}%`;
+  elements.progressBar.setAttribute("aria-valuenow", progressPercent.toString());
   elements.progressLabel.textContent = `Puzzle ${currentPuzzleIndex + 1}/${sessionLength}`;
   elements.progressIndicator.textContent = `Mastery Progress: ${Math.round((score / sessionLength) * 100)}% (80% to advance)`;
   elements.xpDisplay.textContent = `XP: ${xp}`;
