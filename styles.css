@@ -68,10 +68,14 @@ h1 {
   display: flex;
   align-items: center;
   gap: 10px; /* For icons */
+  background: linear-gradient(to bottom, var(--primary-color), #1976d2);
+  color: #fff;
+  border: none;
 }
 
 .instruction-btn:hover, .nav-buttons button:hover {
   transform: scale(1.1);
+  background: linear-gradient(to bottom, var(--secondary-color), #388e3c);
 }
 
 .word-bank, .drop-zone {
@@ -204,7 +208,7 @@ h1 {
 }
 .instruction-btn {
   padding:10px 20px;
-  background:var(--primary-color);
+  background:linear-gradient(to bottom, var(--primary-color), #1976d2);
   color:#fff;
   border:none;
   border-radius:25px;
@@ -213,7 +217,7 @@ h1 {
   box-shadow:0 3px 6px rgba(0,0,0,0.2);
 }
 .instruction-btn:hover {
-  background:var(--secondary-color);
+  background:linear-gradient(to bottom, var(--secondary-color), #388e3c);
   transform:scale(1.05);
 }
 .game-container {
@@ -365,3 +369,22 @@ h1 {
 @keyframes confetti { /* Simple GSAP trigger in JS */ }
 
 #daily-challenge { background: var(--secondary-color); padding: 10px; border-radius: 10px; text-align: center; }
+
+.confetti-piece {
+  position: fixed;
+  top: 0;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 10000;
+}
+
+@media (max-width: 600px) {
+  .nav-buttons {
+    flex-direction: column;
+  }
+  .nav-buttons button {
+    width: 100%;
+  }
+}
