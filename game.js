@@ -1,7 +1,7 @@
 "use strict";
 import { elements } from "./ui.js";
 import { speak } from "./speech.js";
-import { getWordClass, getWordRole, annotateSentence } from "./wordClasses.js";
+import { getWordClass, getWordRole } from "./wordClasses.js";
 
 const INSTRUCTIONS =
   "Drag the words into the drop zone to form the sentence. Tap Check Answer when you are done.";
@@ -254,7 +254,7 @@ function checkAnswer() {
   const correct = puzzle.words.every((w, i) => w === attempt[i]);
   if (correct) {
     dropZone.querySelectorAll(".word").forEach((w) => w.classList.add("correct"));
-    elements.successMessage.textContent = `Great job! Sample Answer: ${annotateSentence(puzzle.sentence)}`;
+    elements.successMessage.textContent = "Great job!";
     animateSuccessMessage();
     score++;
     streak++;
@@ -265,16 +265,6 @@ function checkAnswer() {
     localStorage.setItem("streak", streak.toString());
     speak(puzzle.sentence);
     stopTimer();
-
-    // Display rubric
-    const rubricTable = document.createElement('table');
-    rubricTable.innerHTML = `
-      <tr><th>Criterion</th><th>0 (Incorrect)</th><th>1 (Partial)</th><th>2 (Full)</th></tr>
-      <tr><td>Word Order</td><td>Wrong sequence</td><td>Some correct</td><td>All accurate</td></tr>
-      <tr><td>Parts Usage</td><td>No recognition</td><td>Basic classes</td><td>Metalanguage applied</td></tr>
-      <tr><td>Completion</td><td>Incomplete</td><td>On-time</td><td>Bonus for speed/no hints</td></tr>
-    `;
-    elements.puzzleContainer.appendChild(rubricTable);
   } else {
     dropZone.querySelectorAll(".word").forEach((w) => w.classList.add("incorrect"));
     elements.successMessage.textContent = "Try again!";
@@ -375,12 +365,6 @@ elements.levelSelect.addEventListener("change", async (e) => {
 elements.tutorialNext.addEventListener("click", () => {
   elements.tutorialOverlay.classList.add("hidden");
   localStorage.setItem("tutorialSeen", "yes");
-});
-
-// Add export button
-elements.resetBtn.insertAdjacentHTML('afterend', '<button id="export-btn">Export Progress</button>');
-document.getElementById('export-btn').addEventListener('click', () => {
-  window.print(); // Simple print for PDF export (configure browser for Arial 12, 2.5cm margins, 1.5 spacing)
 });
 
 function loadSettings() {
