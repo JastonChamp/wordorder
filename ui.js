@@ -17,6 +17,7 @@ export const elements = {
   helpBtn: document.getElementById("help-btn"),
   timerMode: document.getElementById("timer-mode"),
    timerDisplay: document.getElementById("timer-display"),
+  pauseTimerBtn: document.getElementById("pause-timer-btn"),
   tutorialOverlay: document.getElementById("tutorial-overlay"),
   tutorialNext: document.getElementById("tutorial-next"),
   levelSelect: document.getElementById("level-select"),
