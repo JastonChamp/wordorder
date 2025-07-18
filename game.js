@@ -21,6 +21,8 @@ let badges = JSON.parse(localStorage.getItem("badges") || "[]");
 let draggedItem = null;
 let hintUsed = false;
 let timer = null;
+let remaining = 30;
+let isPaused = false;
 let timerEnabled = JSON.parse(localStorage.getItem("timerMode") || "false");
 
 const hideTooltip = () => {
@@ -45,15 +47,17 @@ const showTooltip = (e) => {
   document.body.appendChild(tt);
 };
 
-const startTimer = () => {
+const startTimer = (start = 30) => {
   clearInterval(timer);
   elements.timerDisplay.textContent = "";
   if (!timerEnabled) return;
-  let remaining = 30;
+  remaining = start;
   elements.timerDisplay.textContent = `${remaining}`;
   timer = setInterval(() => {
-    remaining--;
-    elements.timerDisplay.textContent = `${remaining}`;
+    if (!isPaused) {
+      remaining--;
+      elements.timerDisplay.textContent = `${remaining}`;
+    }
     if (remaining <= 0) {
       clearInterval(timer);
       elements.timerDisplay.textContent = "";
@@ -66,6 +70,17 @@ const startTimer = () => {
 const stopTimer = () => {
   clearInterval(timer);
   elements.timerDisplay.textContent = "";
+};
+
+const togglePauseTimer = () => {
+  if (!timerEnabled) return;
+  if (!isPaused) {
+    isPaused = true;
+    elements.pauseTimerBtn.innerText = "Resume Timer";
+  } else {
+    isPaused = false;
+    elements.pauseTimerBtn.innerText = "Pause Timer";
+  }
 };
 
 export async function loadSentencesForLevel(level) {
@@ -209,15 +224,16 @@ function displayCurrentPuzzle() {
   elements.prevBtn.disabled = currentPuzzleIndex === 0;
   elements.nextBtn.disabled = true;
 
- const progressPercent = (currentPuzzleIndex / sessionLength) * 100;
-  elements.progressBar.style.width = `${progressPercent}%`;
-  elements.progressBar.setAttribute("aria-valuenow", progressPercent.toString());
+const progressPercent = (currentPuzzleIndex / sessionLength) * 100;
+  animateProgressBar(progressPercent);
   elements.progressLabel.textContent = `Puzzle ${currentPuzzleIndex + 1}/${sessionLength}`;
   elements.progressIndicator.textContent = `Mastery Progress: ${Math.round((score / sessionLength) * 100)}% (80% to advance)`;
   elements.xpDisplay.textContent = `XP: ${xp}`;
   elements.streakDisplay.textContent = `Streak: ${streak}`;
-  elements.badgesList.textContent = badges.join(", ");
+ elements.badgesList.textContent = badges.join(", ");
 
+  isPaused = false;
+  elements.pauseTimerBtn.innerText = "Pause Timer";
   startTimer();
 }
 
@@ -256,6 +272,7 @@ function checkAnswer() {
     dropZone.querySelectorAll(".word").forEach((w) => w.classList.add("correct"));
     elements.successMessage.textContent = "Great job!";
     animateSuccessMessage();
+    fireConfetti();
     score++;
     streak++;
     xp += 10;
@@ -350,6 +367,7 @@ elements.resetBtn.addEventListener("click", resetQuiz);
 elements.listenBtn.addEventListener("click", () => speak(INSTRUCTIONS));
 elements.fullscreenBtn.addEventListener("click", toggleFullscreen);
 elements.themeToggle.addEventListener("click", toggleTheme);
+elements.pauseTimerBtn.addEventListener("click", togglePauseTimer);
 elements.helpBtn.addEventListener("click", () => {
   elements.tutorialOverlay.classList.remove("hidden");
 });
@@ -387,6 +405,32 @@ function animateSuccessMessage() {
       { opacity: 0, y: -10 },
       { opacity: 1, y: 0, duration: 0.5 }
     );
+  }
+}
+
+function animateProgressBar(percent) {
+  if (window.gsap) {
+    gsap.to(elements.progressBar, { width: `${percent}%`, duration: 0.5 });
+  } else {
+    elements.progressBar.style.width = `${percent}%`;
+  }
+  elements.progressBar.setAttribute("aria-valuenow", percent.toString());
+}
+
+function fireConfetti() {
+  if (!window.gsap) return;
+  for (let i = 0; i < 20; i++) {
+    const conf = document.createElement("div");
+    conf.className = "confetti-piece";
+    conf.style.left = Math.random() * 100 + "%";
+    conf.style.backgroundColor = `hsl(${Math.random() * 360},70%,60%)`;
+    document.body.appendChild(conf);
+    gsap.to(conf, {
+      y: "100vh",
+      rotation: Math.random() * 360,
+      duration: 1 + Math.random(),
+      onComplete: () => conf.remove(),
+    });
   }
 }
 
