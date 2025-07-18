@@ -6,7 +6,9 @@
   <title>Word Order Adventure</title>
 
   <!-- Google Font -->
-  <link href="https://fonts.googleapis.com/css2?family=Comic+Neue:wght@400;700&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Comic+Neue:wght@400;700&display=swap" rel="stylesheet" />
+  <!-- Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" integrity="sha512-Kd+eJHCjfukdxbYlR5c+3F4iAfDdc0AGJi/7uWGINuD/7++UZ5EONosFVJeFt3uTJS3BM4tiTqcKki0CZZng9Q==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 
   <!-- Manifest -->
   <link rel="manifest" href="manifest.json" />
@@ -52,10 +54,11 @@
       </select>
       <label><input type="checkbox" id="timer-mode" /> Timer Mode (30s)</label>
       <span id="timer-display"></span>
-      <button id="listen-instructions-btn" class="instruction-btn">Hear Instructions</button>
-      <button id="fullscreen-btn" class="instruction-btn">Fullscreen</button>
-      <button id="theme-toggle" class="instruction-btn">Change Theme</button>
-      <button id="help-btn" class="instruction-btn">Help</button>
+      <button id="listen-instructions-btn" class="instruction-btn" aria-label="Hear Instructions"><i class="fa-solid fa-volume-high" aria-hidden="true"></i> Hear</button>
+      <button id="fullscreen-btn" class="instruction-btn" aria-label="Toggle Fullscreen"><i class="fa-solid fa-up-right-and-down-left-from-center" aria-hidden="true"></i> Fullscreen</button>
+      <button id="theme-toggle" class="instruction-btn" aria-label="Change Theme"><i class="fa-solid fa-palette" aria-hidden="true"></i> Theme</button>
+      <button id="help-btn" class="instruction-btn" aria-label="Help"><i class="fa-solid fa-circle-question" aria-hidden="true"></i> Help</button>
+      <button id="pause-timer-btn" class="instruction-btn" aria-label="Pause Timer"><i class="fa-solid fa-pause" aria-hidden="true"></i> Pause Timer</button>
     </div>
   </header>
 
@@ -82,12 +85,12 @@
     </section>
 
     <nav class="nav-buttons">
-      <button id="prev-btn">Back</button>
-      <button id="hint-btn">Get a Hint</button>
-      <button id="submit-btn" disabled>Check Answer</button>
-      <button id="try-again-btn" style="display:none">Try Again</button>
-      <button id="next-btn">Next</button>
-      <button id="clear-btn">Clear</button>
+      <button id="prev-btn" aria-label="Previous"><i class="fa-solid fa-arrow-left" aria-hidden="true"></i> Back</button>
+      <button id="hint-btn" aria-label="Get a Hint"><i class="fa-solid fa-lightbulb" aria-hidden="true"></i> Hint</button>
+      <button id="submit-btn" disabled aria-label="Check Answer"><i class="fa-solid fa-check" aria-hidden="true"></i> Check</button>
+      <button id="try-again-btn" style="display:none" aria-label="Reveal Answer"><i class="fa-solid fa-rotate-right" aria-hidden="true"></i> Show Answer</button>
+      <button id="next-btn" aria-label="Next"><i class="fa-solid fa-arrow-right" aria-hidden="true"></i> Next</button>
+      <button id="clear-btn" aria-label="Clear"><i class="fa-solid fa-eraser" aria-hidden="true"></i> Clear</button>
     </nav>
 
     <div class="feedback">
@@ -95,9 +98,9 @@
       <p id="success-message" aria-live="polite"></p>
     </div>
 
-    <button id="reset-btn">Start Over</button>
-    <button id="export-btn">Export Progress</button>
-    <button id="share-btn">Share Score</button>
+   <button id="reset-btn" aria-label="Start Over"><i class="fa-solid fa-arrow-rotate-left" aria-hidden="true"></i> Start Over</button>
+    <button id="export-btn" aria-label="Export Progress"><i class="fa-solid fa-download" aria-hidden="true"></i> Export</button>
+    <button id="share-btn" aria-label="Share Score"><i class="fa-solid fa-share-nodes" aria-hidden="true"></i> Share</button>
   </main>
 
   <script type="module" src="game.js"></script>
