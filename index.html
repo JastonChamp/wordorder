@@ -2,11 +2,11 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
   <title>Word Order Adventure</title>
 
   <!-- Google Font -->
-<link href="https://fonts.googleapis.com/css2?family=Comic+Neue:wght@400;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Comic+Neue:wght@400;700&display=swap" rel="stylesheet" />
   <!-- Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" integrity="sha512-Kd+eJHCjfukdxbYlR5c+3F4iAfDdc0AGJi/7uWGINuD/7++UZ5EONosFVJeFt3uTJS3BM4tiTqcKki0CZZng9Q==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 
@@ -24,26 +24,24 @@
   <!-- Tutorial Overlay -->
   <div id="tutorial-overlay" class="hidden">
     <div id="tutorial-content">
-      <h2>Welcome to Word Order Adventure!</h2>
+      <h2>How to Play</h2>
       <ol>
-        <li>Drag words from the bank into the drop zone.</li>
-        <li>Tap “Check Answer” to see if you got it right.</li>
-        <li>Use one free hint per puzzle from the Hint button.</li>
-        <li>Earn XP, badges and level up as you master sentences!</li>
+        <li>Tap a word to pick it up.</li>
+        <li>Tap the sentence area to place it.</li>
+        <li>Put the words in the right order!</li>
+        <li>Tap "Check" to see if you got it right.</li>
       </ol>
-      <button id="tutorial-next">Got it!</button>
+      <button id="tutorial-next">Let's Go!</button>
     </div>
   </div>
 
   <header>
     <h1>Word Order Adventure</h1>
     <p class="instructions">
-      Drag the words below to make a sentence or question!<br />
-      Start with a capital letter and end with punctuation.<br />
-      <span style="font-size:0.8em;color:var(--accent-color);">(Tap and hold or swipe on phones)</span>
+      Tap the words to build the sentence!
     </p>
     <div class="controls">
-      <label for="level-select">Pick Your Level:</label>
+      <label for="level-select">Level:</label>
       <select id="level-select">
         <option value="p1">Primary 1</option>
         <option value="p2">Primary 2</option>
@@ -52,13 +50,13 @@
         <option value="p5">Primary 5</option>
         <option value="p6">Primary 6</option>
       </select>
-      <label><input type="checkbox" id="timer-mode" /> Timer Mode (30s)</label>
+      <label><input type="checkbox" id="timer-mode" /> <span class="btn-label">Timer</span></label>
       <span id="timer-display"></span>
-      <button id="listen-instructions-btn" class="instruction-btn" aria-label="Hear Instructions"><i class="fa-solid fa-volume-high" aria-hidden="true"></i> Hear</button>
-      <button id="fullscreen-btn" class="instruction-btn" aria-label="Toggle Fullscreen"><i class="fa-solid fa-up-right-and-down-left-from-center" aria-hidden="true"></i> Fullscreen</button>
-      <button id="theme-toggle" class="instruction-btn" aria-label="Change Theme"><i class="fa-solid fa-palette" aria-hidden="true"></i> Theme</button>
-      <button id="help-btn" class="instruction-btn" aria-label="Help"><i class="fa-solid fa-circle-question" aria-hidden="true"></i> Help</button>
-      <button id="pause-timer-btn" class="instruction-btn" aria-label="Pause Timer"><i class="fa-solid fa-pause" aria-hidden="true"></i> Pause Timer</button>
+      <button id="listen-instructions-btn" class="instruction-btn" aria-label="Hear Instructions"><i class="fa-solid fa-volume-high" aria-hidden="true"></i> <span class="btn-label">Hear</span></button>
+      <button id="fullscreen-btn" class="instruction-btn" aria-label="Toggle Fullscreen"><i class="fa-solid fa-expand" aria-hidden="true"></i></button>
+      <button id="theme-toggle" class="instruction-btn" aria-label="Change Theme"><i class="fa-solid fa-palette" aria-hidden="true"></i></button>
+      <button id="help-btn" class="instruction-btn" aria-label="Help"><i class="fa-solid fa-circle-question" aria-hidden="true"></i></button>
+      <button id="pause-timer-btn" class="instruction-btn" aria-label="Pause Timer" style="display:none"><i class="fa-solid fa-pause" aria-hidden="true"></i> <span class="btn-label">Pause</span></button>
     </div>
   </header>
 
@@ -68,7 +66,7 @@
     <section id="progress-bar-container">
       <div id="progress-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span id="progress-label"></span></div>
     </section>
-    <section id="progress-indicator">Mastery Progress: 0% (80% to advance)</section>
+    <section id="progress-indicator">Mastery: 0% (need 80%)</section>
 
     <section id="gamification-panel">
       <p id="xp-display">XP: 0</p>
@@ -87,10 +85,10 @@
     <nav class="nav-buttons">
       <button id="prev-btn" aria-label="Previous"><i class="fa-solid fa-arrow-left" aria-hidden="true"></i> Back</button>
       <button id="hint-btn" aria-label="Get a Hint"><i class="fa-solid fa-lightbulb" aria-hidden="true"></i> Hint</button>
-      <button id="submit-btn" disabled aria-label="Check Answer"><i class="fa-solid fa-check" aria-hidden="true"></i> Check</button>
-      <button id="try-again-btn" style="display:none" aria-label="Reveal Answer"><i class="fa-solid fa-rotate-right" aria-hidden="true"></i> Show Answer</button>
-      <button id="next-btn" aria-label="Next"><i class="fa-solid fa-arrow-right" aria-hidden="true"></i> Next</button>
       <button id="clear-btn" aria-label="Clear"><i class="fa-solid fa-eraser" aria-hidden="true"></i> Clear</button>
+      <button id="submit-btn" disabled aria-label="Check Answer"><i class="fa-solid fa-check" aria-hidden="true"></i> Check Answer</button>
+      <button id="try-again-btn" style="display:none" aria-label="Reveal Answer"><i class="fa-solid fa-eye" aria-hidden="true"></i> Show Answer</button>
+      <button id="next-btn" aria-label="Next"><i class="fa-solid fa-arrow-right" aria-hidden="true"></i> Next</button>
     </nav>
 
     <div class="feedback">
@@ -98,9 +96,11 @@
       <p id="success-message" aria-live="polite"></p>
     </div>
 
-   <button id="reset-btn" aria-label="Start Over"><i class="fa-solid fa-arrow-rotate-left" aria-hidden="true"></i> Start Over</button>
-    <button id="export-btn" aria-label="Export Progress"><i class="fa-solid fa-download" aria-hidden="true"></i> Export</button>
-    <button id="share-btn" aria-label="Share Score"><i class="fa-solid fa-share-nodes" aria-hidden="true"></i> Share</button>
+    <div class="bottom-actions">
+      <button id="reset-btn" aria-label="Start Over"><i class="fa-solid fa-arrow-rotate-left" aria-hidden="true"></i> Start Over</button>
+      <button id="export-btn" aria-label="Export Progress"><i class="fa-solid fa-download" aria-hidden="true"></i> Export</button>
+      <button id="share-btn" aria-label="Share Score"><i class="fa-solid fa-share-nodes" aria-hidden="true"></i> Share</button>
+    </div>
   </main>
 
   <script type="module" src="game.js"></script>
