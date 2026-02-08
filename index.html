@@ -5,103 +5,214 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
   <title>Word Order Adventure</title>
 
-  <!-- Google Font -->
-  <link href="https://fonts.googleapis.com/css2?family=Comic+Neue:wght@400;700&display=swap" rel="stylesheet" />
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Fredoka+One&display=swap" rel="stylesheet" />
   <!-- Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" integrity="sha512-Kd+eJHCjfukdxbYlR5c+3F4iAfDdc0AGJi/7uWGINuD/7++UZ5EONosFVJeFt3uTJS3BM4tiTqcKki0CZZng9Q==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-
-  <!-- Manifest -->
   <link rel="manifest" href="manifest.json" />
-
-  <!-- Favicon -->
   <link rel="shortcut icon" href="./images/favicon.ico" type="image/x-icon" />
   <link rel="icon" href="./images/favicon.ico" type="image/x-icon" />
-
-  <!-- Main stylesheet -->
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-  <!-- Tutorial Overlay -->
+
+  <!-- ===== Animated Onboarding Tutorial ===== -->
   <div id="tutorial-overlay" class="hidden">
     <div id="tutorial-content">
-      <h2>How to Play</h2>
-      <ol>
-        <li>Tap a word to pick it up.</li>
-        <li>Tap the sentence area to place it.</li>
-        <li>Put the words in the right order!</li>
-        <li>Tap "Check" to see if you got it right.</li>
-      </ol>
-      <button id="tutorial-next">Let's Go!</button>
+      <div id="tutorial-steps">
+        <div class="tutorial-step active" data-step="0">
+          <div class="tutorial-icon"><i class="fa-solid fa-hand-pointer"></i></div>
+          <h2>Welcome!</h2>
+          <p>Build sentences by putting words in the right order. Let's learn how!</p>
+        </div>
+        <div class="tutorial-step" data-step="1">
+          <div class="tutorial-icon"><i class="fa-solid fa-arrow-up-from-bracket"></i></div>
+          <h2>Tap to Pick</h2>
+          <p>Tap any word in the top area to move it down into your sentence.</p>
+        </div>
+        <div class="tutorial-step" data-step="2">
+          <div class="tutorial-icon"><i class="fa-solid fa-arrow-down-to-bracket"></i></div>
+          <h2>Tap to Remove</h2>
+          <p>Made a mistake? Tap a word in your sentence to move it back!</p>
+        </div>
+        <div class="tutorial-step" data-step="3">
+          <div class="tutorial-icon"><i class="fa-solid fa-circle-check"></i></div>
+          <h2>Check Your Answer</h2>
+          <p>When all words are placed, tap the big green button to check!</p>
+        </div>
+      </div>
+      <div class="tutorial-dots">
+        <span class="dot active" data-dot="0"></span>
+        <span class="dot" data-dot="1"></span>
+        <span class="dot" data-dot="2"></span>
+        <span class="dot" data-dot="3"></span>
+      </div>
+      <div class="tutorial-buttons">
+        <button id="tutorial-skip" class="tutorial-btn-skip">Skip</button>
+        <button id="tutorial-next" class="tutorial-btn-next">Next <i class="fa-solid fa-arrow-right"></i></button>
+      </div>
     </div>
   </div>
 
-  <header>
-    <h1>Word Order Adventure</h1>
-    <p class="instructions">
-      Tap the words to build the sentence!
-    </p>
-    <div class="controls">
-      <label for="level-select">Level:</label>
-      <select id="level-select">
-        <option value="p1">Primary 1</option>
-        <option value="p2">Primary 2</option>
-        <option value="p3" selected>Primary 3</option>
-        <option value="p4">Primary 4</option>
-        <option value="p5">Primary 5</option>
-        <option value="p6">Primary 6</option>
-      </select>
-      <label><input type="checkbox" id="timer-mode" /> <span class="btn-label">Timer</span></label>
-      <span id="timer-display"></span>
-      <button id="listen-instructions-btn" class="instruction-btn" aria-label="Hear Instructions"><i class="fa-solid fa-volume-high" aria-hidden="true"></i> <span class="btn-label">Hear</span></button>
-      <button id="fullscreen-btn" class="instruction-btn" aria-label="Toggle Fullscreen"><i class="fa-solid fa-expand" aria-hidden="true"></i></button>
-      <button id="theme-toggle" class="instruction-btn" aria-label="Change Theme"><i class="fa-solid fa-palette" aria-hidden="true"></i></button>
-      <button id="help-btn" class="instruction-btn" aria-label="Help"><i class="fa-solid fa-circle-question" aria-hidden="true"></i></button>
-      <button id="pause-timer-btn" class="instruction-btn" aria-label="Pause Timer" style="display:none"><i class="fa-solid fa-pause" aria-hidden="true"></i> <span class="btn-label">Pause</span></button>
+  <!-- ===== Session Complete Overlay ===== -->
+  <div id="session-complete-overlay" class="hidden">
+    <div id="session-complete-content">
+      <div class="session-stars" id="session-stars"></div>
+      <h2 id="session-title">Session Complete!</h2>
+      <div class="session-stats">
+        <div class="stat-card">
+          <div class="stat-value" id="stat-score">0/10</div>
+          <div class="stat-label">Correct</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="stat-accuracy">0%</div>
+          <div class="stat-label">Accuracy</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="stat-xp-earned">+0</div>
+          <div class="stat-label">XP Earned</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="stat-streak">0</div>
+          <div class="stat-label">Best Streak</div>
+        </div>
+      </div>
+      <div class="session-actions">
+        <button id="session-play-again" class="session-btn primary"><i class="fa-solid fa-rotate-right"></i> Play Again</button>
+        <button id="session-next-level" class="session-btn secondary"><i class="fa-solid fa-arrow-up"></i> Next Level</button>
+      </div>
     </div>
-  </header>
+  </div>
 
-  <main class="game-container">
-    <section id="puzzle-container" role="region" aria-live="polite"></section>
-
-    <section id="progress-bar-container">
-      <div id="progress-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span id="progress-label"></span></div>
-    </section>
-    <section id="progress-indicator">Mastery: 0% (need 80%)</section>
-
-    <section id="gamification-panel">
-      <p id="xp-display">XP: 0</p>
-      <p id="streak-display">Streak: 0</p>
-      <div id="badges-container">Badges: <span id="badges-list"></span></div>
-      <div id="daily-challenge">Daily Quest: Complete 5 puzzles! <button id="claim-reward">Claim</button></div>
-    </section>
-
-    <section id="word-class-legend">
-      <span class="legend-item noun">Noun</span>
-      <span class="legend-item verb">Verb</span>
-      <span class="legend-item adjective">Adjective</span>
-      <span class="legend-item adverb">Adverb</span>
-    </section>
-
-    <nav class="nav-buttons">
-      <button id="prev-btn" aria-label="Previous"><i class="fa-solid fa-arrow-left" aria-hidden="true"></i> Back</button>
-      <button id="hint-btn" aria-label="Get a Hint"><i class="fa-solid fa-lightbulb" aria-hidden="true"></i> Hint</button>
-      <button id="clear-btn" aria-label="Clear"><i class="fa-solid fa-eraser" aria-hidden="true"></i> Clear</button>
-      <button id="submit-btn" disabled aria-label="Check Answer"><i class="fa-solid fa-check" aria-hidden="true"></i> Check Answer</button>
-      <button id="try-again-btn" style="display:none" aria-label="Reveal Answer"><i class="fa-solid fa-eye" aria-hidden="true"></i> Show Answer</button>
-      <button id="next-btn" aria-label="Next"><i class="fa-solid fa-arrow-right" aria-hidden="true"></i> Next</button>
-    </nav>
-
-    <div class="feedback">
-      <p id="hint"></p>
-      <p id="success-message" aria-live="polite"></p>
+  <!-- ===== Game Mode Selector ===== -->
+  <div id="mode-selector-overlay" class="hidden">
+    <div id="mode-selector-content">
+      <h2>Choose Your Mode</h2>
+      <div class="mode-cards">
+        <button class="mode-card" data-mode="practice">
+          <div class="mode-icon"><i class="fa-solid fa-book-open"></i></div>
+          <h3>Practice</h3>
+          <p>Learn at your own pace. No timer, unlimited hints.</p>
+        </button>
+        <button class="mode-card" data-mode="challenge">
+          <div class="mode-icon"><i class="fa-solid fa-clock"></i></div>
+          <h3>Challenge</h3>
+          <p>Race against the clock! 30 seconds per sentence.</p>
+        </button>
+        <button class="mode-card" data-mode="streak">
+          <div class="mode-icon"><i class="fa-solid fa-fire"></i></div>
+          <h3>Streak</h3>
+          <p>How many can you get right in a row?</p>
+        </button>
+      </div>
     </div>
+  </div>
 
-    <div class="bottom-actions">
-      <button id="reset-btn" aria-label="Start Over"><i class="fa-solid fa-arrow-rotate-left" aria-hidden="true"></i> Start Over</button>
-      <button id="export-btn" aria-label="Export Progress"><i class="fa-solid fa-download" aria-hidden="true"></i> Export</button>
-      <button id="share-btn" aria-label="Share Score"><i class="fa-solid fa-share-nodes" aria-hidden="true"></i> Share</button>
-    </div>
-  </main>
+  <!-- ===== Main App ===== -->
+  <div class="app-shell">
+    <header>
+      <div class="header-top">
+        <div class="brand">
+          <h1><span class="brand-icon">✨</span> Word Order Adventure</h1>
+        </div>
+        <div class="header-actions">
+          <button id="sound-toggle" class="icon-btn" aria-label="Toggle Sound"><i class="fa-solid fa-volume-high"></i></button>
+          <button id="theme-toggle" class="icon-btn" aria-label="Change Theme"><i class="fa-solid fa-moon"></i></button>
+          <button id="fullscreen-btn" class="icon-btn" aria-label="Toggle Fullscreen"><i class="fa-solid fa-expand"></i></button>
+          <button id="help-btn" class="icon-btn" aria-label="Help"><i class="fa-solid fa-circle-question"></i></button>
+        </div>
+      </div>
+
+      <!-- Stats Bar -->
+      <div class="stats-bar">
+        <div class="stat-pill xp-pill" id="xp-display"><i class="fa-solid fa-star"></i> <span>0 XP</span></div>
+        <div class="stat-pill streak-pill" id="streak-display"><i class="fa-solid fa-fire"></i> <span>0</span></div>
+        <div class="stat-pill level-pill">
+          <i class="fa-solid fa-graduation-cap"></i>
+          <select id="level-select" aria-label="Select Level">
+            <option value="p1">Level 1</option>
+            <option value="p2">Level 2</option>
+            <option value="p3" selected>Level 3</option>
+            <option value="p4">Level 4</option>
+            <option value="p5">Level 5</option>
+            <option value="p6">Level 6</option>
+          </select>
+        </div>
+        <button class="stat-pill mode-pill" id="mode-btn"><i class="fa-solid fa-gamepad"></i> <span id="current-mode-label">Practice</span></button>
+      </div>
+    </header>
+
+    <main class="game-container">
+      <!-- Progress -->
+      <div class="progress-section">
+        <div class="progress-text">
+          <span id="progress-label">1 / 10</span>
+          <span id="timer-display"></span>
+        </div>
+        <div id="progress-bar-container">
+          <div id="progress-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"></div>
+        </div>
+      </div>
+
+      <!-- Instruction Hint -->
+      <div class="instruction-banner" id="instruction-banner">
+        <i class="fa-solid fa-hand-pointer"></i> Tap words to build the sentence!
+      </div>
+
+      <!-- Puzzle Area -->
+      <section id="puzzle-container" role="region" aria-live="polite"></section>
+
+      <!-- Word Class Legend (collapsible) -->
+      <details class="legend-details">
+        <summary><i class="fa-solid fa-palette"></i> Word Colors</summary>
+        <div id="word-class-legend">
+          <span class="legend-item noun"><span class="legend-dot"></span> Noun</span>
+          <span class="legend-item verb"><span class="legend-dot"></span> Verb</span>
+          <span class="legend-item adjective"><span class="legend-dot"></span> Adjective</span>
+          <span class="legend-item adverb"><span class="legend-dot"></span> Adverb</span>
+        </div>
+      </details>
+
+      <!-- Action Buttons -->
+      <div class="action-buttons">
+        <div class="action-row-top">
+          <button id="hint-btn" class="action-btn hint-action" aria-label="Get a Hint"><i class="fa-solid fa-lightbulb"></i> Hint</button>
+          <button id="clear-btn" class="action-btn clear-action" aria-label="Clear"><i class="fa-solid fa-eraser"></i> Clear</button>
+          <button id="listen-instructions-btn" class="action-btn listen-action" aria-label="Listen"><i class="fa-solid fa-volume-high"></i> Listen</button>
+        </div>
+        <button id="submit-btn" class="action-btn submit-action" disabled aria-label="Check Answer"><i class="fa-solid fa-check-circle"></i> Check Answer</button>
+        <button id="try-again-btn" class="action-btn reveal-action" style="display:none" aria-label="Show Answer"><i class="fa-solid fa-eye"></i> Show Answer</button>
+      </div>
+
+      <!-- Feedback -->
+      <div class="feedback">
+        <p id="hint"></p>
+        <p id="success-message" aria-live="polite"></p>
+      </div>
+
+      <!-- Navigation -->
+      <div class="nav-row">
+        <button id="prev-btn" class="nav-btn" aria-label="Previous"><i class="fa-solid fa-chevron-left"></i></button>
+        <span class="nav-counter" id="nav-counter">1 / 10</span>
+        <button id="next-btn" class="nav-btn" aria-label="Next"><i class="fa-solid fa-chevron-right"></i></button>
+      </div>
+    </main>
+
+    <!-- Footer actions -->
+    <footer class="app-footer">
+      <button id="reset-btn" class="footer-btn"><i class="fa-solid fa-arrow-rotate-left"></i> New Session</button>
+      <button id="share-btn" class="footer-btn"><i class="fa-solid fa-share-nodes"></i> Share</button>
+    </footer>
+  </div>
+
+  <!-- Hidden elements for backwards compatibility -->
+  <div style="display:none">
+    <input type="checkbox" id="timer-mode" />
+    <button id="pause-timer-btn"></button>
+    <span id="progress-indicator"></span>
+    <span id="badges-list"></span>
+    <button id="export-btn"></button>
+  </div>
 
   <script type="module" src="game.js"></script>
   <script>

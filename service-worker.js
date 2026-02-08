@@ -1,6 +1,6 @@
-const CACHE_NAME = "word-order-v6";
+const CACHE_NAME = "word-order-v7";
 const urlsToCache = [
-  "/","index.html","styles.css","game.js","ui.js","speech.js","wordClasses.js",
+  "/","index.html","styles.css","game.js","ui.js","speech.js","wordClasses.js","sounds.js",
   "data/p1.json","data/p2.json","data/p3.json","data/p4.json","data/p5.json","data/p6.json",
   "manifest.json","favicon.ico","icon-192.png","icon-512.png",
   "images/mascot.png","images/star.png","images/first-win.png",
