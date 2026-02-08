@@ -2,6 +2,7 @@
 import { elements } from "./ui.js";
 import { speak } from "./speech.js";
 import { getWordClass, getWordRole } from "./wordClasses.js";
+import { playTap, playPlace, playCorrect, playWrong, playComplete, playHint, resumeAudio, setSoundEnabled, isSoundEnabled } from "./sounds.js";
 
 const INSTRUCTIONS =
   "Tap a word to pick it up, then tap the sentence area to place it. Put the words in the right order and tap Check Answer!";
@@ -12,37 +13,46 @@ const sessionLength = 10;
 let puzzles = [];
 let currentPuzzleIndex = 0;
 let score = 0;
+let sessionXpEarned = 0;
+let bestStreakThisSession = 0;
+let currentStreak = 0;
+let attempts = 0;
 
 let currentLevel = localStorage.getItem("currentLevel") || "p3";
 let xp = +localStorage.getItem("xp") || 0;
 let streak = +localStorage.getItem("streak") || 0;
 let badges = JSON.parse(localStorage.getItem("badges") || "[]");
+let gameMode = localStorage.getItem("gameMode") || "practice";
 
 let draggedItem = null;
-let selectedWord = null; // For tap-to-select
+let selectedWord = null;
 let hintUsed = false;
 let timer = null;
 let remaining = 30;
 let isPaused = false;
-let timerEnabled = JSON.parse(localStorage.getItem("timerMode") || "false");
+let timerEnabled = false;
 
-// Positive feedback messages for correct answers
+// Tutorial state
+let tutorialStep = 0;
+const totalTutorialSteps = 4;
+
+// Positive feedback messages
 const correctMessages = [
-  "Great job!",
-  "Well done!",
-  "You got it!",
-  "Amazing!",
-  "Super!",
-  "Brilliant!",
-  "Perfect!",
-  "Fantastic!",
-  "Awesome work!",
-  "You're a star!",
+  "Great job! ⭐",
+  "Well done! 🌟",
+  "You got it! 🎉",
+  "Amazing! ✨",
+  "Super! 🚀",
+  "Brilliant! 💫",
+  "Perfect! 🏆",
+  "Fantastic! 🎊",
+  "Awesome work! 💪",
+  "You're a star! ⭐",
 ];
 
 const encourageMessages = [
   "Almost! Try again!",
-  "Not quite - try moving some words!",
+  "Not quite - check the colored words!",
   "Keep trying, you can do it!",
   "So close! Give it another go!",
 ];
@@ -61,16 +71,13 @@ const showTooltip = (e) => {
   hideTooltip();
   const role = e.currentTarget.dataset.role;
   if (!role) return;
-
   const tt = document.createElement("div");
   tt.className = "word-tooltip";
   tt.textContent = role;
-
   const rect = e.currentTarget.getBoundingClientRect();
   tt.style.left = `${rect.left + rect.width / 2 + window.scrollX}px`;
   tt.style.top = `${rect.top + window.scrollY - 8}px`;
   tt.style.transform = "translateX(-50%)";
-
   document.body.appendChild(tt);
 };
 
@@ -80,11 +87,11 @@ const startTimer = (start = 30) => {
   elements.timerDisplay.textContent = "";
   if (!timerEnabled) return;
   remaining = start;
-  elements.timerDisplay.textContent = `${remaining}`;
+  elements.timerDisplay.textContent = `${remaining}s`;
   timer = setInterval(() => {
     if (!isPaused) {
       remaining--;
-      elements.timerDisplay.textContent = `${remaining}`;
+      elements.timerDisplay.textContent = `${remaining}s`;
     }
     if (remaining <= 0) {
       clearInterval(timer);
@@ -92,6 +99,7 @@ const startTimer = (start = 30) => {
       elements.submitBtn.disabled = true;
       elements.successMessage.textContent = "Time's up!";
       elements.successMessage.className = "incorrect-msg";
+      playWrong();
     }
   }, 1000);
 };
@@ -99,17 +107,6 @@ const startTimer = (start = 30) => {
 const stopTimer = () => {
   clearInterval(timer);
   elements.timerDisplay.textContent = "";
-};
-
-const togglePauseTimer = () => {
-  if (!timerEnabled) return;
-  if (!isPaused) {
-    isPaused = true;
-    elements.pauseTimerBtn.innerHTML = '<i class="fa-solid fa-play" aria-hidden="true"></i> <span class="btn-label">Resume</span>';
-  } else {
-    isPaused = false;
-    elements.pauseTimerBtn.innerHTML = '<i class="fa-solid fa-pause" aria-hidden="true"></i> <span class="btn-label">Pause</span>';
-  }
 };
 
 // ===== Data Loading =====
@@ -126,7 +123,6 @@ export async function loadSentencesForLevel(level) {
     return [];
   }
 }
-export const getSentencesForLevel = (lvl) => sentenceCache[lvl] || [];
 
 // ===== Drag & Drop Handlers =====
 export const handleDragStart = (e) => {
@@ -143,7 +139,6 @@ export const handleDragEnd = () => {
   if (draggedItem) draggedItem.classList.remove("dragging");
   draggedItem = null;
 };
-
 export const handleDragLeave = (e) => e.currentTarget.classList.remove("active");
 export const handleDrop = (e) => {
   e.preventDefault();
@@ -152,6 +147,7 @@ export const handleDrop = (e) => {
   draggedItem.classList.remove("hint");
   draggedItem.style.backgroundColor = "";
   e.currentTarget.appendChild(draggedItem);
+  playPlace();
   updateDropZonePlaceholder();
   updateSubmitButton();
   hideTooltip();
@@ -159,7 +155,6 @@ export const handleDrop = (e) => {
 
 // ===== Touch Drag Handlers =====
 export const handleTouchStart = (e) => {
-  // Don't prevent default for tap - only for drag
   const touch = e.touches[0];
   const el = e.currentTarget;
   el._touchStartX = touch.clientX;
@@ -181,29 +176,22 @@ export const handleTouchMove = (e) => {
       hideTooltip();
     }
   }
-
   if (draggedItem) {
     const target = document.elementFromPoint(touch.clientX, touch.clientY);
-    document
-      .querySelectorAll(".drop-zone.active, .word-bank.active")
+    document.querySelectorAll(".drop-zone.active, .word-bank.active")
       .forEach((dz) => dz.classList.remove("active"));
     const dropZone = target && (target.closest(".drop-zone") || target.closest(".word-bank"));
-    if (dropZone) {
-      dropZone.classList.add("active");
-    }
+    if (dropZone) dropZone.classList.add("active");
   }
 };
 
 export const handleTouchEnd = (e) => {
   const el = e.currentTarget;
-
-  // If it was a tap (not a drag), use tap-to-select
   if (!el._touchMoved) {
     e.preventDefault();
     handleWordTap(el);
     return;
   }
-
   e.preventDefault();
   const touch = e.changedTouches[0];
   const target = document.elementFromPoint(touch.clientX, touch.clientY);
@@ -213,6 +201,7 @@ export const handleTouchEnd = (e) => {
     draggedItem.classList.remove("hint");
     draggedItem.style.backgroundColor = "";
     dropTarget.appendChild(draggedItem);
+    playPlace();
     updateDropZonePlaceholder();
     updateSubmitButton();
     hideTooltip();
@@ -221,7 +210,7 @@ export const handleTouchEnd = (e) => {
   draggedItem = null;
 };
 
-// ===== Tap-to-Select (Primary interaction for children) =====
+// ===== Tap-to-Select =====
 function deselectWord() {
   if (selectedWord) {
     selectedWord.classList.remove("selected");
@@ -234,70 +223,64 @@ function handleWordTap(wordEl) {
   const wordBank = elements.puzzleContainer.querySelector(".word-bank");
   if (!dropZone || !wordBank) return;
 
-  // If this word is already selected, deselect it
   if (selectedWord === wordEl) {
     deselectWord();
     return;
   }
 
-  // If word is in the word bank, move it to drop zone
   if (wordBank.contains(wordEl)) {
     deselectWord();
     wordEl.classList.remove("hint");
     wordEl.style.backgroundColor = "";
     dropZone.appendChild(wordEl);
+    playPlace();
     updateDropZonePlaceholder();
     updateSubmitButton();
-    // Brief visual pop
     wordEl.style.animation = "none";
-    wordEl.offsetHeight; // force reflow
-    wordEl.style.animation = "bounce 0.3s ease";
-  }
-  // If word is in the drop zone, move it back to word bank
-  else if (dropZone.contains(wordEl)) {
+    wordEl.offsetHeight;
+    wordEl.style.animation = "correctPop 0.3s ease";
+  } else if (dropZone.contains(wordEl)) {
     deselectWord();
     wordBank.appendChild(wordEl);
+    playTap();
     updateDropZonePlaceholder();
     updateSubmitButton();
   }
-
   hideTooltip();
 }
 
 function handleWordClick(e) {
-  // Only handle click on desktop (touch is handled separately)
   if (e.target._touchMoved !== undefined) return;
   handleWordTap(e.currentTarget);
 }
 
-// ===== Drop zone tap handler (for placing selected word) =====
 function handleDropZoneTap(e) {
   if (selectedWord && e.target.classList.contains("drop-zone")) {
     selectedWord.classList.remove("selected", "hint");
     selectedWord.style.backgroundColor = "";
     e.target.appendChild(selectedWord);
+    playPlace();
     deselectWord();
     updateDropZonePlaceholder();
     updateSubmitButton();
   }
 }
 
-// ===== Helper: Update placeholder & submit state =====
+// ===== Helpers =====
 function updateDropZonePlaceholder() {
   const dropZone = elements.puzzleContainer.querySelector(".drop-zone");
   if (!dropZone) return;
   const placeholder = dropZone.querySelector(".drop-zone-placeholder");
   const hasWords = dropZone.querySelectorAll(".word").length > 0;
-  if (placeholder) {
-    placeholder.style.display = hasWords ? "none" : "block";
-  }
+  if (placeholder) placeholder.style.display = hasWords ? "none" : "block";
 }
 
 function updateSubmitButton() {
   const dropZone = elements.puzzleContainer.querySelector(".drop-zone");
   if (!dropZone) return;
   const wordCount = dropZone.querySelectorAll(".word").length;
-  elements.submitBtn.disabled = wordCount === 0;
+  const puzzle = puzzles[currentPuzzleIndex];
+  elements.submitBtn.disabled = !puzzle || wordCount !== puzzle.words.length;
 }
 
 // ===== Puzzle Generation =====
@@ -318,6 +301,10 @@ async function generatePuzzles() {
   });
   currentPuzzleIndex = 0;
   score = 0;
+  sessionXpEarned = 0;
+  bestStreakThisSession = 0;
+  currentStreak = 0;
+  attempts = 0;
 }
 
 // ===== Display Current Puzzle =====
@@ -326,8 +313,7 @@ function displayCurrentPuzzle() {
   deselectWord();
 
   if (currentPuzzleIndex < 0) currentPuzzleIndex = 0;
-  if (currentPuzzleIndex >= puzzles.length)
-    currentPuzzleIndex = puzzles.length - 1;
+  if (currentPuzzleIndex >= puzzles.length) currentPuzzleIndex = puzzles.length - 1;
 
   const puzzle = puzzles[currentPuzzleIndex];
   if (!puzzle) return;
@@ -336,6 +322,11 @@ function displayCurrentPuzzle() {
   elements.successMessage.textContent = "";
   elements.successMessage.className = "";
   elements.hint.textContent = "";
+
+  // Hide instruction banner after first puzzle
+  if (currentPuzzleIndex > 0 && elements.instructionBanner) {
+    elements.instructionBanner.style.display = "none";
+  }
 
   // Word bank label
   const bankLabel = document.createElement("div");
@@ -380,7 +371,6 @@ function displayCurrentPuzzle() {
   dropZone.addEventListener("drop", handleDrop);
   dropZone.addEventListener("click", handleDropZoneTap);
 
-  // Placeholder text
   const placeholder = document.createElement("div");
   placeholder.className = "drop-zone-placeholder";
   placeholder.textContent = "Tap words above to place them here";
@@ -396,21 +386,34 @@ function displayCurrentPuzzle() {
   const progressPercent = (currentPuzzleIndex / sessionLength) * 100;
   animateProgressBar(progressPercent);
   elements.progressLabel.textContent = `${currentPuzzleIndex + 1} / ${sessionLength}`;
-  elements.progressIndicator.textContent = `Mastery: ${Math.round((score / sessionLength) * 100)}% (need 80%)`;
-  elements.xpDisplay.textContent = `XP: ${xp}`;
-  elements.streakDisplay.textContent = `Streak: ${streak}`;
-  elements.badgesList.textContent = badges.join(", ");
+  if (elements.navCounter) {
+    elements.navCounter.textContent = `${currentPuzzleIndex + 1} / ${sessionLength}`;
+  }
+  updateStatsDisplay();
 
   isPaused = false;
-  elements.pauseTimerBtn.innerHTML = '<i class="fa-solid fa-pause" aria-hidden="true"></i> <span class="btn-label">Pause</span>';
-  startTimer();
+  if (gameMode === "challenge") {
+    timerEnabled = true;
+    startTimer(30);
+  } else {
+    timerEnabled = false;
+    stopTimer();
+  }
+}
+
+function updateStatsDisplay() {
+  if (elements.xpDisplay) {
+    elements.xpDisplay.innerHTML = `<i class="fa-solid fa-star"></i> <span>${xp} XP</span>`;
+  }
+  if (elements.streakDisplay) {
+    elements.streakDisplay.innerHTML = `<i class="fa-solid fa-fire"></i> <span>${streak}</span>`;
+  }
 }
 
 // ===== Reveal Answer =====
 function revealAnswer() {
   const puzzle = puzzles[currentPuzzleIndex];
   if (!puzzle) return;
-
   const dropZone = elements.puzzleContainer.querySelector(".drop-zone");
   if (!dropZone) return;
 
@@ -431,51 +434,132 @@ function revealAnswer() {
   stopTimer();
 }
 
-// ===== Check Answer =====
+// ===== Check Answer (with word-by-word feedback) =====
 function checkAnswer() {
   const dropZone = elements.puzzleContainer.querySelector(".drop-zone");
-  const attempt = Array.from(dropZone.querySelectorAll(".word")).map((ch) => ch.textContent);
+  const wordEls = Array.from(dropZone.querySelectorAll(".word"));
+  const attempt = wordEls.map((ch) => ch.textContent);
   const puzzle = puzzles[currentPuzzleIndex];
 
   if (attempt.length !== puzzle.words.length) return;
 
+  attempts++;
   const correct = puzzle.words.every((w, i) => w === attempt[i]);
+
+  // Word-by-word highlighting
+  wordEls.forEach((el, i) => {
+    el.classList.remove("word-correct", "word-incorrect", "correct", "incorrect");
+    if (attempt[i] === puzzle.words[i]) {
+      el.classList.add("word-correct");
+    } else {
+      el.classList.add("word-incorrect");
+    }
+  });
+
   if (correct) {
-    dropZone.querySelectorAll(".word").forEach((w) => w.classList.add("correct"));
+    wordEls.forEach((w) => {
+      w.classList.remove("word-correct", "word-incorrect");
+      w.classList.add("correct");
+    });
     elements.successMessage.textContent = randomFrom(correctMessages);
     elements.successMessage.className = "correct-msg";
     animateSuccessMessage();
     fireConfetti();
+    playCorrect();
+
     score++;
+    currentStreak++;
+    if (currentStreak > bestStreakThisSession) bestStreakThisSession = currentStreak;
     streak++;
-    xp += 10;
+
+    const earnedXp = hintUsed ? 5 : 10;
+    xp += earnedXp;
+    sessionXpEarned += earnedXp;
+
     elements.nextBtn.disabled = false;
     elements.submitBtn.disabled = true;
     localStorage.setItem("xp", xp.toString());
     localStorage.setItem("streak", streak.toString());
     speak(puzzle.sentence);
     stopTimer();
+
+    // Haptic feedback
+    if (navigator.vibrate) navigator.vibrate(50);
+
+    // Auto-advance or show session complete
+    if (currentPuzzleIndex === puzzles.length - 1) {
+      setTimeout(showSessionComplete, 1500);
+    }
   } else {
-    dropZone.querySelectorAll(".word").forEach((w) => {
-      w.classList.add("incorrect");
-      // Remove incorrect class after animation
-      setTimeout(() => w.classList.remove("incorrect"), 500);
-    });
+    playWrong();
     elements.successMessage.textContent = randomFrom(encourageMessages);
     elements.successMessage.className = "incorrect-msg";
-    elements.tryAgainBtn.style.display = "inline-block";
+    elements.tryAgainBtn.style.display = "inline-flex";
+    currentStreak = 0;
     streak = 0;
     localStorage.setItem("streak", "0");
+
+    // Haptic feedback
+    if (navigator.vibrate) navigator.vibrate([50, 30, 50]);
+
+    // Remove word-level highlighting after a delay so child can study it
+    setTimeout(() => {
+      wordEls.forEach((el) => el.classList.remove("word-correct", "word-incorrect"));
+    }, 2000);
   }
 
-  elements.progressIndicator.textContent = `Mastery: ${Math.round((score / sessionLength) * 100)}% (need 80%)`;
-  elements.xpDisplay.textContent = `XP: ${xp}`;
-  elements.streakDisplay.textContent = `Streak: ${streak}`;
+  updateStatsDisplay();
+}
+
+// ===== Session Complete Screen =====
+function showSessionComplete() {
+  playComplete();
+
+  const accuracy = Math.round((score / sessionLength) * 100);
+  const starCount = accuracy >= 90 ? 3 : accuracy >= 70 ? 2 : accuracy >= 50 ? 1 : 0;
+
+  // Set star display
+  elements.sessionStars.innerHTML = "";
+  for (let i = 0; i < 3; i++) {
+    const star = document.createElement("span");
+    star.textContent = i < starCount ? "⭐" : "☆";
+    star.style.animation = i < starCount ? `starAppear 0.5s ease ${i * 0.2}s both` : "none";
+    star.style.opacity = i < starCount ? "1" : "0.3";
+    elements.sessionStars.appendChild(star);
+  }
+
+  // Title based on performance
+  if (accuracy === 100) {
+    elements.sessionTitle.textContent = "Perfect Score! 🏆";
+  } else if (accuracy >= 80) {
+    elements.sessionTitle.textContent = "Great Job! 🌟";
+  } else if (accuracy >= 50) {
+    elements.sessionTitle.textContent = "Good Effort! 💪";
+  } else {
+    elements.sessionTitle.textContent = "Keep Practicing! 📚";
+  }
+
+  elements.statScore.textContent = `${score}/${sessionLength}`;
+  elements.statAccuracy.textContent = `${accuracy}%`;
+  elements.statXpEarned.textContent = `+${sessionXpEarned}`;
+  elements.statStreak.textContent = `${bestStreakThisSession}`;
+
+  elements.sessionCompleteOverlay.classList.remove("hidden");
+  fireConfetti();
+
+  // Check for level-up suggestion
+  const levels = ["p1", "p2", "p3", "p4", "p5", "p6"];
+  const currentIdx = levels.indexOf(currentLevel);
+  if (accuracy >= 80 && currentIdx < levels.length - 1) {
+    elements.sessionNextLevel.style.display = "inline-flex";
+  } else {
+    elements.sessionNextLevel.style.display = "none";
+  }
 }
 
 // ===== Hint =====
 function showHint() {
-  if (hintUsed) return;
+  if (hintUsed && gameMode !== "practice") return;
   const puzzle = puzzles[currentPuzzleIndex];
   const dropZone = elements.puzzleContainer.querySelector(".drop-zone");
   const wordBank = elements.puzzleContainer.querySelector(".word-bank");
@@ -489,20 +573,20 @@ function showHint() {
   if (wordEl) {
     const role = getWordRole(nextWord, nextIndex, puzzle.words);
     wordEl.classList.add("hint");
-    wordEl.style.backgroundColor = `var(--hint-${role}-bg)`;
   }
   elements.hint.textContent = `Next word: "${nextWord}"`;
   hintUsed = true;
+  playHint();
 }
 
-// ===== Clear Puzzle =====
+// ===== Clear =====
 function clearPuzzle() {
   deselectWord();
   const dropZone = elements.puzzleContainer.querySelector(".drop-zone");
   const wordBank = elements.puzzleContainer.querySelector(".word-bank");
   if (!dropZone || !wordBank) return;
   Array.from(dropZone.querySelectorAll(".word")).forEach((ch) => {
-    ch.classList.remove("correct", "incorrect", "hint");
+    ch.classList.remove("correct", "incorrect", "hint", "word-correct", "word-incorrect");
     ch.style.backgroundColor = "";
     wordBank.appendChild(ch);
   });
@@ -525,11 +609,43 @@ function toggleFullscreen() {
 
 // ===== Theme =====
 function toggleTheme() {
-  elements.body.classList.toggle("light-theme");
-  localStorage.setItem(
-    "theme",
-    elements.body.classList.contains("light-theme") ? "light" : "dark"
-  );
+  const isDark = elements.body.classList.toggle("dark-theme");
+  localStorage.setItem("theme", isDark ? "dark" : "light");
+  // Update icon
+  const icon = elements.themeToggle.querySelector("i");
+  if (icon) {
+    icon.className = isDark ? "fa-solid fa-sun" : "fa-solid fa-moon";
+  }
+}
+
+// ===== Sound Toggle =====
+function toggleSound() {
+  const enabled = !isSoundEnabled();
+  setSoundEnabled(enabled);
+  localStorage.setItem("soundEnabled", enabled.toString());
+  const icon = elements.soundToggle.querySelector("i");
+  if (icon) {
+    icon.className = enabled ? "fa-solid fa-volume-high" : "fa-solid fa-volume-xmark";
+  }
+}
+
+// ===== Game Modes =====
+function setGameMode(mode) {
+  gameMode = mode;
+  localStorage.setItem("gameMode", mode);
+  const labels = { practice: "Practice", challenge: "Challenge", streak: "Streak" };
+  if (elements.currentModeLabel) {
+    elements.currentModeLabel.textContent = labels[mode] || "Practice";
+  }
+  timerEnabled = mode === "challenge";
+}
+
+function showModeSelector() {
+  elements.modeSelectorOverlay.classList.remove("hidden");
+}
+
+function hideModeSelector() {
+  elements.modeSelectorOverlay.classList.add("hidden");
 }
 
 // ===== Reset =====
@@ -538,15 +654,69 @@ async function resetQuiz() {
   displayCurrentPuzzle();
 }
 
+// ===== Tutorial =====
+function advanceTutorial() {
+  tutorialStep++;
+  if (tutorialStep >= totalTutorialSteps) {
+    closeTutorial();
+    return;
+  }
+  updateTutorialDisplay();
+}
+
+function closeTutorial() {
+  elements.tutorialOverlay.classList.add("hidden");
+  localStorage.setItem("tutorialSeen", "yes");
+  tutorialStep = 0;
+}
+
+function updateTutorialDisplay() {
+  document.querySelectorAll(".tutorial-step").forEach((s) => s.classList.remove("active"));
+  document.querySelectorAll(".dot").forEach((d) => d.classList.remove("active"));
+
+  const step = document.querySelector(`.tutorial-step[data-step="${tutorialStep}"]`);
+  const dot = document.querySelector(`.dot[data-dot="${tutorialStep}"]`);
+  if (step) step.classList.add("active");
+  if (dot) dot.classList.add("active");
+
+  // Update button text on last step
+  const nextBtn = document.getElementById("tutorial-next");
+  if (nextBtn) {
+    if (tutorialStep === totalTutorialSteps - 1) {
+      nextBtn.innerHTML = 'Let\'s Go! <i class="fa-solid fa-rocket"></i>';
+    } else {
+      nextBtn.innerHTML = 'Next <i class="fa-solid fa-arrow-right"></i>';
+    }
+  }
+}
+
+// ===== Share =====
+function shareScore() {
+  const accuracy = Math.round((score / sessionLength) * 100);
+  const text = `I scored ${score}/${sessionLength} (${accuracy}%) on Word Order Adventure! Can you beat my score?`;
+  if (navigator.share) {
+    navigator.share({ title: "Word Order Adventure", text }).catch(() => {});
+  } else {
+    navigator.clipboard.writeText(text).then(() => {
+      elements.successMessage.textContent = "Score copied to clipboard!";
+      elements.successMessage.className = "correct-msg";
+    }).catch(() => {});
+  }
+}
+
 // ===== Event Listeners =====
 elements.submitBtn.addEventListener("click", checkAnswer);
 elements.nextBtn.addEventListener("click", () => {
-  if (currentPuzzleIndex < puzzles.length - 1) currentPuzzleIndex++;
-  displayCurrentPuzzle();
+  if (currentPuzzleIndex < puzzles.length - 1) {
+    currentPuzzleIndex++;
+    displayCurrentPuzzle();
+  }
 });
 elements.prevBtn.addEventListener("click", () => {
-  if (currentPuzzleIndex > 0) currentPuzzleIndex--;
-  displayCurrentPuzzle();
+  if (currentPuzzleIndex > 0) {
+    currentPuzzleIndex--;
+    displayCurrentPuzzle();
+  }
 });
 elements.hintBtn.addEventListener("click", showHint);
 elements.tryAgainBtn.addEventListener("click", revealAnswer);
@@ -555,39 +725,110 @@ elements.resetBtn.addEventListener("click", resetQuiz);
 elements.listenBtn.addEventListener("click", () => speak(INSTRUCTIONS));
 elements.fullscreenBtn.addEventListener("click", toggleFullscreen);
 elements.themeToggle.addEventListener("click", toggleTheme);
-elements.pauseTimerBtn.addEventListener("click", togglePauseTimer);
 elements.helpBtn.addEventListener("click", () => {
+  tutorialStep = 0;
+  updateTutorialDisplay();
   elements.tutorialOverlay.classList.remove("hidden");
 });
-elements.timerMode.addEventListener("change", (e) => {
-  timerEnabled = e.target.checked;
-  localStorage.setItem("timerMode", timerEnabled);
-  // Show/hide pause button based on timer mode
-  elements.pauseTimerBtn.style.display = timerEnabled ? "" : "none";
-  if (!timerEnabled) stopTimer();
-});
+
+// Sound toggle
+if (elements.soundToggle) {
+  elements.soundToggle.addEventListener("click", toggleSound);
+}
+
+// Tutorial buttons
+elements.tutorialNext.addEventListener("click", advanceTutorial);
+if (elements.tutorialSkip) {
+  elements.tutorialSkip.addEventListener("click", closeTutorial);
+}
+
+// Level select
 elements.levelSelect.addEventListener("change", async (e) => {
   currentLevel = e.target.value;
   localStorage.setItem("currentLevel", currentLevel);
   await resetQuiz();
 });
-elements.tutorialNext.addEventListener("click", () => {
-  elements.tutorialOverlay.classList.add("hidden");
-  localStorage.setItem("tutorialSeen", "yes");
+
+// Game mode
+if (elements.modeBtn) {
+  elements.modeBtn.addEventListener("click", showModeSelector);
+}
+
+// Mode card selection
+document.querySelectorAll(".mode-card").forEach((card) => {
+  card.addEventListener("click", () => {
+    const mode = card.dataset.mode;
+    setGameMode(mode);
+    hideModeSelector();
+    resetQuiz();
+  });
 });
+
+// Close mode selector on overlay click
+if (elements.modeSelectorOverlay) {
+  elements.modeSelectorOverlay.addEventListener("click", (e) => {
+    if (e.target === elements.modeSelectorOverlay) hideModeSelector();
+  });
+}
+
+// Session complete buttons
+if (elements.sessionPlayAgain) {
+  elements.sessionPlayAgain.addEventListener("click", () => {
+    elements.sessionCompleteOverlay.classList.add("hidden");
+    resetQuiz();
+  });
+}
+if (elements.sessionNextLevel) {
+  elements.sessionNextLevel.addEventListener("click", () => {
+    elements.sessionCompleteOverlay.classList.add("hidden");
+    const levels = ["p1", "p2", "p3", "p4", "p5", "p6"];
+    const nextIdx = levels.indexOf(currentLevel) + 1;
+    if (nextIdx < levels.length) {
+      currentLevel = levels[nextIdx];
+      localStorage.setItem("currentLevel", currentLevel);
+      elements.levelSelect.value = currentLevel;
+    }
+    resetQuiz();
+  });
+}
+
+// Share button
+if (elements.shareBtn) {
+  elements.shareBtn.addEventListener("click", shareScore);
+}
+
+// Resume audio on first interaction
+document.addEventListener("click", resumeAudio, { once: true });
+document.addEventListener("touchstart", resumeAudio, { once: true });
 
 // ===== Load Settings =====
 function loadSettings() {
   const storedTheme = localStorage.getItem("theme");
-  if (storedTheme === "light") {
-    elements.body.classList.add("light-theme");
+  if (storedTheme === "dark") {
+    elements.body.classList.add("dark-theme");
+    const icon = elements.themeToggle.querySelector("i");
+    if (icon) icon.className = "fa-solid fa-sun";
   }
-  timerEnabled = JSON.parse(localStorage.getItem("timerMode") || "false");
-  elements.timerMode.checked = timerEnabled;
-  elements.pauseTimerBtn.style.display = timerEnabled ? "" : "none";
+
+  // Sound
+  const storedSound = localStorage.getItem("soundEnabled");
+  if (storedSound === "false") {
+    setSoundEnabled(false);
+    const icon = elements.soundToggle?.querySelector("i");
+    if (icon) icon.className = "fa-solid fa-volume-xmark";
+  }
+
+  // Game mode
+  const storedMode = localStorage.getItem("gameMode") || "practice";
+  setGameMode(storedMode);
+
+  // Tutorial
   if (!localStorage.getItem("tutorialSeen")) {
+    tutorialStep = 0;
+    updateTutorialDisplay();
     elements.tutorialOverlay.classList.remove("hidden");
   }
+
   elements.levelSelect.value = currentLevel;
 }
 
@@ -613,21 +854,21 @@ function animateProgressBar(percent) {
 
 function fireConfetti() {
   if (!window.gsap) return;
-  const colors = ["#ff6b6b", "#ffd93d", "#6bcb77", "#4d96ff", "#ff922b", "#cc5de8"];
-  for (let i = 0; i < 30; i++) {
+  const colors = ["#6C63FF", "#00C853", "#FFB300", "#FF5252", "#26C6DA", "#AB47BC"];
+  for (let i = 0; i < 40; i++) {
     const conf = document.createElement("div");
     conf.className = "confetti-piece";
     conf.style.left = Math.random() * 100 + "%";
     conf.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
-    conf.style.width = (6 + Math.random() * 8) + "px";
-    conf.style.height = (6 + Math.random() * 8) + "px";
+    conf.style.width = (6 + Math.random() * 10) + "px";
+    conf.style.height = (6 + Math.random() * 10) + "px";
     conf.style.borderRadius = Math.random() > 0.5 ? "50%" : "2px";
     document.body.appendChild(conf);
     gsap.to(conf, {
       y: "100vh",
-      x: (Math.random() - 0.5) * 200,
+      x: (Math.random() - 0.5) * 300,
       rotation: Math.random() * 720,
-      duration: 1.2 + Math.random() * 0.8,
+      duration: 1.5 + Math.random() * 1,
       ease: "power1.out",
       onComplete: () => conf.remove(),
     });
